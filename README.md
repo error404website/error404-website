@@ -31,17 +31,17 @@ Four chapters. Twenty recovered files. One transmission.
 ## Screens
 
 <p align="center">
-  <img src="docs/screenshot-hero.png" alt="Hero: the outline-cut ERROR_404 logo over the skyline artwork, with the REC timecode gutter" width="100%" />
+  <img src="docs/screenshot-hero.png" alt="Hero: the outline ERROR_404 logo lit from inside by the flashlight over the skyline artwork, the REC timecode gutter, and the player dock playing 08 ENDLESS_GLOW" width="100%" />
 </p>
 
 <table>
   <tr>
-    <td width="72%"><img src="docs/screenshot-catalogue.png" alt="Catalogue: ARCHIVE_404 heading and the ORIGIN chapter card with its player" /></td>
-    <td width="28%"><img src="docs/screenshot-mobile.png" alt="Phone: hero with the prompt menu icon" /></td>
+    <td width="72%"><img src="docs/screenshot-catalogue.png" alt="Catalogue: THE FEED chapter card with hyperpop · metalcore · 2-step tags, the gradient play key, waveform and tracklist, with the dock below" /></td>
+    <td width="28%"><img src="docs/screenshot-mobile.png" alt="Phone: hero with the HYPERPOP MAXIMALISM tagline, the distressed menu icon and the dock playing 07 GOSPEL_OUT" /></td>
   </tr>
   <tr>
-    <td align="center"><sub>Catalogue: chapter cards with built-in players</sub></td>
-    <td align="center"><sub>Phone</sub></td>
+    <td align="center"><sub>Catalogue: chapter cards with built-in players, and the dock on every page</sub></td>
+    <td align="center"><sub>Phone: the hyperpop tagline and the dock</sub></td>
   </tr>
 </table>
 
