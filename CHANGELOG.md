@@ -3,6 +3,20 @@
 All notable changes to the ERROR_404 website are recorded here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow the album releases.
 
+## [Unreleased]
+
+### Changed
+
+- Favicon is now the gradient "4" on a transparent background, so Safari no longer shows a white rim around a dark tile. The small sizes are slightly bolder so the 4 stays legible at 16 px.
+- Tab icons no longer list the black-tile 192/512 PNGs, which Chrome could pick over the transparent icon. Those now live only in the manifest.
+
+### Added
+
+- Safari pinned-tab icon (`safari-pinned-tab.svg`, tinted magenta).
+- Android maskable icon, with the 4 inside the safe zone so launchers don't crop it.
+- `apple-touch-icon-precomposed.png` for older iOS and other apps that request it.
+- The 404 page now carries the full icon set.
+
 ## [1.0.0] — 2026-10-04
 
 The first release of the ARCHIVE_404 site from source.
