@@ -16,10 +16,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - BOOKING · ↓ DOWNLOAD button is slimmer so it sits in proportion with the nav: 44 → 34 px in the nav (centred in the 80 px bar) and 54 → 46 px in the mobile menu (still above the 44 px tap minimum).
 - BOOKING · ↓ DOWNLOAD button (nav and mobile menu) restyled as "holo foil": an iridescent magenta/violet/cyan/silver edge that slowly rotates, a soft glow, and a holographic sheen across each half on hover. It is the same size as before, the rotation runs on the GPU, and it respects Reduce Motion.
+- Holo foil on every primary button, matching the nav: chapter DOWNLOAD ▸ (now 34 px on desktop and tablet, 44 px on phones), TRANSMIT once the form is valid, the download pop-up button, and the 404 page's RETURN TO THE ARCHIVE. Their hover sheen now sweeps by background position rather than transform, so Safari can't paint it outside the button.
 - Chapter descriptions (and the expanded file notes) now run the full width of the card instead of stopping at 640 px.
 - Favicon is now the gradient "4" on a transparent background, so Safari no longer shows a white rim around a dark tile. The small sizes are slightly bolder so the 4 stays legible at 16 px.
 - Tab icons no longer list the black-tile 192/512 PNGs, which Chrome could pick over the transparent icon. Those now live only in the manifest.
-- Holo foil on every primary button, matching the nav: chapter DOWNLOAD ▸ (now 34 px on desktop and tablet, 44 px on phones), TRANSMIT once the form is valid, the download pop-up button, and the 404 page's RETURN TO THE ARCHIVE. Their hover sheen now sweeps by background position rather than transform, so Safari can't paint it outside the button.
 
 ### Fixed
 
