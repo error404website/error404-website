@@ -1,5 +1,6 @@
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import React from "react";
+import { TaglineSwap } from "./TaglineSwap";
 
 function ParticleField() {
   const canvasRef = React.useRef(null);
@@ -249,7 +250,7 @@ export function Hero() {
               }}
               className="font-body font-light text-ghost/40 text-[clamp(0.78rem,2vw,1rem)] tracking-[0.1em] text-center"
             >
-              SOMETHING SURVIVED THE CRASH
+              <TaglineSwap />
             </motion.p>
           </div>
         </motion.div>

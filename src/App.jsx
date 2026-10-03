@@ -8,6 +8,7 @@ import { Footer } from "./components/Footer";
 import { Gutters } from "./components/Gutters";
 import { Hero } from "./components/Hero";
 import { Nav } from "./components/Nav";
+import { PlayerDock } from "./components/PlayerDock";
 import { Signal } from "./components/Signal";
 
 export default function App() {
@@ -50,6 +51,7 @@ export default function App() {
             <Signal />
           </main>
           <Footer />
+          <PlayerDock />
           <DownloadModal open={downloadOpen} onClose={closeDownload} />
           <Gutters />
         </>
