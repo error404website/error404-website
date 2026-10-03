@@ -117,6 +117,13 @@ Everything lives in [`src/data/chapters.js`](src/data/chapters.js):
 
 Put the MP3 in `public/audio/` under the same name. CI fails the build if a listed track file is missing.
 
+### Updating the audio
+
+1. Replace the file in `public/audio/`, keeping its snake_case name (e.g. `07 gospel_out.mp3` → `gospel_out.mp3`).
+2. Update that track's `duration` in `src/data/chapters.js` if the length changed.
+3. Nothing else: each build stamps every track with a hash of its contents (`?v=…`, see `vite.config.js` and `src/lib/audioSrc.js`), so listeners get the new file straight away instead of a copy from their 30-day browser cache.
+4. For a new album download, publish a new GitHub Release with the zip (see Deployment). The download button always points at the latest release.
+
 ### Developer switches
 
 | Parameter   | Effect                                                                      |

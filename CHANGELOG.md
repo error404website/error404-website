@@ -16,6 +16,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- GOSPEL_OUT: new mix from the v6 masters (now 3:43, was 3:45). The other 19 tracks have identical audio; their only change is a new genre tag, so they stay as they are on the site.
+- Audio cache-busting: every track URL now carries a hash of its file (`?v=…`), stamped at build time, so a replaced mix reaches returning listeners immediately instead of after the 30-day browser cache expires.
 - Genres updated across the site to hyperpop first, then metalcore and 2-step: the chapter-card tags (were UK Grime · Future Garage · Hyperpop Metal), the Collective "SOUND" line and About paragraph, the page keywords and the README.
 - Player dock now uses the nav's exact black (#000) with no top line (it was #07080F with a grey hairline), so the page is framed by two identical bars. The play key's inside, the queue pop-up and the phone sheet match. Its dim text is nudged up to stay as readable on the darker black: chapter line 25 → 38 %, times 20 → 32 %, skip icons 45 → 55 %, plus a slightly brighter seek track, waveform, queue border and queue numbers/durations.
 - Mobile menu icon is now properly distressed. The torn-prompt texture was too light to see at 22 px, so the `>_` and ✕ now have a bolder stroke (3, up from 2.6), stronger torn edges (displacement 1.9, up from 0.9, with finer grain) and small chipped-ink marks.
