@@ -64,7 +64,6 @@ function ChapterPlayer({ chapter, accent, accentB, cardIndex }) {
   const [currentTime, setCurrentTime] = React.useState(0);
   const [duration, setDuration] = React.useState(0);
   const track = chapter.tracks[trackIndex];
-  const cardStyle = CARD_STYLES[cardIndex];
   React.useEffect(() => {
     const E = audioRef.current;
     if (E) {
@@ -77,6 +76,8 @@ function ChapterPlayer({ chapter, accent, accentB, cardIndex }) {
         E.play().catch(() => {});
       }
     }
+    // Only reload when the track changes; play/pause is handled by the effect below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trackIndex]);
   React.useEffect(() => {
     const E = audioRef.current;
@@ -285,7 +286,6 @@ function ChapterCard({ chapter, index, onDownload }) {
   const [accentA, accentB] = CHAPTER_ACCENTS[index % CHAPTER_ACCENTS.length];
   const cardStyle = CARD_STYLES[index % CARD_STYLES.length];
   const isWreckage = index === 2;
-  const isWhole = index === 3;
   return (
     <motion.div
       ref={cardRef}

@@ -59,7 +59,9 @@ export function BootSequence({ onComplete }) {
     setFlashKey((x) => x + 1);
     try {
       sessionStorage.setItem("e404-intro", "1");
-    } catch {}
+    } catch {
+      // Storage can be blocked (e.g. Safari Private Browsing); the intro simply plays again next visit.
+    }
     onComplete();
   }, [onComplete]);
   React.useEffect(() => {

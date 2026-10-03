@@ -41,7 +41,7 @@ function SignalMeter({ sent }) {
             animate={
               sent
                 ? {
-                    scaleY: [1, 1.4 + Math.random() * 0.6, 1],
+                    scaleY: [1, 1.4 + ((i * 37) % 10) * 0.06, 1],
                     opacity: [0.4, 0.9, 0.4],
                   }
                 : {

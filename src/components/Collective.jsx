@@ -375,7 +375,7 @@ export function Collective() {
                 }
               </p>
               <p>
-                The collective's work combines crushing sub-bass, distorted guitars, glitch-driven
+                The collective&apos;s work combines crushing sub-bass, distorted guitars, glitch-driven
                 electronics, live instrumentation and cinematic visuals to create performances that feel
                 equally at home in a club, festival field, concert hall or underground warehouse. Every
                 release is presented as a recovered transmission. Every performance is an act of memory
