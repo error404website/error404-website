@@ -256,7 +256,7 @@ function ChapterPlayer({ chapter, accent, accentB, cardIndex }) {
                     repeat: 1 / 0,
                   }}
                 >
-                  ▶
+                  {"\u25B6\uFE0E"}
                 </motion.span>
               ) : (
                 String(E.number).padStart(2, "0")

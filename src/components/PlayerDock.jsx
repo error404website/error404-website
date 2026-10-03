@@ -29,6 +29,27 @@ function save(i, t) {
   }
 }
 
+// Drawn icons (option S2, "terminal chevrons": square-capped strokes like the >_ menu icon).
+// SVGs rather than the ⏮ ⏭ ☰ ✕ characters, which iOS swaps for coloured emoji.
+const Icon = ({ d }) => (
+  <svg
+    viewBox="0 0 16 16"
+    width="16"
+    height="16"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="square"
+    aria-hidden="true"
+  >
+    <path d={d} />
+  </svg>
+);
+const PREV = "M8 3.5L3.5 8 8 12.5M13 3.5L8.5 8 13 12.5";
+const NEXT = "M3 3.5L7.5 8 3 12.5M8 3.5L12.5 8 8 12.5";
+const QUEUE = "M2.5 4h11M2.5 8h11M2.5 12h7";
+const CLOSE = "M4 4l8 8M12 4l-8 8";
+
 function PlayKey({ playing, onClick, label }) {
   return (
     <button
@@ -214,7 +235,7 @@ export function PlayerDock() {
               onClick={() => setQueueOpen(false)}
               aria-label="Close queue"
             >
-              ✕
+              <Icon d={CLOSE} />
             </button>
           </div>
           <div className="e-dock-ql" ref={listRef}>
@@ -242,7 +263,7 @@ export function PlayerDock() {
                         " w-full flex items-center gap-3 text-left focus:outline-none"
                       }
                     >
-                      <span className="e-dock-n">{cur && playing ? "▶" : pad(t.number)}</span>
+                      <span className="e-dock-n">{cur && playing ? "\u25B6\uFE0E" : pad(t.number)}</span>
                       <span className={"e-trk-t flex-1 truncate" + (cur ? " cur" : "")}>{t.title}</span>
                       <span className="e-dock-d">{t.duration}</span>
                     </button>
@@ -268,10 +289,10 @@ export function PlayerDock() {
               onClick={prev}
               aria-label="Previous track"
             >
-              ⏮
+              <Icon d={PREV} />
             </button>
             <button type="button" className="e-dock-sk e-dock-next" onClick={next} aria-label="Next track">
-              ⏭
+              <Icon d={NEXT} />
             </button>
             <div className="e-dock-who">
               <p className="e-dock-tt">{title}</p>
@@ -317,7 +338,7 @@ export function PlayerDock() {
               <span className="e-dock-led" aria-hidden="true" />
               <span className="e-dock-qlbl">QUEUE {pad(index + 1)} / 20</span>
               <span className="e-dock-qico" aria-hidden="true">
-                ☰
+                <Icon d={QUEUE} />
               </span>
             </button>
           </div>

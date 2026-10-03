@@ -32,6 +32,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Fixed
 
+- Player dock icons render the same on every device. The ⏮ ⏭ ☰ ✕ characters, which iPhones and iPads turned into coloured emoji, are now drawn SVGs: thin square-capped « » chevrons, queue lines and close cross, matching the >_ menu icon. The ▶ playing-track marker in the dock queue and the chapter tracklists is forced to text style for the same reason.
 - Logo effects update straight away for returning visitors. `logo-fx.js` is served from `/assets/` (cached for a week, no hashed name), so browsers could keep running an old copy after a deploy. Its `<script>` tag is now stamped with a hash of the file at build time (`?v=…`), which changes only when the file does.
 - Logo flashlight (closing logo, and now back on the hero alongside the Signal Overload glitch): its purple glow no longer spills onto the background. It is now masked to the letter shapes, so the light only shows inside the cut-out (slightly brighter there to compensate), and it follows the cursor by moving the gradient, not a layer, so nothing can escape in Safari.
 - Holo-foil button: in Safari its rotating foil layer escaped the button and painted a large gradient across the nav and hero. The foil now animates inside the button's own 1 px border (an animated `@property` angle), and the hover sheen is clipped with `clip-path`, so nothing can draw outside the button.

@@ -2608,6 +2608,8 @@ body {
 }
 .e-dock-sk {
   flex: none;
+  display: grid;
+  place-items: center;
   width: 32px;
   height: 44px;
   font-size: 13px;
@@ -2730,8 +2732,12 @@ body {
 }
 .e-dock-qico {
   display: none;
-  font-size: 14px;
   letter-spacing: 0;
+}
+.e-dock-qico svg,
+.e-dock-sk svg,
+.e-dock-qx svg {
+  display: block;
 }
 .e-dock-line {
   display: none;
@@ -2774,6 +2780,8 @@ body {
   margin-left: auto;
 }
 .e-dock-qx {
+  display: grid;
+  place-items: center;
   width: 32px;
   height: 32px;
   margin: -8px -8px -8px 0;
