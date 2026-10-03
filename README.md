@@ -9,6 +9,7 @@ Four chapters. Twenty recovered files. One transmission.
 
 <br />
 
+[![Live](https://img.shields.io/website?url=https%3A%2F%2Ferror404.run&style=flat-square&label=error404.run&up_message=live&up_color=4ade80&down_color=FF00E5&labelColor=030409)](https://error404.run)
 [![CI](https://github.com/error404website/error404-website/actions/workflows/ci.yml/badge.svg)](https://github.com/error404website/error404-website/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/error404website/error404-website?style=flat-square&label=ARCHIVE_404&color=FF00E5&labelColor=030409)](https://github.com/error404website/error404-website/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/error404website/error404-website/total?style=flat-square&label=downloads&color=00EFFF&labelColor=030409)](https://github.com/error404website/error404-website/releases/latest)
@@ -20,7 +21,7 @@ Four chapters. Twenty recovered files. One transmission.
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-030409?style=flat-square&logo=tailwindcss&logoColor=00EFFF)](https://tailwindcss.com)
 [![Netlify](https://img.shields.io/badge/hosted%20on-Netlify-030409?style=flat-square&logo=netlify&logoColor=00EFFF)](https://www.netlify.com)
 
-**[↓ Download the album](https://github.com/error404website/error404-website/releases/latest/download/ARCHIVE_404.zip)** · **[Releases](https://github.com/error404website/error404-website/releases)** · **[Changelog](CHANGELOG.md)**
+**[▶ error404.run](https://error404.run)** · **[↓ Download the album](https://github.com/error404website/error404-website/releases/latest/download/ARCHIVE_404.zip)** · **[Releases](https://github.com/error404website/error404-website/releases)** · **[Changelog](CHANGELOG.md)**
 
 </div>
 
