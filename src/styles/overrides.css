@@ -1384,7 +1384,8 @@
 
 /* global scale support: keep full-screen sections full-screen when the site is zoomed */
 .hero-vh {
-  min-height: calc(100vh / var(--ez, 1));
+  /* the hero ends where the player dock begins, so its tagline and scroll cue stay visible */
+  min-height: calc(100vh / var(--ez, 1) - var(--dock-h, 0px));
 }
 
 /* fluid scale: browsers don't rescale vw/vh under CSS zoom, so full-window sizes are divided by the scale */
@@ -2545,4 +2546,360 @@ body {
   .e-fx-glitch .fx-s2 {
     display: none;
   }
+}
+
+/* ===== hero tagline swap (TaglineSwap): RGB flicker while it scrambles ===== */
+.e-swap-glitch {
+  text-shadow:
+    -2px 0 rgba(255, 0, 229, 0.8),
+    2px 0 rgba(0, 239, 255, 0.8);
+}
+
+/* =================== site player dock (PlayerDock) ===================
+   Fixed to the bottom of every page; same parts as the chapter players
+   (holo .e-playbtn, .e-trk rows, gradient seek). Desktop: one row with seek,
+   waveform and a queue popover. Phones: key + title + skip + queue, a glowing
+   progress line on top, and the queue as a bottom sheet. */
+:root {
+  --dock-h: 68px;
+}
+@media (max-width: 767px) {
+  :root {
+    --dock-h: 64px;
+  }
+}
+.e-dock-spacer {
+  height: calc(var(--dock-h) + env(safe-area-inset-bottom));
+}
+.e-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  font-family:
+    Space Mono,
+    monospace;
+}
+.e-dock-bar {
+  position: relative;
+  background: rgba(7, 8, 15, 0.96);
+  border-top: 1px solid rgba(244, 244, 248, 0.08);
+  padding-bottom: env(safe-area-inset-bottom);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.e-dock-row {
+  max-width: 80rem;
+  margin: 0 auto;
+  height: var(--dock-h);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 24px;
+}
+.e-dock .e-playbtn {
+  width: 44px;
+  height: 44px;
+}
+.e-dock-sk {
+  flex: none;
+  width: 32px;
+  height: 44px;
+  font-size: 13px;
+  color: rgba(244, 244, 248, 0.45);
+  transition: color 0.2s;
+}
+.e-dock-sk:hover,
+.e-dock-sk:focus-visible {
+  color: #f4f4f8;
+  outline: none;
+}
+.e-dock-who {
+  width: 220px;
+  min-width: 0;
+  flex: none;
+}
+.e-dock-tt {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: rgba(244, 244, 248, 0.8);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.e-dock-tc {
+  margin-top: 3px;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: rgba(244, 244, 248, 0.25);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.e-dock-mid {
+  flex: 1;
+  min-width: 0;
+}
+.e-dock-seek {
+  position: relative;
+  height: 2px;
+  background: rgba(244, 244, 248, 0.14);
+  cursor: pointer;
+}
+.e-dock-seek::before {
+  content: "";
+  position: absolute;
+  inset: -10px 0;
+}
+.e-dock-seek:focus-visible {
+  outline: 1px solid rgba(255, 0, 229, 0.6);
+  outline-offset: 6px;
+}
+.e-dock-seek b,
+.e-dock-line b {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #ff00e5, #00efff);
+  border-radius: 2px;
+}
+.e-dock-times {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 9px;
+  color: rgba(244, 244, 248, 0.2);
+  font-variant-numeric: tabular-nums;
+}
+.e-dock-wave {
+  flex: none;
+  width: 170px;
+  height: 28px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+.e-dock-wave i {
+  flex: 1;
+  min-width: 2px;
+  border-radius: 2px;
+  background: #ff00e5;
+  opacity: 0.1;
+  transition: opacity 0.4s;
+}
+.e-dock-wave i:nth-child(3n + 2) {
+  background: #00efff;
+}
+.e-dock-wave i.p {
+  opacity: 0.62;
+}
+.e-dock-qbtn {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(244, 244, 248, 0.16);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: rgba(244, 244, 248, 0.7);
+  white-space: nowrap;
+  transition:
+    border-color 0.2s,
+    color 0.2s;
+}
+.e-dock-qbtn:hover,
+.e-dock-qbtn:focus-visible,
+.q-open .e-dock-qbtn {
+  border-color: rgba(255, 0, 229, 0.5);
+  color: #f4f4f8;
+  outline: none;
+}
+.e-dock-led {
+  width: 5px;
+  height: 5px;
+  background: #4ade80;
+  box-shadow: 0 0 6px #4ade80;
+}
+.e-dock-qico {
+  display: none;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+.e-dock-line {
+  display: none;
+}
+/* queue */
+.e-dock-q {
+  position: absolute;
+  right: max(24px, calc((100vw - 80rem) / 2 + 24px));
+  bottom: calc(var(--dock-h) + env(safe-area-inset-bottom) + 10px);
+  width: 360px;
+  max-height: min(420px, 60vh);
+  display: flex;
+  flex-direction: column;
+  background: rgba(7, 8, 15, 0.97);
+  border: 1px solid rgba(244, 244, 248, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  pointer-events: none;
+  transition:
+    opacity 0.2s,
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.q-open .e-dock-q {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.e-dock-qh {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: rgba(244, 244, 248, 0.45);
+  border-bottom: 1px solid rgba(244, 244, 248, 0.06);
+}
+.e-dock-qpos {
+  margin-left: auto;
+}
+.e-dock-qx {
+  width: 32px;
+  height: 32px;
+  margin: -8px -8px -8px 0;
+  color: rgba(244, 244, 248, 0.6);
+  font-size: 12px;
+}
+.e-dock-ql {
+  position: relative;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 0, 229, 0.4) transparent;
+}
+.e-dock-ch {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 16px 6px;
+  font-size: 8.5px;
+  letter-spacing: 0.3em;
+  color: rgba(244, 244, 248, 0.45);
+  border-top: 1px solid rgba(244, 244, 248, 0.05);
+}
+.e-dock-ch b {
+  font-weight: 400;
+  color: #ff00e5;
+}
+.e-dock-ql > div:first-child .e-dock-ch {
+  border-top: 0;
+}
+.e-dock-q .e-trk {
+  min-height: 40px;
+  padding: 0 16px 0 18px;
+}
+.e-dock-n {
+  width: 20px;
+  flex: none;
+  font-size: 10px;
+  color: rgba(244, 244, 248, 0.2);
+  font-variant-numeric: tabular-nums;
+}
+.e-dock-q .e-trk.cur .e-dock-n {
+  color: #ff00e5;
+}
+.e-dock.playing .e-trk.cur .e-dock-n {
+  animation: e-dock-blink 1s steps(1) infinite;
+}
+@keyframes e-dock-blink {
+  50% {
+    opacity: 0.3;
+  }
+}
+.e-dock-d {
+  flex: none;
+  font-size: 9px;
+  color: rgba(244, 244, 248, 0.15);
+}
+/* tablet: drop the waveform */
+@media (max-width: 1023px) {
+  .e-dock-wave {
+    display: none;
+  }
+  .e-dock-who {
+    width: 180px;
+  }
+}
+/* phones */
+@media (max-width: 767px) {
+  .e-dock-row {
+    gap: 8px;
+    padding: 0 12px;
+  }
+  .e-dock-prev,
+  .e-dock-mid,
+  .e-dock-qlbl,
+  .e-dock-led {
+    display: none;
+  }
+  .e-dock-who {
+    flex: 1;
+    width: auto;
+    order: 1;
+  }
+  .e-dock-next {
+    order: 2;
+  }
+  .e-dock-qbtn {
+    order: 3;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+  .e-dock-qico {
+    display: block;
+  }
+  .e-dock-line {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -1px;
+    height: 2px;
+    background: rgba(244, 244, 248, 0.08);
+  }
+  .e-dock-line b {
+    box-shadow: 0 0 8px #ff00e5;
+  }
+  .e-dock-q {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-height: none;
+    height: 78vh;
+    height: 78dvh;
+    border-radius: 18px 18px 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    transform: translate3d(0, 100%, 0);
+    z-index: 2;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .e-dock-q {
+    transition: none;
+  }
+  .e-dock.playing .e-trk.cur .e-dock-n {
+    animation: none;
+  }
+}
+/* the wide-screen telemetry gutters stop above the dock */
+.e-gut {
+  bottom: var(--dock-h);
 }

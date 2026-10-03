@@ -7,6 +7,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Added
 
+- Site player dock: a player fixed to the bottom of every page (desktop and mobile) that plays the whole archive in order, 01 → 20 and round again, styled like the chapter players (holo ▶ key, "01 — ORIGIN" + chapter, gradient seek and times, waveform). Its queue lists all 20 tracks by chapter: a popover on desktop, a bottom sheet on phones. It hands over to and from the chapter players, remembers the track and position between visits, and shows lock-screen / headphone controls. The hero now ends where the dock begins, and the wide-screen gutters stop above it.
+- Hero tagline: every few seconds "SOMETHING SURVIVED THE CRASH" scrambles into "HYPERPOP MAXIMALISM" and back, in the same type and colour, with an RGB flicker while it changes (ARCHIVE_404 above it keeps its gradient). Screen readers get both lines; Reduce Motion keeps the original line.
 - Safari pinned-tab icon (`safari-pinned-tab.svg`, tinted magenta).
 - Android maskable icon, with the 4 inside the safe zone so launchers don't crop it.
 - `apple-touch-icon-precomposed.png` for older iOS and other apps that request it.
