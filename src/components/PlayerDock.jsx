@@ -12,14 +12,20 @@ const BARS = [
 const STORE = "e404-dock";
 const pad = (n) => String(n).padStart(2, "0");
 
+// First-time visitors start on GOSPEL_OUT; returning visitors resume where they left off.
+const DEFAULT_INDEX = Math.max(
+  0,
+  TRACKS.findIndex((t) => t.title === "GOSPEL_OUT"),
+);
+
 function readSaved() {
   try {
     const s = JSON.parse(localStorage.getItem(STORE) || "null");
     if (s && Number.isInteger(s.i) && s.i >= 0 && s.i < TRACKS.length) return s;
   } catch {
-    // Storage can be blocked (e.g. Safari Private Browsing); start from track 01.
+    // Storage can be blocked (e.g. Safari Private Browsing); start on the default track.
   }
-  return { i: 0, t: 0 };
+  return { i: DEFAULT_INDEX, t: 0 };
 }
 
 function save(i, t) {

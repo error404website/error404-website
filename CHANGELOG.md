@@ -16,6 +16,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Player dock: first-time visitors now start on 07 GOSPEL_OUT (was 01 ORIGIN) on every device, carrying on in album order from there. Returning visitors still resume their last track and position.
 - Intro: removed the bottom loading bar, both corner frame ticks and the visible SKIP button, leaving just the tracklist rain and the readout. Tapping anywhere or pressing any key still skips, and the SKIP button stays available to screen readers, appearing only when it is focused.
 - GOSPEL_OUT: final mix from the v6 masters (3:45), replacing the earlier v6 version (3:43). The other 19 tracks are unchanged (their v6 files differ only by the added genre tag).
 - New intro, "the tracklist falls": matrix code rain whose columns stream the album's 20 track names in the magenta → cyan palette with white-hot heads, while a terminal readout counts "> RECOVERING ARCHIVE_404 · FILE 07/20 GOSPEL_OUT … 20/20 FILES INTACT". The streams then drain and the intro fades into the hero. It lasts about 4 s, is skippable (tap, key or SKIP), plays once per visit, and Reduce Motion skips it. It replaces the THE FUTURE FAILED / THE ARCHIVE REMEMBERED cold open.
