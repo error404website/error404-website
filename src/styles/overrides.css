@@ -2901,3 +2901,55 @@ body {
 .e-gut {
   bottom: var(--dock-h);
 }
+
+/* ===== intro M3: terminal readout over the tracklist rain (BootSequence) ===== */
+.e-bterm {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  padding: 18px 22px;
+  min-width: min(440px, calc(100vw - 48px));
+  background: rgba(3, 4, 9, 0.78);
+  border: 1px solid rgba(244, 244, 248, 0.12);
+  font-family:
+    Space Mono,
+    monospace;
+  font-size: clamp(11px, 1.3vw, 15px);
+  letter-spacing: 0.08em;
+  line-height: 2;
+  color: #f4f4f8;
+  white-space: nowrap;
+  text-shadow: 0 0 10px rgba(255, 0, 229, 0.5);
+  transition: opacity 0.4s;
+}
+.e-bterm.out {
+  opacity: 0;
+}
+.e-bterm b {
+  font-weight: 400;
+  color: #ff00e5;
+}
+.e-bterm i {
+  font-style: normal;
+  color: #00efff;
+}
+.e-bterm-t {
+  margin-left: 1.4em;
+  color: rgba(244, 244, 248, 0.6);
+}
+.e-bterm-cur {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.1em;
+  margin-top: 4px;
+  background: linear-gradient(90deg, #ff00e5, #00efff);
+  vertical-align: -0.2em;
+  animation: e4-blink 1s steps(1) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .e-bterm-cur {
+    animation: none;
+  }
+}

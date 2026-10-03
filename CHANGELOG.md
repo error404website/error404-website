@@ -16,6 +16,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- New intro, "the tracklist falls": matrix code rain whose columns stream the album's 20 track names in the magenta → cyan palette with white-hot heads, while a terminal readout counts "> RECOVERING ARCHIVE_404 · FILE 07/20 GOSPEL_OUT … 20/20 FILES INTACT". The streams then drain and the intro fades into the hero. It lasts about 4 s, is skippable (tap, key or SKIP), plays once per visit, and Reduce Motion skips it. It replaces the THE FUTURE FAILED / THE ARCHIVE REMEMBERED cold open.
 - Play buttons (dock and all four chapter players) lose their holo-foil box: the ▶ and ❚❚ are now the icon alone in the magenta → cyan gradient, with a soft gradient glow on hover and while playing, still in a 44 px tap target. The dock's QUEUE button and phone queue icon lose their bordered box too.
 - GOSPEL_OUT: new mix from the v6 masters (now 3:43, was 3:45). The other 19 tracks have identical audio; their only change is a new genre tag, so they stay as they are on the site.
 - Audio cache-busting: every track URL now carries a hash of its file (`?v=…`), stamped at build time, so a replaced mix reaches returning listeners immediately instead of after the 30-day browser cache expires.
