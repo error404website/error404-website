@@ -60,7 +60,7 @@ npm run preview        # serve the build locally
 npm run format         # auto-format everything with Prettier
 ```
 
-Requires Node 20 (see `.nvmrc`).
+Requires Node 22 LTS (see `.nvmrc`).
 
 ### Project structure
 
@@ -109,7 +109,7 @@ Put the MP3 in `public/audio/` under the same name. CI fails the build if a list
 
 ## Deployment
 
-The site deploys automatically on **Netlify** from the `main` branch. `netlify.toml` sets the build (`npm run build` → `dist`, Node 20), long-term caching for hashed bundles, fonts and audio, and security headers.
+The site deploys automatically on **Netlify** from the `main` branch. `netlify.toml` sets the build (`npm run build` → `dist`, Node 22), long-term caching for hashed bundles, fonts and audio, and security headers.
 
 **The album download** (`ARCHIVE_404.zip`, about 160 MB) is too large for git, so it's attached to the [latest GitHub Release](https://github.com/error404website/error404-website/releases/latest). The site links to `/releases/latest/download/ARCHIVE_404.zip`, so publishing a new release with a new zip updates the download automatically:
 
