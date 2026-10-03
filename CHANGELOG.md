@@ -5,6 +5,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Fixed
+
+- Page weight: the four chapter players no longer download their first track when the page loads (about 16 MB of MP3s on every visit). Audio now loads only when you press play, so a phone visit drops from about 17 MB to about 0.6 MB.
+- Fonts no longer block the first paint: the Google Fonts stylesheet loads in the background, with a `<noscript>` fallback.
+- Images: the brand-kit logos show 900 px previews (31 KB each) and still download at full size, the collective portrait serves an 800 px version on phones, and both carry their width and height so the layout doesn't jump.
+- Accessibility: the page now has a heading for screen readers, the nav logo link, colour swatches and queue button announce the same words they show, and the nav's ARCHIVE_404 tag, inactive nav links and the dock's chapter line and times are a little brighter to meet contrast guidelines.
+- Removed four unused artwork paths from the tracklist data.
+
 ## [1.1.0] — 2026-10-03
 
 The hyperpop redesign: a new intro and hero, a site-wide player, v6 audio and a refreshed design system.

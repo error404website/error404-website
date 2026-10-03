@@ -95,6 +95,7 @@ export function Hero() {
       aria-label="Archive 404 — hero"
       className="e-hero hero-vh relative w-full overflow-hidden flex flex-col items-center justify-center"
     >
+      <h1 className="sr-only">ERROR_404 — ARCHIVE_404, a hyperpop album in four chapters</h1>
       <motion.div
         className="absolute inset-0 w-full h-[118%] -top-[9%]"
         style={{

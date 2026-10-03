@@ -331,7 +331,7 @@ export function PlayerDock() {
               onClick={() => setQueueOpen((o) => !o)}
               aria-expanded={queueOpen}
               aria-controls="e-dock-queue"
-              aria-label="Queue"
+              aria-label={`QUEUE ${pad(index + 1)} / 20`}
             >
               <span className="e-dock-led" aria-hidden="true" />
               <span className="e-dock-qlbl">QUEUE {pad(index + 1)} / 20</span>

@@ -105,7 +105,6 @@ export function Nav({ onDownloadOpen }) {
               });
             }}
             className="shrink-0 group"
-            aria-label="ERROR404 — back to top"
           >
             <span className="e4-lock">
               <img
@@ -122,11 +121,12 @@ export function Nav({ onDownloadOpen }) {
                 }}
               />
               <span aria-hidden={true} className="e4-lock-div" />
-              <span aria-hidden={true} className="e4-lock-tag">
+              <span className="e4-lock-tag">
                 ARCHIVE
                 <br />
                 _404
               </span>
+              <span className="sr-only"> — back to top</span>
             </span>
           </a>
           <div ref={linksRef} className="hidden lg:flex items-center gap-1">
