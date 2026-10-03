@@ -179,7 +179,7 @@ export function Nav({ onDownloadOpen }) {
               aria-expanded={menuOpen}
             >
               <span className="e4-ic" aria-hidden={true}>
-                {/* "torn prompt": the >_ with ink-bled edges from a light displacement filter */}
+                {/* distressed "torn prompt": the >_ with torn, ink-bled edges (displacement filter) and chipped ink */}
                 <svg className="e4-p" viewBox="0 0 24 24" fill="none">
                   <defs>
                     <linearGradient
@@ -193,52 +193,59 @@ export function Nav({ onDownloadOpen }) {
                       <stop offset="0" stopColor="#FF00E5" />
                       <stop offset="1" stopColor="#00EFFF" />
                     </linearGradient>
-                    <filter id="e4-torn-p" x="-20%" y="-20%" width="140%" height="140%">
-                      <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="3" seed="3" />
+                    <filter id="e4-torn-p" x="-25%" y="-25%" width="150%" height="150%">
+                      <feTurbulence type="fractalNoise" baseFrequency="0.62" numOctaves="3" seed="4" />
                       <feDisplacementMap
                         in="SourceGraphic"
-                        scale="0.9"
+                        scale="1.9"
                         xChannelSelector="R"
                         yChannelSelector="G"
                       />
                     </filter>
                   </defs>
                   <g filter="url(#e4-torn-p)">
-                    <path
-                      d="M3 5.5l7.2 6.5L3 18.5"
-                      stroke="#F4F4F8"
-                      strokeWidth="2.6"
-                      strokeLinecap="square"
-                    />
+                    <path d="M3 5.5l7.2 6.5L3 18.5" stroke="#F4F4F8" strokeWidth="3" strokeLinecap="square" />
                     <rect
                       className="e4-cur"
                       x="12"
-                      y="16.2"
+                      y="15.9"
                       width="9.5"
-                      height="2.6"
+                      height="3"
                       fill="url(#e4-cur-grad)"
+                    />
+                    {/* ink chips */}
+                    <path
+                      d="M5.1 7.6l1.2-.4M8.6 10.9l.9.9M5.4 16.2l1.3.2M15.2 17.6v-.9M18.8 17.7v-.8"
+                      stroke="#000"
+                      strokeWidth=".8"
                     />
                   </g>
                 </svg>
                 <svg className="e4-x" viewBox="0 0 24 24" fill="none">
                   <defs>
-                    <filter id="e4-torn-x" x="-20%" y="-20%" width="140%" height="140%">
-                      <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="3" seed="5" />
+                    <filter id="e4-torn-x" x="-25%" y="-25%" width="150%" height="150%">
+                      <feTurbulence type="fractalNoise" baseFrequency="0.62" numOctaves="3" seed="5" />
                       <feDisplacementMap
                         in="SourceGraphic"
-                        scale="0.9"
+                        scale="1.9"
                         xChannelSelector="R"
                         yChannelSelector="G"
                       />
                     </filter>
                   </defs>
-                  <path
-                    d="M4.5 4.5l15 15M19.5 4.5l-15 15"
-                    stroke="#F4F4F8"
-                    strokeWidth="2.6"
-                    strokeLinecap="square"
-                    filter="url(#e4-torn-x)"
-                  />
+                  <g filter="url(#e4-torn-x)">
+                    <path
+                      d="M4.5 4.5l15 15M19.5 4.5l-15 15"
+                      stroke="#F4F4F8"
+                      strokeWidth="3"
+                      strokeLinecap="square"
+                    />
+                    <path
+                      d="M7.4 6.6l.9.9M15.6 8.4l.8-.8M8.3 16.2l.8-.8M16.5 16.6l-.8-.8"
+                      stroke="#000"
+                      strokeWidth=".8"
+                    />
+                  </g>
                 </svg>
               </span>
             </button>

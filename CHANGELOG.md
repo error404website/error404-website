@@ -16,6 +16,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Mobile menu icon is now properly distressed. The torn-prompt texture was too light to see at 22 px, so the `>_` and ✕ now have a bolder stroke (3, up from 2.6), stronger torn edges (displacement 1.9, up from 0.9, with finer grain) and small chipped-ink marks.
 - Logo flashlight (hero and closing) now moves on its own: it drifts across the letters in a smooth loop and no longer follows the mouse or touch.
 - Intro and hero: "Signal Overload". The hero logo is now a plain outline cut-out over the artwork (the flashlight reveal is gone). Every 4–6 s it corrupts for half a second: magenta/cyan outline copies jump off-register, two slices shear sideways, and the artwork splits into colour channels. Scanlines and a slow VHS tracking band sit over the hero. The intro keeps its two lines and timing, but each line now arrives RGB-split and jittering over heavier static, with scanlines and a tracking roll. The closing logo keeps its flashlight. Reduce Motion turns all of it off, and nothing flashes the screen.
 - Mobile menu icon is now the "torn prompt": the same `>_` and ✕, with a heavier stroke and ink-bled, hand-cut edges (a light SVG displacement filter) to match the logo. The gradient cursor still blinks, and the tap target is still 44 px.
