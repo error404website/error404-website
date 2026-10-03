@@ -27,6 +27,25 @@ Four chapters. Twenty recovered files. One transmission.
 
 ---
 
+## Screens
+
+<p align="center">
+  <img src="docs/screenshot-hero.png" alt="Hero: the spotlight-reveal ERROR_404 logo over the skyline artwork, with the REC timecode gutter" width="100%" />
+</p>
+
+<table>
+  <tr>
+    <td width="72%"><img src="docs/screenshot-catalogue.png" alt="Catalogue: ARCHIVE_404 heading and the ORIGIN chapter card with its player" /></td>
+    <td width="28%"><img src="docs/screenshot-mobile.png" alt="Phone: hero with the prompt menu icon" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Catalogue: chapter cards with built-in players</sub></td>
+    <td align="center"><sub>Phone</sub></td>
+  </tr>
+</table>
+
+---
+
 ## The archive
 
 | Chapter             | Tracks                                                              |
