@@ -2149,3 +2149,73 @@ body {
     display: none;
   }
 }
+
+/* ===== primary buttons (.e-b1): same holo foil as the BOOKING · DOWNLOAD split =====
+   Chapter DOWNLOAD, TRANSMIT (once the form is valid) and the download pop-up.
+   The sheen sweeps by background-position, not transform, so it stays a plain paint
+   that overflow:hidden clips in every browser (a transformed sheen escapes in Safari)
+   while the outer glow is left unclipped. */
+.e-b1 {
+  background:
+    linear-gradient(var(--e-void-2), var(--e-void-2)) padding-box,
+    conic-gradient(from var(--e-foil), #ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5) border-box;
+  border: 1px solid transparent;
+  animation: e-foil-spin 6s linear infinite;
+  box-shadow:
+    0 0 22px -6px rgba(255, 0, 229, 0.55),
+    0 0 40px -12px rgba(0, 239, 255, 0.5);
+}
+.e-b1:hover {
+  box-shadow:
+    0 0 26px -4px rgba(255, 0, 229, 0.7),
+    0 0 48px -10px rgba(0, 239, 255, 0.6);
+}
+.e-b1::after {
+  transform: none;
+  background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgba(255, 0, 229, 0.22) 46%,
+      rgba(255, 255, 255, 0.35) 50%,
+      rgba(0, 239, 255, 0.22) 54%,
+      transparent 60%
+    )
+    100% 0 / 300% 100% no-repeat;
+  mix-blend-mode: screen;
+  transition: background-position 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.e-b1:hover::after,
+.e-b1:focus-visible::after {
+  transform: none;
+  background-position: 0% 0;
+}
+/* chapter player ▶ buttons: foil edge when paused; while a track plays the whole
+   button fills with the rotating foil (the dark pause bars sit on top) */
+.e-playbtn {
+  background:
+    linear-gradient(#07080f, #07080f) padding-box,
+    conic-gradient(from var(--e-foil), #ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5) border-box;
+  border: 1px solid transparent;
+  animation: e-foil-spin 6s linear infinite;
+  box-shadow:
+    0 0 18px -6px rgba(255, 0, 229, 0.55),
+    0 0 32px -12px rgba(0, 239, 255, 0.5);
+}
+.e-playbtn.on {
+  background: conic-gradient(from var(--e-foil), #ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5) border-box;
+  animation-duration: 3s;
+  box-shadow:
+    0 0 22px -4px rgba(255, 0, 229, 0.7),
+    0 0 40px -10px rgba(0, 239, 255, 0.6);
+}
+.e-playbtn:hover {
+  box-shadow:
+    0 0 24px -4px rgba(255, 0, 229, 0.7),
+    0 0 44px -10px rgba(0, 239, 255, 0.6);
+}
+@media (prefers-reduced-motion: reduce) {
+  .e-b1,
+  .e-playbtn {
+    animation: none;
+  }
+}
