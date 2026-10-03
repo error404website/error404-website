@@ -57,21 +57,21 @@ export function Nav({ onDownloadOpen }) {
   }, []);
   // While the menu is open: stop the page behind it from scrolling (a stray swipe
   // on iOS moves the toolbar and resizes the overlay mid-wipe), close on Escape,
-  // and once the wipe has finished, pause the hidden animations behind it.
+  // and tell the hero's canvas/spotlight loops to skip drawing. That's a plain JS
+  // flag rather than a class, so opening never triggers a page-wide style recalc.
   const menuRef = React.useRef(null);
   React.useEffect(() => {
     if (!menuOpen) return;
-    const root = document.documentElement;
     const menu = menuRef.current;
     const block = (e) => e.preventDefault();
     const onKey = (e) => e.key === "Escape" && setMenuOpen(false);
     menu?.addEventListener("touchmove", block, { passive: false });
     menu?.addEventListener("wheel", block, { passive: false });
     window.addEventListener("keydown", onKey);
-    const settle = setTimeout(() => root.classList.add("menu-open"), 500);
+    const settle = setTimeout(() => (window.__e404MenuOpen = true), 300);
     return () => {
       clearTimeout(settle);
-      root.classList.remove("menu-open");
+      window.__e404MenuOpen = false;
       menu?.removeEventListener("touchmove", block);
       menu?.removeEventListener("wheel", block);
       window.removeEventListener("keydown", onKey);

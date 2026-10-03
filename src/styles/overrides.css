@@ -37,18 +37,19 @@
     opacity: 0;
   }
 }
-/* mobile menu: always mounted; the slat wipe and fade are CSS transitions on
-   transform/opacity, so they run on the GPU even while the page is busy */
+/* mobile menu: always mounted and always painted (closed = slats parked off-screen,
+   content at opacity 0, inert), so the first tap doesn't wait on drawing it. The
+   slat wipe and fade are CSS transitions on transform/opacity, run on the GPU. */
 .e4-menu {
-  visibility: hidden;
   pointer-events: none;
   overscroll-behavior: contain;
-  transition: visibility 0s 0.65s;
 }
 .e4-menu.is-open {
-  visibility: visible;
   pointer-events: auto;
-  transition: none;
+}
+.e4-menu:not(.is-open) *,
+.e4-menu:not(.is-open) *::after {
+  animation-play-state: paused;
 }
 .e4-sl {
   position: absolute;
@@ -58,7 +59,7 @@
   height: calc(100% / 6 + 1px);
   background: #030409;
   transform: translate3d(-101%, 0, 0);
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i) * 35ms);
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i) * 15ms);
   will-change: transform;
   backface-visibility: hidden;
 }
@@ -82,22 +83,28 @@
   padding: calc(64px + 28px) 32px calc(40px + env(safe-area-inset-bottom));
   background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0 1px, transparent 1px 3px);
   opacity: 0;
-  transition: opacity 0.15s;
+  transition: opacity 0.1s;
   will-change: opacity;
 }
 .e4-menu.is-open .e4-inner {
   opacity: 1;
-  transition: opacity 0.2s 0.3s;
+  transition: opacity 0.16s 0.1s;
 }
-/* once the wipe has finished, everything hidden behind the menu stops animating */
-html.menu-open main *,
-html.menu-open footer * {
-  animation-play-state: paused !important;
+/* links rise in while the slats are still landing */
+.e4-nav {
+  transform: translate3d(0, 8px, 0);
+  transition: transform 0.1s;
+}
+.e4-menu.is-open .e4-nav {
+  transform: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
 }
 @media (prefers-reduced-motion: reduce) {
   .e4-sl,
   .e4-inner,
-  .e4-menu.is-open .e4-inner {
+  .e4-nav,
+  .e4-menu.is-open .e4-inner,
+  .e4-menu.is-open .e4-nav {
     transition-duration: 0.01s;
     transition-delay: 0s;
   }
