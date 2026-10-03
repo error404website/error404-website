@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import React from "react";
 
 const NAV_LINKS = [
@@ -55,16 +55,40 @@ export function Nav({ onDownloadOpen }) {
     window.addEventListener("resize", u);
     return () => window.removeEventListener("resize", u);
   }, []);
+  // While the menu is open: stop the page behind it from scrolling (a stray swipe
+  // on iOS moves the toolbar and resizes the overlay mid-wipe), close on Escape,
+  // and once the wipe has finished, pause the hidden animations behind it.
+  const menuRef = React.useRef(null);
+  React.useEffect(() => {
+    if (!menuOpen) return;
+    const root = document.documentElement;
+    const menu = menuRef.current;
+    const block = (e) => e.preventDefault();
+    const onKey = (e) => e.key === "Escape" && setMenuOpen(false);
+    menu?.addEventListener("touchmove", block, { passive: false });
+    menu?.addEventListener("wheel", block, { passive: false });
+    window.addEventListener("keydown", onKey);
+    const settle = setTimeout(() => root.classList.add("menu-open"), 500);
+    return () => {
+      clearTimeout(settle);
+      root.classList.remove("menu-open");
+      menu?.removeEventListener("touchmove", block);
+      menu?.removeEventListener("wheel", block);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
   const scrollToSection = (u, d) => {
     u.preventDefault();
     const f = document.getElementById(d.replace("#", ""));
-    if (f) {
-      f.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
     setMenuOpen(false);
+    if (f) {
+      requestAnimationFrame(() =>
+        f.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        }),
+      );
+    }
   };
   return (
     <>
@@ -180,104 +204,65 @@ export function Nav({ onDownloadOpen }) {
           </div>
         </div>
       </nav>
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-label="Mobile navigation"
-            className="e4-menu fixed inset-0 z-40 md:hidden overflow-hidden"
-            initial="closed"
-            animate="open"
-            exit="closed"
-            key="mobile-overlay"
-          >
-            {[0, 1, 2, 3, 4, 5].map((u) => (
-              <motion.div
-                className="e4-sl"
-                style={{
-                  top: `${(u * 100) / 6}%`,
-                }}
-                variants={{
-                  closed: {
-                    x: u % 2 ? "101%" : "-101%",
-                  },
-                  open: {
-                    x: "0%",
-                  },
-                }}
-                transition={{
-                  duration: 0.45,
-                  ease: [0.16, 1, 0.3, 1],
-                  delay: u * 0.035,
-                }}
-                key={u}
-              />
-            ))}
-            <motion.div
-              className="e4-inner"
-              variants={{
-                closed: {
-                  opacity: 0,
-                  transition: {
-                    duration: 0.15,
-                  },
-                },
-                open: {
-                  opacity: 1,
-                  transition: {
-                    duration: 0.2,
-                    delay: 0.3,
-                  },
-                },
+      {/* Always mounted, so opening never waits on React building it. The slat wipe
+          and fade are CSS transitions (GPU), toggled by .is-open. */}
+      <div
+        ref={menuRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Mobile navigation"
+        aria-hidden={!menuOpen}
+        inert={menuOpen ? undefined : ""}
+        className={"e4-menu fixed inset-0 z-40 md:hidden overflow-hidden" + (menuOpen ? " is-open" : "")}
+      >
+        {[0, 1, 2, 3, 4, 5].map((u) => (
+          <div className="e4-sl" style={{ "--i": u }} key={u} />
+        ))}
+        <div className="e4-inner">
+          <div className="e4-sys">
+            <span
+              className="e8c"
+              style={{
+                "--c": "#FF00E5",
               }}
             >
-              <div className="e4-sys">
-                <span
-                  className="e8c"
-                  style={{
-                    "--c": "#FF00E5",
-                  }}
-                >
-                  <i />
-                  <span>SYS::OPEN</span>
+              <i />
+              <span>SYS::OPEN</span>
+            </span>
+          </div>
+          <nav className="e4-nav" aria-label="Mobile navigation links">
+            {NAV_LINKS.map(({ label, href }, f) => (
+              <a
+                href={href}
+                onClick={(p) => scrollToSection(p, href)}
+                className={"e4c-link" + (activeHref === href ? " active" : "")}
+                aria-current={activeHref === href ? "location" : undefined}
+                key={href}
+              >
+                <span className="e4c-l font-heading">{label}</span>
+                <span className="e4c-s">
+                  <b>{String(f + 1).padStart(2, "0")}</b>
+                  {["THE ALBUM", "WHO WE ARE", "20 RECOVERED FILES", "BOOK THE SHOW"][f]}
                 </span>
-              </div>
-              <nav className="e4-nav" aria-label="Mobile navigation links">
-                {NAV_LINKS.map(({ label, href }, f) => (
-                  <a
-                    href={href}
-                    onClick={(p) => scrollToSection(p, href)}
-                    className={"e4c-link" + (activeHref === href ? " active" : "")}
-                    aria-current={activeHref === href ? "location" : undefined}
-                    key={href}
-                  >
-                    <span className="e4c-l font-heading">{label}</span>
-                    <span className="e4c-s">
-                      <b>{String(f + 1).padStart(2, "0")}</b>
-                      {["THE ALBUM", "WHO WE ARE", "20 RECOVERED FILES", "BOOK THE SHOW"][f]}
-                    </span>
-                  </a>
-                ))}
-              </nav>
-              <span className="e-split e-split-menu">
-                <a href="#signal" onClick={(u) => scrollToSection(u, "#signal")} className="e-split-bk">
-                  BOOKING
-                </a>
-                <button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    onDownloadOpen();
-                  }}
-                  className="e-split-dl"
-                >
-                  ↓ DOWNLOAD
-                </button>
-              </span>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              </a>
+            ))}
+          </nav>
+          <span className="e-split e-split-menu">
+            <a href="#signal" onClick={(u) => scrollToSection(u, "#signal")} className="e-split-bk">
+              BOOKING
+            </a>
+            <button
+              onClick={() => {
+                setMenuOpen(false);
+                onDownloadOpen();
+              }}
+              className="e-split-dl"
+            >
+              ↓ DOWNLOAD
+            </button>
+          </span>
+        </div>
+      </div>
     </>
   );
 }

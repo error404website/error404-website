@@ -59,7 +59,7 @@
     window.addEventListener('pointermove', e => visible && track(e.clientX, e.clientY), { passive: true });
     window.addEventListener('touchmove', e => visible && e.touches[0] && track(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
     (function loop(t) {
-      if (visible) {
+      if (visible && !document.documentElement.classList.contains('menu-open')) {
         const r = layer.getBoundingClientRect();
         if (t - last > 1500) { tx = r.width / 2 + Math.sin(t / 1700) * r.width * .42; ty = r.height / 2 + Math.sin(t / 1100) * r.height * .6; }
         x = x === null ? tx : lerp(x, tx, .12); y = y === null ? ty : lerp(y, ty, .12);
