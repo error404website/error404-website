@@ -37,12 +37,36 @@
     opacity: 0;
   }
 }
+/* mobile menu: always mounted; the slat wipe and fade are CSS transitions on
+   transform/opacity, so they run on the GPU even while the page is busy */
+.e4-menu {
+  visibility: hidden;
+  pointer-events: none;
+  overscroll-behavior: contain;
+  transition: visibility 0s 0.65s;
+}
+.e4-menu.is-open {
+  visibility: visible;
+  pointer-events: auto;
+  transition: none;
+}
 .e4-sl {
   position: absolute;
   left: 0;
   right: 0;
+  top: calc(var(--i) * 100% / 6);
   height: calc(100% / 6 + 1px);
   background: #030409;
+  transform: translate3d(-101%, 0, 0);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--i) * 35ms);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+.e4-sl:nth-child(even) {
+  transform: translate3d(101%, 0, 0);
+}
+.e4-menu.is-open .e4-sl {
+  transform: translate3d(0, 0, 0);
 }
 .e4-sl:nth-child(odd) {
   border-right: 1px solid rgba(255, 0, 229, 0.5);
@@ -57,6 +81,26 @@
   flex-direction: column;
   padding: calc(64px + 28px) 32px calc(40px + env(safe-area-inset-bottom));
   background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.015) 0 1px, transparent 1px 3px);
+  opacity: 0;
+  transition: opacity 0.15s;
+  will-change: opacity;
+}
+.e4-menu.is-open .e4-inner {
+  opacity: 1;
+  transition: opacity 0.2s 0.3s;
+}
+/* once the wipe has finished, everything hidden behind the menu stops animating */
+html.menu-open main *,
+html.menu-open footer * {
+  animation-play-state: paused !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .e4-sl,
+  .e4-inner,
+  .e4-menu.is-open .e4-inner {
+    transition-duration: 0.01s;
+    transition-delay: 0s;
+  }
 }
 .e4-sys {
   display: flex;
