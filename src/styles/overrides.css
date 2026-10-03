@@ -2069,3 +2069,86 @@ body {
 .e-date input[data-empty]:not(:focus) + .e-date-ph {
   visibility: visible;
 }
+
+/* ===== split button: 01 holo foil =====
+   An iridescent foil edge (a conic gradient rotated with transform, so the GPU spins
+   it without repainting) and a holographic sheen that sweeps each half on hover. */
+.e-split {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 1px;
+  border: 0;
+  background: none;
+  box-shadow:
+    0 0 22px -6px rgba(255, 0, 229, 0.55),
+    0 0 40px -12px rgba(0, 239, 255, 0.5);
+}
+.e-split::before {
+  content: "";
+  position: absolute;
+  inset: -400%;
+  z-index: -1;
+  background: conic-gradient(#ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5);
+  animation: e-foil-spin 6s linear infinite;
+  will-change: transform;
+}
+@keyframes e-foil-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+.e-split-bk,
+.e-split-dl {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0d0e18, #06070d);
+}
+.e-split-bk {
+  border-right-color: rgba(244, 244, 248, 0.12);
+}
+.e-split-dl {
+  background: linear-gradient(180deg, #151026, #08070f);
+}
+.e-split-bk::after,
+.e-split-dl::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 0, 229, 0.22) 45%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(0, 239, 255, 0.22) 55%,
+    transparent 65%
+  );
+  mix-blend-mode: screen;
+  transform: translateX(-120%);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.e-split-bk:hover::after,
+.e-split-dl:hover::after,
+.e-split-bk:focus-visible::after,
+.e-split-dl:focus-visible::after {
+  transform: translateX(120%);
+}
+.e-split-bk:hover {
+  background:
+    linear-gradient(rgba(74, 222, 128, 0.06), rgba(74, 222, 128, 0.06)),
+    linear-gradient(180deg, #0d0e18, #06070d);
+}
+.e-split-dl:hover {
+  background:
+    linear-gradient(rgba(255, 0, 229, 0.1), rgba(255, 0, 229, 0.1)), linear-gradient(180deg, #151026, #08070f);
+}
+@media (prefers-reduced-motion: reduce) {
+  .e-split::before {
+    animation: none;
+  }
+  .e-split-bk::after,
+  .e-split-dl::after {
+    display: none;
+  }
+}
