@@ -2583,11 +2583,15 @@ body {
 }
 .e-dock-bar {
   position: relative;
-  background: rgba(7, 8, 15, 0.96);
-  border-top: 1px solid rgba(244, 244, 248, 0.08);
+  /* the nav's exact black, no top line: the page is framed by two identical bars */
+  background: #000;
   padding-bottom: env(safe-area-inset-bottom);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+}
+/* the play key's inside matches the bar (paused state; playing fills with foil) */
+.e-dock .e-playbtn:not(.on) {
+  background:
+    linear-gradient(#000, #000) padding-box,
+    conic-gradient(from var(--e-foil), #ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5) border-box;
 }
 .e-dock-row {
   max-width: 80rem;
@@ -2607,7 +2611,7 @@ body {
   width: 32px;
   height: 44px;
   font-size: 13px;
-  color: rgba(244, 244, 248, 0.45);
+  color: rgba(244, 244, 248, 0.55);
   transition: color 0.2s;
 }
 .e-dock-sk:hover,
@@ -2632,7 +2636,7 @@ body {
   margin-top: 3px;
   font-size: 9px;
   letter-spacing: 0.2em;
-  color: rgba(244, 244, 248, 0.25);
+  color: rgba(244, 244, 248, 0.38);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2644,7 +2648,7 @@ body {
 .e-dock-seek {
   position: relative;
   height: 2px;
-  background: rgba(244, 244, 248, 0.14);
+  background: rgba(244, 244, 248, 0.18);
   cursor: pointer;
 }
 .e-dock-seek::before {
@@ -2670,7 +2674,7 @@ body {
   justify-content: space-between;
   margin-top: 6px;
   font-size: 9px;
-  color: rgba(244, 244, 248, 0.2);
+  color: rgba(244, 244, 248, 0.32);
   font-variant-numeric: tabular-nums;
 }
 .e-dock-wave {
@@ -2686,7 +2690,7 @@ body {
   min-width: 2px;
   border-radius: 2px;
   background: #ff00e5;
-  opacity: 0.1;
+  opacity: 0.14;
   transition: opacity 0.4s;
 }
 .e-dock-wave i:nth-child(3n + 2) {
@@ -2702,7 +2706,7 @@ body {
   gap: 8px;
   min-height: 34px;
   padding: 0 12px;
-  border: 1px solid rgba(244, 244, 248, 0.16);
+  border: 1px solid rgba(244, 244, 248, 0.2);
   font-size: 9px;
   letter-spacing: 0.24em;
   color: rgba(244, 244, 248, 0.7);
@@ -2741,8 +2745,8 @@ body {
   max-height: min(420px, 60vh);
   display: flex;
   flex-direction: column;
-  background: rgba(7, 8, 15, 0.97);
-  border: 1px solid rgba(244, 244, 248, 0.08);
+  background: #000;
+  border: 1px solid rgba(244, 244, 248, 0.1);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
   opacity: 0;
   transform: translate3d(0, 12px, 0);
@@ -2807,7 +2811,7 @@ body {
   width: 20px;
   flex: none;
   font-size: 10px;
-  color: rgba(244, 244, 248, 0.2);
+  color: rgba(244, 244, 248, 0.3);
   font-variant-numeric: tabular-nums;
 }
 .e-dock-q .e-trk.cur .e-dock-n {
@@ -2824,7 +2828,7 @@ body {
 .e-dock-d {
   flex: none;
   font-size: 9px;
-  color: rgba(244, 244, 248, 0.15);
+  color: rgba(244, 244, 248, 0.25);
 }
 /* tablet: drop the waveform */
 @media (max-width: 1023px) {
