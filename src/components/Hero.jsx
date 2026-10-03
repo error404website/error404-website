@@ -35,11 +35,10 @@ function ParticleField() {
       () => s(t.width, t.height),
     );
     let a;
-    const root = document.documentElement;
     const l = () => {
       a = requestAnimationFrame(l);
       // hidden under the open mobile menu: skip drawing
-      if (root.classList.contains("menu-open")) return;
+      if (window.__e404MenuOpen) return;
       n.clearRect(0, 0, t.width, t.height);
       for (const u of o) {
         u.x += u.vx;
