@@ -1,0 +1,13 @@
+# dependencies and build output
+node_modules/
+dist/
+
+# macOS metadata (the external drive creates ._ files next to everything)
+.DS_Store
+._*
+
+# local tooling
+.netlify/
+*.log
+.env
+.env.*

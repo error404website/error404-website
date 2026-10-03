@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<meta name="robots" content="noindex" />
+<title>404 — File not found · ERROR_404</title>
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="stylesheet" href="/fonts/fonts.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --void:#030409; --ghost:#F4F4F8; --t2:rgba(244,244,248,.7); --t3:rgba(244,244,248,.45); --t4:rgba(244,244,248,.28);
+    --hair2:rgba(244,244,248,.14); --magenta:#FF00E5; --cyan:#00EFFF; --violet:#A100FF;
+    --mono:'Space Mono',monospace; --head:'Bebas Neue',sans-serif; --grad:linear-gradient(90deg,var(--magenta),var(--cyan)); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { height:100%; background:var(--void); }
+  body { color:var(--ghost); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden;
+    background-image:radial-gradient(ellipse 60% 50% at 50% 42%, rgba(161,0,255,.14), transparent 65%); }
+  a { color:inherit; text-decoration:none; }
+  a:focus-visible { outline:1px solid var(--magenta); outline-offset:4px; }
+  .bar { position:fixed; top:0; left:0; right:0; height:64px; display:flex; align-items:center; padding:0 max(16px,env(safe-area-inset-left)); background:#000; z-index:2; }
+  .bar img { height:26px; width:auto; filter:drop-shadow(0 0 1.5px rgba(255,0,229,.7)) drop-shadow(0 0 10px rgba(161,0,255,.3)); }
+  .tick { position:fixed; width:16px; height:16px; z-index:1; }
+  .tick.tl { top:88px; left:24px; border-top:1px solid var(--magenta); border-left:1px solid var(--magenta); }
+  .tick.br { bottom:24px; right:24px; border-bottom:1px solid var(--cyan); border-right:1px solid var(--cyan); }
+  main { min-height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:112px 20px 64px; gap:22px; }
+  .chip { display:inline-flex; align-items:stretch; border:1px solid var(--hair2); font-family:var(--mono); font-size:8px; letter-spacing:.32em; text-transform:uppercase; line-height:1; }
+  .chip i { width:22px; display:grid; place-items:center; border-right:1px solid var(--hair2); }
+  .chip i::after { content:""; width:5px; height:5px; background:var(--magenta); box-shadow:0 0 6px var(--magenta); animation:pulse 1.2s steps(1) infinite; }
+  .chip span { padding:7px 10px; color:var(--t2); }
+  .big { font-family:var(--head); font-weight:400; font-size:clamp(7rem,30vw,16rem); line-height:.8; letter-spacing:.01em;
+    background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 0 2px rgba(255,0,229,.6)) drop-shadow(0 0 24px rgba(161,0,255,.35)); }
+  h1 { font-family:var(--head); font-weight:400; font-size:clamp(1.9rem,5vw,3rem); line-height:.95; letter-spacing:.02em; }
+  h1 em { font-style:normal; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .log { font-family:var(--mono); font-size:12px; line-height:2; color:var(--t3); text-align:left; letter-spacing:.06em; max-width:100%; }
+  .log b { color:var(--magenta); font-weight:400; margin-right:8px; }
+  .log .v { color:var(--t2); word-break:break-all; }
+  .log .ok { color:var(--cyan); }
+  .home { display:inline-flex; align-items:center; gap:10px; min-height:48px; padding:0 22px; margin-top:6px; font-family:var(--mono); font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:var(--ghost);
+    background:linear-gradient(#07080F,#07080F) padding-box, var(--grad) border-box; border:1px solid transparent; transition:box-shadow .25s; }
+  .home:hover { box-shadow:0 0 24px -6px rgba(255,0,229,.6); }
+  footer { position:fixed; bottom:0; left:0; right:0; padding:16px 24px calc(16px + env(safe-area-inset-bottom)); font-family:var(--mono); font-size:8px; letter-spacing:.32em; color:var(--t4); text-align:center; pointer-events:none; }
+  @keyframes pulse { 50% { opacity:.25; } }
+  @media (prefers-reduced-motion:reduce) { .chip i::after { animation:none; } }
+  @media (max-width:640px) { .tick.tl { top:80px; left:16px; } .tick.br { right:16px; bottom:16px; } }
+</style>
+</head>
+<body>
+  <header class="bar"><a href="/" aria-label="ERROR_404 — home"><img src="/assets/error404logo.svg" alt="ERROR404" width="1414" height="348" /></a></header>
+  <span class="tick tl" aria-hidden="true"></span><span class="tick br" aria-hidden="true"></span>
+  <main>
+    <span class="chip"><i></i><span>SIGNAL LOST</span></span>
+    <div class="big" aria-hidden="true">404</div>
+    <h1>THIS FILE DIDN'T SURVIVE THE <em>CRASH.</em></h1>
+    <div class="log" role="status">
+      <div><b>&gt;</b>REQUESTED <span class="v" id="path">/</span></div>
+      <div><b>&gt;</b>STATUS <span class="v">NOT_FOUND</span></div>
+      <div><b>&gt;</b>ARCHIVE_404 <span class="ok">20/20 FILES INTACT</span></div>
+    </div>
+    <a class="home" href="/">← RETURN TO THE ARCHIVE</a>
+  </main>
+  <footer>© ERROR_404</footer>
+  <script>document.getElementById('path').textContent = location.pathname + location.search;</script>
+</body>
+</html>
