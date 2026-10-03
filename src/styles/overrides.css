@@ -2224,7 +2224,8 @@ body {
 }
 
 /* =================== B · SIGNAL OVERLOAD: hero + intro ===================
-   Hero: the logo stays an outline cut-out over the art (no torch). Every 4–6 s
+   Hero: the logo is an outline cut-out over the art, with the torch reveal whose
+   light stays inside the letters (see .e-fx-bloom). Every 4–6 s
    (assets/logo-fx.js) it "corrupts" for ~0.5 s: magenta/cyan outline copies jump
    off-register, two slices shear sideways, and the artwork splits into colour
    channels. Scanlines and a VHS tracking band sit over the hero all the time.
@@ -2233,7 +2234,7 @@ body {
 .e-hero {
   clip-path: inset(0);
 }
-.e-fx-glitch path {
+.e-fx-glitch :is(.fx-base, .fx-gm, .fx-gc, .fx-s1, .fx-s2) path {
   fill: none;
   stroke: rgba(244, 244, 248, 0.62);
   stroke-width: 1.6;
@@ -2270,7 +2271,9 @@ body {
 .e-fx-glitch.burst .fx-s2 {
   animation: e-gl-s2 0.52s steps(1) both;
 }
-.e-fx-glitch.burst .fx-base {
+.e-fx-glitch.burst .fx-base,
+.e-fx-glitch.burst .fx-lit,
+.e-fx-glitch.burst .e-fx-bloom {
   animation: e-gl-base 0.52s steps(1) both;
 }
 @keyframes e-gl-m {

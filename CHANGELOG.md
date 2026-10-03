@@ -14,6 +14,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Logo flashlight (hero and closing) now moves on its own: it drifts across the letters in a smooth loop and no longer follows the mouse or touch.
 - Intro and hero: "Signal Overload". The hero logo is now a plain outline cut-out over the artwork (the flashlight reveal is gone). Every 4–6 s it corrupts for half a second: magenta/cyan outline copies jump off-register, two slices shear sideways, and the artwork splits into colour channels. Scanlines and a slow VHS tracking band sit over the hero. The intro keeps its two lines and timing, but each line now arrives RGB-split and jittering over heavier static, with scanlines and a tracking roll. The closing logo keeps its flashlight. Reduce Motion turns all of it off, and nothing flashes the screen.
 - Mobile menu icon is now the "torn prompt": the same `>_` and ✕, with a heavier stroke and ink-bled, hand-cut edges (a light SVG displacement filter) to match the logo. The gradient cursor still blinks, and the tap target is still 44 px.
 - BOOKING · ↓ DOWNLOAD button is slimmer so it sits in proportion with the nav: 44 → 34 px in the nav (centred in the 80 px bar) and 54 → 46 px in the mobile menu (still above the 44 px tap minimum).
@@ -26,7 +27,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Fixed
 
-- Closing logo flashlight: its purple glow no longer spills onto the background. It is now masked to the letter shapes, so the light only shows inside the cut-out (slightly brighter there to compensate), and it follows the cursor by moving the gradient, not a layer, so nothing can escape in Safari.
+- Logo flashlight (closing logo, and now back on the hero alongside the Signal Overload glitch): its purple glow no longer spills onto the background. It is now masked to the letter shapes, so the light only shows inside the cut-out (slightly brighter there to compensate), and it follows the cursor by moving the gradient, not a layer, so nothing can escape in Safari.
 - Holo-foil button: in Safari its rotating foil layer escaped the button and painted a large gradient across the nav and hero. The foil now animates inside the button's own 1 px border (an animated `@property` angle), and the hover sheen is clipped with `clip-path`, so nothing can draw outside the button.
 - Mobile menu opens about twice as fast: the links are readable after ~0.15 s (was ~0.5 s) and the slat wipe ends at 0.34 s (was 0.63 s). The page-wide "pause what's behind" step, which froze phones for a moment at the end of opening and the start of closing, is gone; only the hero particles and spotlight now skip drawing, through a flag that costs nothing. The menu is drawn at page load, so the first tap is as quick as the rest.
 - Mobile menu opens smoothly. It's now built once and kept ready instead of on every tap, and the six-slat wipe runs as GPU CSS transitions instead of frame-by-frame JavaScript. The page behind can't scroll while it's open (which on iPhone also moved the toolbar mid-wipe). Once the wipe finishes, the hidden hero particles, spotlight logo and looping animations pause. Escape closes it, and it respects Reduce Motion. The look is unchanged.
