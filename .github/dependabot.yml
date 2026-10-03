@@ -1,11 +1,17 @@
 version: 2
 updates:
+  # Safe updates only: minor and patch releases, grouped into one weekly PR.
+  # Major versions (e.g. React 19, Tailwind 4) need planned migration work,
+  # so they're ignored here and upgraded by hand.
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
         update-types: [minor, patch]

@@ -2,7 +2,7 @@
   "name": "error404-website",
   "private": true,
   "version": "1.0.0",
-  "description": "ERROR_404 \u2014 ARCHIVE_404 website",
+  "description": "ERROR_404 — ARCHIVE_404 website",
   "type": "module",
   "scripts": {
     "dev": "vite",
