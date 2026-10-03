@@ -1945,3 +1945,76 @@ body {
   box-shadow: none;
   filter: drop-shadow(0 0 8px rgba(255, 0, 229, 0.5));
 }
+
+/* form text colours: one placeholder grey for every field, the date field included */
+.e-input::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+/* date field: same box, text and colours as the text inputs on every browser */
+.e-date {
+  position: relative;
+}
+.e-date input[type="date"] {
+  display: block;
+  height: calc(1.5em + 2rem + 2px);
+  line-height: 1.5;
+  text-align: left;
+}
+.e-date input[type="date"]::-webkit-date-and-time-value {
+  margin: 0;
+  text-align: left;
+}
+.e-date input[type="date"]::-webkit-datetime-edit,
+.e-date input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  padding: 0;
+}
+.e-date input[type="date"]::-webkit-datetime-edit,
+.e-date input[type="date"]::-webkit-datetime-edit-text,
+.e-date input[type="date"]::-webkit-datetime-edit-day-field,
+.e-date input[type="date"]::-webkit-datetime-edit-month-field,
+.e-date input[type="date"]::-webkit-datetime-edit-year-field {
+  color: inherit;
+}
+.e-date input[type="date"]::-webkit-datetime-edit-day-field:focus,
+.e-date input[type="date"]::-webkit-datetime-edit-month-field:focus,
+.e-date input[type="date"]::-webkit-datetime-edit-year-field:focus {
+  background-color: rgba(255, 0, 229, 0.28);
+  color: #f4f4f8;
+  outline: none;
+}
+.e-date input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.4;
+  cursor: pointer;
+  filter: invert(1) grayscale(1);
+  transition: opacity 0.2s;
+}
+.e-date input[type="date"]:hover::-webkit-calendar-picker-indicator,
+.e-date input[type="date"]:focus::-webkit-calendar-picker-indicator {
+  opacity: 0.75;
+}
+/* empty and not being edited: hide the browser's own text and show ours */
+.e-date-ph {
+  position: absolute;
+  left: calc(1rem + 1px);
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: "Space Mono", monospace;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #9ca3af;
+  pointer-events: none;
+  white-space: nowrap;
+  visibility: hidden;
+}
+.e-date input[data-empty] {
+  color: #9ca3af;
+}
+.e-date input[data-empty]:not(:focus) {
+  color: transparent;
+  transition: none;
+}
+.e-date input[data-empty]:not(:focus) + .e-date-ph {
+  visibility: visible;
+}
