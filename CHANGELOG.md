@@ -19,6 +19,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - Chapter descriptions (and the expanded file notes) now run the full width of the card instead of stopping at 640 px.
 - Favicon is now the gradient "4" on a transparent background, so Safari no longer shows a white rim around a dark tile. The small sizes are slightly bolder so the 4 stays legible at 16 px.
 - Tab icons no longer list the black-tile 192/512 PNGs, which Chrome could pick over the transparent icon. Those now live only in the manifest.
+- BOOKING text is now 11 px, the same as DOWNLOAD and the nav links (it was 10 px).
 
 ### Fixed
 
