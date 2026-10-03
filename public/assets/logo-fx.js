@@ -1,12 +1,11 @@
 /* ERROR_404 logo behaviours
-   hero    : outline cut-out + spotlight reveal (light kept inside the letters) + "signal overload" glitch bursts every 4–6 s
+   hero    : outline cut-out + self-moving spotlight reveal (light kept inside the letters) + "signal overload" glitch bursts every 4–6 s
    nav     : signature draw-on (replays on hover)
-   closing : spotlight reveal (cursor torch, wanders when idle)
+   closing : spotlight reveal (torch drifts across the letters on its own)
    Attaches to the React-rendered logos once they mount; marks hosts with data-fx. */
 (() => {
   window.__efx = true;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const lerp = (a, b, t) => a + (b - a) * t;
   let VB, D, SUBS, uid = 0;
 
   const gradDef = id => `<defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="1414" y2="0"><stop offset=".585" stop-color="#F4F4F8"/><stop offset=".625" stop-color="#FF00E5"/><stop offset=".995" stop-color="#00EFFF"/></linearGradient></defs>`;
@@ -56,18 +55,14 @@
     torch(layer);
   }
 
-  /* ---------- torch: follows the pointer (wanders when idle); drives --x/--y/--r ---------- */
+  /* ---------- torch: drifts across the letters on its own (not cursor-driven); drives --x/--y/--r ---------- */
   function torch(layer) {
-    let tx = 0, ty = 0, x = null, y = null, last = -1e9, visible = false;
+    let visible = false;
     new IntersectionObserver(es => es.forEach(e => visible = e.isIntersecting)).observe(layer);
-    const track = (cx, cy) => { const r = layer.getBoundingClientRect(); tx = cx - r.left; ty = cy - r.top; last = performance.now(); };
-    window.addEventListener('pointermove', e => visible && track(e.clientX, e.clientY), { passive: true });
-    window.addEventListener('touchmove', e => visible && e.touches[0] && track(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
     (function loop(t) {
       if (visible && !window.__e404MenuOpen) {
         const r = layer.getBoundingClientRect();
-        if (t - last > 1500) { tx = r.width / 2 + Math.sin(t / 1700) * r.width * .42; ty = r.height / 2 + Math.sin(t / 1100) * r.height * .6; }
-        x = x === null ? tx : lerp(x, tx, .12); y = y === null ? ty : lerp(y, ty, .12);
+        const x = r.width / 2 + Math.sin(t / 1700) * r.width * .42, y = r.height / 2 + Math.sin(t / 1100) * r.height * .6;
         layer.style.setProperty('--x', x.toFixed(1) + 'px'); layer.style.setProperty('--y', y.toFixed(1) + 'px');
         layer.style.setProperty('--r', Math.max(110, r.width * .22).toFixed(0) + 'px');
       }
