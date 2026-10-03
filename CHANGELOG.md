@@ -5,6 +5,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-10-03
+
+The hyperpop redesign: a new intro and hero, a site-wide player, v6 audio and a refreshed design system.
+
 ### Added
 
 - Site player dock: a player fixed to the bottom of every page (desktop and mobile) that plays the whole archive in order, 01 → 20 and round again, styled like the chapter players (holo ▶ key, "01 — ORIGIN" + chapter, gradient seek and times, waveform). Its queue lists all 20 tracks by chapter: a popover on desktop, a bottom sheet on phones. It hands over to and from the chapter players, remembers the track and position between visits, and shows lock-screen / headphone controls. The hero now ends where the dock begins, and the wide-screen gutters stop above it.
@@ -49,7 +53,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 - SIGNAL form: the event-date field now matches the other fields on every browser and screen size. Empty, it shows a grey DD / MM / YYYY placeholder in the visitor's own date order; Safari used to show today's date in purple and white, and iPhones showed nothing. A chosen date is white like the other answers, the field is the same height as its neighbours, and the calendar icon and selected segment use the site's colours.
 - Placeholder grey is now set explicitly; the old class never compiled, so it fell back to Tailwind's default.
 
-## [1.0.0] — 2026-10-04
+## [1.0.0] — 2026-10-03
 
 The first release of the ARCHIVE_404 site from source.
 
@@ -73,4 +77,6 @@ The first release of the ARCHIVE_404 site from source.
 | 03 THE WRECKAGE | THE_WRECKAGE · READ · COME_HOME · CHANGED_THE_LOCK · DOWN_THE_FRONT |
 | 04 WHOLE        | WHOLE · ENOUGH · OPEN_SKY · ALL_OF_ME · BETTER_DAYS                 |
 
+[Unreleased]: https://github.com/error404website/error404-website/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/error404website/error404-website/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/error404website/error404-website/releases/tag/v1.0.0
