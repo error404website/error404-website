@@ -2219,3 +2219,324 @@ body {
     animation: none;
   }
 }
+
+/* =================== B · SIGNAL OVERLOAD: hero + intro ===================
+   Hero: the logo stays an outline cut-out over the art (no torch). Every 4–6 s
+   (assets/logo-fx.js) it "corrupts" for ~0.5 s: magenta/cyan outline copies jump
+   off-register, two slices shear sideways, and the artwork splits into colour
+   channels. Scanlines and a VHS tracking band sit over the hero all the time.
+   Everything moves by transform/opacity; the hero is clip-path'd so Safari can't
+   paint any of it outside the section. */
+.e-hero {
+  clip-path: inset(0);
+}
+.e-fx-glitch path {
+  fill: none;
+  stroke: rgba(244, 244, 248, 0.62);
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+}
+.e-fx-glitch .fx-gm path {
+  stroke: #ff00e5;
+}
+.e-fx-glitch .fx-gc path {
+  stroke: #00efff;
+}
+.e-fx-glitch .fx-gm,
+.e-fx-glitch .fx-gc,
+.e-fx-glitch .fx-s1,
+.e-fx-glitch .fx-s2 {
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+.e-fx-glitch .fx-s1 {
+  clip-path: inset(16% 0 58% 0);
+}
+.e-fx-glitch .fx-s2 {
+  clip-path: inset(60% 0 14% 0);
+}
+.e-fx-glitch.burst .fx-gm {
+  animation: e-gl-m 0.52s steps(1) both;
+}
+.e-fx-glitch.burst .fx-gc {
+  animation: e-gl-c 0.52s steps(1) both;
+}
+.e-fx-glitch.burst .fx-s1 {
+  animation: e-gl-s1 0.52s steps(1) both;
+}
+.e-fx-glitch.burst .fx-s2 {
+  animation: e-gl-s2 0.52s steps(1) both;
+}
+.e-fx-glitch.burst .fx-base {
+  animation: e-gl-base 0.52s steps(1) both;
+}
+@keyframes e-gl-m {
+  0% {
+    opacity: 0.9;
+    transform: translate(-1.1%, 2%);
+  }
+  25% {
+    transform: translate(1.4%, -1%);
+    clip-path: inset(8% 0 48% 0);
+  }
+  50% {
+    transform: translate(-0.6%, 0);
+    clip-path: inset(52% 0 6% 0);
+  }
+  75% {
+    transform: translate(0.5%, 1%);
+    clip-path: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+@keyframes e-gl-c {
+  0% {
+    opacity: 0.9;
+    transform: translate(1.1%, -2%);
+  }
+  25% {
+    transform: translate(-1.2%, 1%);
+    clip-path: inset(46% 0 12% 0);
+  }
+  50% {
+    transform: translate(0.8%, 0);
+    clip-path: inset(0 0 62% 0);
+  }
+  75% {
+    transform: translate(-0.4%, -1%);
+    clip-path: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+@keyframes e-gl-s1 {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(2.6%);
+  }
+  55% {
+    opacity: 1;
+    transform: translateX(-1.4%);
+  }
+  75% {
+    opacity: 0;
+  }
+}
+@keyframes e-gl-s2 {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+    transform: translateX(-3%);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(1.8%);
+  }
+  80% {
+    opacity: 0;
+  }
+}
+@keyframes e-gl-base {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  60% {
+    opacity: 0.35;
+  }
+  40% {
+    opacity: 0.8;
+  }
+}
+/* artwork colour channels */
+.e-art-ch {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+.e-art-ch.r {
+  filter: sepia(1) saturate(8) hue-rotate(-60deg);
+}
+.e-art-ch.c {
+  filter: sepia(1) saturate(8) hue-rotate(140deg);
+}
+.e-burst .e-art-ch.r {
+  animation: e-ch-r 0.52s steps(1) both;
+}
+.e-burst .e-art-ch.c {
+  animation: e-ch-c 0.52s steps(1) both;
+}
+@keyframes e-ch-r {
+  0% {
+    opacity: 0.5;
+    transform: translate(-1.2%, 0.3%);
+  }
+  35% {
+    opacity: 0.4;
+    transform: translate(1.6%, 0);
+  }
+  70% {
+    opacity: 0.45;
+    transform: translate(-0.6%, -0.3%);
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+@keyframes e-ch-c {
+  0% {
+    opacity: 0.45;
+    transform: translate(1.2%, -0.3%);
+  }
+  35% {
+    opacity: 0.4;
+    transform: translate(-1.4%, 0);
+  }
+  70% {
+    opacity: 0.45;
+    transform: translate(0.8%, 0.3%);
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+/* scanlines + tracking band */
+.e-hero-fx {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  clip-path: inset(0);
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px);
+}
+.e-hero-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 9%;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.05), rgba(255, 0, 229, 0.09), transparent);
+  transform: translateY(-120%);
+  animation: e-track 7s linear infinite;
+  will-change: transform;
+}
+@keyframes e-track {
+  to {
+    transform: translateY(1150%);
+  }
+}
+
+/* intro: each line arrives as an RGB-split, jittering transmission over static */
+.e-bl > span {
+  position: relative;
+}
+.e-bl > span::before,
+.e-bl > span::after {
+  content: attr(data-t);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.85;
+}
+.e-bl > span::before {
+  color: #ff00e5;
+  transform: translate(-0.06em, 0);
+  clip-path: inset(0 0 52% 0);
+}
+.e-bl > span::after {
+  color: #00efff;
+  transform: translate(0.06em, 0);
+  clip-path: inset(48% 0 0 0);
+}
+.e-bl.in > span::before {
+  animation: e-bl-m 0.2s steps(2) infinite;
+}
+.e-bl.in > span::after {
+  animation: e-bl-c 0.22s steps(2) infinite;
+}
+@keyframes e-bl-m {
+  0% {
+    transform: translate(-0.09em, 0.02em);
+    clip-path: inset(4% 0 58% 0);
+  }
+  100% {
+    transform: translate(0.05em, -0.01em);
+    clip-path: inset(38% 0 22% 0);
+  }
+}
+@keyframes e-bl-c {
+  0% {
+    transform: translate(0.08em, -0.02em);
+    clip-path: inset(60% 0 4% 0);
+  }
+  100% {
+    transform: translate(-0.06em, 0.01em);
+    clip-path: inset(12% 0 54% 0);
+  }
+}
+.e-bscan {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.3) 0 1px, transparent 1px 3px);
+}
+.e-btrack {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 12%;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.06), rgba(255, 0, 229, 0.12), transparent);
+  transform: translateY(-120%);
+  will-change: transform;
+}
+.e-boot.run .e-btrack {
+  animation: e-btrack 1.6s linear infinite;
+}
+@keyframes e-btrack {
+  to {
+    transform: translateY(900%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .e-hero-track,
+  .e-btrack,
+  .e-bl.in > span::before,
+  .e-bl.in > span::after {
+    animation: none;
+  }
+  .e-art-ch,
+  .e-fx-glitch .fx-gm,
+  .e-fx-glitch .fx-gc,
+  .e-fx-glitch .fx-s1,
+  .e-fx-glitch .fx-s2 {
+    display: none;
+  }
+}
