@@ -1,5 +1,5 @@
 /* ERROR_404 logo behaviours
-   hero    : spotlight reveal (same as closing, stronger outline over the artwork)
+   hero    : outline cut-out with "signal overload" glitch bursts every 4–6 s
    nav     : signature draw-on (replays on hover)
    closing : spotlight reveal (cursor torch, wanders when idle)
    Attaches to the React-rendered logos once they mount; marks hosts with data-fx. */
@@ -70,9 +70,33 @@
     })(0);
   }
 
+  /* ---------- hero: outline + glitch bursts ---------- */
+  function glitch(host) {
+    host.dataset.fx = 'hero';
+    const out = cls => `<svg class="${cls}" viewBox="${VB}" aria-hidden="true"><path fill-rule="evenodd" d="${D}"/></svg>`;
+    const layer = document.createElement('div');
+    layer.className = 'e-fx-layer e-fx-glitch';
+    layer.innerHTML =
+      `<svg class="fx-base" viewBox="${VB}" role="img" aria-label="ERROR404"><path fill-rule="evenodd" d="${D}"/></svg>` +
+      out('fx-gm') + out('fx-gc') + out('fx-s1') + out('fx-s2');
+    host.appendChild(layer);
+    if (reduce) return;
+    const section = host.closest('section');
+    let visible = false;
+    new IntersectionObserver(es => es.forEach(e => visible = e.isIntersecting)).observe(layer);
+    const burst = () => {
+      if (visible && !window.__e404MenuOpen && !document.hidden) {
+        layer.classList.add('burst'); section && section.classList.add('e-burst');
+        setTimeout(() => { layer.classList.remove('burst'); section && section.classList.remove('e-burst'); }, 520);
+      }
+      setTimeout(burst, 4000 + Math.random() * 2000);
+    };
+    setTimeout(burst, 2600);
+  }
+
   /* ---------- attach when React mounts the logos ---------- */
   function scan() {
-    document.querySelectorAll('.e-logo-slam:not([data-fx])').forEach(h => spotlight(h, 'hero'));
+    document.querySelectorAll('.e-logo-slam:not([data-fx])').forEach(h => glitch(h));
     document.querySelectorAll('.e-logo-full:not(.e-logo-slam):not([data-fx])').forEach(h => spotlight(h, 'closing'));
     document.querySelectorAll('img.e4-lock-logo').forEach(img => { if (!img.parentElement.dataset.fx) nav(img); });
   }

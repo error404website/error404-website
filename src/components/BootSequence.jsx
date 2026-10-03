@@ -26,7 +26,7 @@ function NoiseCanvas() {
       for (let f = 0; f < d.length; f += 4) {
         const p = Math.random() * 255;
         d[f] = d[f + 1] = d[f + 2] = p;
-        d[f + 3] = Math.random() * 14;
+        d[f + 3] = Math.random() * 24;
       }
       n.putImageData(u, 0, 0);
       r = requestAnimationFrame(o);
@@ -122,6 +122,8 @@ export function BootSequence({ onComplete }) {
         }}
         aria-hidden="true"
       />
+      <span className="e-bscan" aria-hidden={true} />
+      <span className="e-btrack" aria-hidden={true} />
       <span className="e-bc tl" aria-hidden={true} />
       <span className="e-bc br" aria-hidden={true} />
       <span
@@ -134,13 +136,13 @@ export function BootSequence({ onComplete }) {
         <span>TRANSMISSION INCOMING</span>
       </span>
       <div className={"e-bl font-heading" + (step >= 3 ? " out" : step >= 2 ? " in" : "")}>
-        <span>
+        <span data-t="THE FUTURE FAILED.">
           {"THE FUTURE "}
           <span className="e-grad">FAILED.</span>
         </span>
       </div>
       <div className={"e-bl font-heading" + (step >= 5 ? " out" : step >= 4 ? " in" : "")}>
-        <span>
+        <span data-t="THE ARCHIVE REMEMBERED.">
           {"THE ARCHIVE "}
           <span className="e-grad">REMEMBERED.</span>
         </span>

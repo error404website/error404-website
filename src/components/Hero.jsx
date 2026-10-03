@@ -92,7 +92,7 @@ export function Hero() {
       ref={sectionRef}
       id="archive"
       aria-label="Archive 404 — hero"
-      className="hero-vh relative w-full overflow-hidden flex flex-col items-center justify-center"
+      className="e-hero hero-vh relative w-full overflow-hidden flex flex-col items-center justify-center"
     >
       <motion.div
         className="absolute inset-0 w-full h-[118%] -top-[9%]"
@@ -111,10 +111,31 @@ export function Hero() {
           className="w-full h-full object-cover object-center"
           draggable={false}
         />
+        {/* magenta / cyan channel copies, flashed off-register during a glitch burst */}
+        <img
+          src="/assets/ARCHIVE_404_HERO3.webp"
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+          className="e-art-ch r"
+          draggable={false}
+        />
+        <img
+          src="/assets/ARCHIVE_404_HERO3.webp"
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+          className="e-art-ch c"
+          draggable={false}
+        />
       </motion.div>
       <div className="absolute inset-0 bg-void/25" />
       <div className="absolute inset-x-0 bottom-0 h-[75%] bg-gradient-to-t from-void via-void/55 to-transparent" />
       <div className="e-hero-top absolute inset-x-0 top-0 pointer-events-none" aria-hidden="true" />
+      {/* signal overload: scanlines + a rolling VHS tracking band */}
+      <div className="e-hero-fx" aria-hidden="true">
+        <span className="e-hero-track" />
+      </div>
       <div
         className="absolute inset-0"
         style={{
