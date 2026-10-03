@@ -1450,7 +1450,7 @@ body {
   font-size: 15px;
   line-height: 1.7;
   color: rgba(244, 244, 248, 0.7);
-  max-width: 640px;
+  max-width: none;
 }
 .e-clamp {
   display: -webkit-box;
