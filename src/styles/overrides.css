@@ -242,11 +242,11 @@
   font-size: 7px;
   line-height: 1.5;
   letter-spacing: 0.38em;
-  color: rgba(244, 244, 248, 0.35);
+  color: rgba(244, 244, 248, 0.55);
   transition: color 0.3s;
 }
 .group:hover .e4-lock-tag {
-  color: rgba(244, 244, 248, 0.6);
+  color: rgba(244, 244, 248, 0.8);
 }
 
 /* ---- desktop nav links: 08 chromatic ---- */
@@ -261,7 +261,7 @@
   font-size: 10px;
   letter-spacing: 0.22em;
   white-space: nowrap;
-  color: rgba(244, 244, 248, 0.35);
+  color: rgba(244, 244, 248, 0.5);
   transition: color 0.3s;
 }
 .e8-link:hover {
@@ -2625,7 +2625,7 @@ body {
   margin-top: 3px;
   font-size: 9px;
   letter-spacing: 0.2em;
-  color: rgba(244, 244, 248, 0.38);
+  color: rgba(244, 244, 248, 0.55);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2663,7 +2663,7 @@ body {
   justify-content: space-between;
   margin-top: 6px;
   font-size: 9px;
-  color: rgba(244, 244, 248, 0.32);
+  color: rgba(244, 244, 248, 0.5);
   font-variant-numeric: tabular-nums;
 }
 .e-dock-wave {

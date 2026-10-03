@@ -22,7 +22,6 @@ function PaletteSwatch({ name, hex }) {
     <button
       onClick={copy}
       className="group/sw text-left border border-ghost/8 overflow-hidden focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan/50"
-      aria-label={`Copy ${name} ${hex}`}
     >
       <div
         className="h-16 sm:h-20 w-full relative"
@@ -41,7 +40,10 @@ function PaletteSwatch({ name, hex }) {
         </span>
       </div>
       <div className="px-2.5 py-2 bg-void/40">
-        <p className="font-mono text-[9px] text-ghost/55 tracking-[0.2em]">{name}</p>
+        <p className="font-mono text-[9px] text-ghost/55 tracking-[0.2em]">
+          {name}
+          <span className="sr-only"> </span>
+        </p>
         <p className="font-mono text-[9px] text-ghost/30 tracking-[0.1em] mt-0.5">{hex}</p>
       </div>
     </button>
@@ -50,6 +52,7 @@ function PaletteSwatch({ name, hex }) {
 
 function MediaCard({
   preview,
+  previewSize,
   label,
   hint,
   onLight,
@@ -93,6 +96,8 @@ function MediaCard({
       >
         <img
           src={preview}
+          width={previewSize ? previewSize[0] : undefined}
+          height={previewSize ? previewSize[1] : undefined}
           alt={label}
           loading="lazy"
           decoding="async"
@@ -306,6 +311,8 @@ export function Collective() {
           >
             <img
               src="/assets/collective/portrait.webp"
+              srcSet="/assets/collective/portrait-800.webp 800w, /assets/collective/portrait.webp 1254w"
+              sizes="(max-width: 1023px) 90vw, 560px"
               alt="ERROR_404 Collective"
               loading="lazy"
               decoding="async"
@@ -459,7 +466,8 @@ export function Collective() {
             <MediaCard
               index={0}
               inView={kitInView}
-              preview="/assets/brand/error404-logo-white.webp"
+              preview="/assets/brand/error404-logo-white-preview.webp"
+              previewSize={[900, 623]}
               label="LOGO — LIGHT"
               hint="for dark backgrounds"
               downloads={[
@@ -477,7 +485,8 @@ export function Collective() {
               index={1}
               inView={kitInView}
               onLight={true}
-              preview="/assets/brand/error404-logo-black.webp"
+              preview="/assets/brand/error404-logo-black-preview.webp"
+              previewSize={[900, 623]}
               label="LOGO — DARK"
               hint="for light backgrounds"
               downloads={[

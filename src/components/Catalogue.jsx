@@ -65,7 +65,14 @@ function ChapterPlayer({ chapter, accent, accentB, cardIndex }) {
   const [currentTime, setCurrentTime] = React.useState(0);
   const [duration, setDuration] = React.useState(0);
   const track = chapter.tracks[trackIndex];
+  // On first render the <audio> already has its src (preload="none"), so skip load():
+  // calling it makes Chrome start downloading the whole track before anyone presses play.
+  const firstRender = React.useRef(true);
   React.useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
     const E = audioRef.current;
     if (E) {
       E.src = audioSrc(track.audioPath);
