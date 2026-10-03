@@ -179,25 +179,66 @@ export function Nav({ onDownloadOpen }) {
               aria-expanded={menuOpen}
             >
               <span className="e4-ic" aria-hidden={true}>
-                <svg className="e4-p" viewBox="0 0 22 22" fill="none">
-                  <path d="M3 6l6 5-6 5" stroke="#F4F4F8" strokeWidth="1.8" strokeLinecap="square" />
+                {/* "torn prompt": the >_ with ink-bled edges from a light displacement filter */}
+                <svg className="e4-p" viewBox="0 0 24 24" fill="none">
                   <defs>
                     <linearGradient
                       id="e4-cur-grad"
                       gradientUnits="userSpaceOnUse"
-                      x1="11"
+                      x1="12"
                       y1="0"
-                      x2="19"
+                      x2="21.5"
                       y2="0"
                     >
                       <stop offset="0" stopColor="#FF00E5" />
                       <stop offset="1" stopColor="#00EFFF" />
                     </linearGradient>
+                    <filter id="e4-torn-p" x="-20%" y="-20%" width="140%" height="140%">
+                      <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="3" seed="3" />
+                      <feDisplacementMap
+                        in="SourceGraphic"
+                        scale="0.9"
+                        xChannelSelector="R"
+                        yChannelSelector="G"
+                      />
+                    </filter>
                   </defs>
-                  <rect className="e4-cur" x="11" y="15" width="8" height="2" fill="url(#e4-cur-grad)" />
+                  <g filter="url(#e4-torn-p)">
+                    <path
+                      d="M3 5.5l7.2 6.5L3 18.5"
+                      stroke="#F4F4F8"
+                      strokeWidth="2.6"
+                      strokeLinecap="square"
+                    />
+                    <rect
+                      className="e4-cur"
+                      x="12"
+                      y="16.2"
+                      width="9.5"
+                      height="2.6"
+                      fill="url(#e4-cur-grad)"
+                    />
+                  </g>
                 </svg>
-                <svg className="e4-x" viewBox="0 0 22 22" fill="none">
-                  <path d="M5 5l12 12M17 5L5 17" stroke="#F4F4F8" strokeWidth="1.8" strokeLinecap="square" />
+                <svg className="e4-x" viewBox="0 0 24 24" fill="none">
+                  <defs>
+                    <filter id="e4-torn-x" x="-20%" y="-20%" width="140%" height="140%">
+                      <feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="3" seed="5" />
+                      <feDisplacementMap
+                        in="SourceGraphic"
+                        scale="0.9"
+                        xChannelSelector="R"
+                        yChannelSelector="G"
+                      />
+                    </filter>
+                  </defs>
+                  <path
+                    d="M4.5 4.5l15 15M19.5 4.5l-15 15"
+                    stroke="#F4F4F8"
+                    strokeWidth="2.6"
+                    strokeLinecap="square"
+                    filter="url(#e4-torn-x)"
+                  />
                 </svg>
               </span>
             </button>

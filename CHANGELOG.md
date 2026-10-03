@@ -14,6 +14,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Mobile menu icon is now the "torn prompt": the same `>_` and ✕, with a heavier stroke and ink-bled, hand-cut edges (a light SVG displacement filter) to match the logo. The gradient cursor still blinks, and the tap target is still 44 px.
 - BOOKING · ↓ DOWNLOAD button is slimmer so it sits in proportion with the nav: 44 → 34 px in the nav (centred in the 80 px bar) and 54 → 46 px in the mobile menu (still above the 44 px tap minimum).
 - BOOKING · ↓ DOWNLOAD button (nav and mobile menu) restyled as "holo foil": an iridescent magenta/violet/cyan/silver edge that slowly rotates, a soft glow, and a holographic sheen across each half on hover. It is the same size as before, the rotation runs on the GPU, and it respects Reduce Motion.
 - Chapter descriptions (and the expanded file notes) now run the full width of the card instead of stopping at 640 px.
