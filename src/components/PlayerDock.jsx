@@ -1,5 +1,6 @@
 import React from "react";
 import { CHAPTERS } from "../data/chapters";
+import { audioSrc } from "../lib/audioSrc";
 import { formatTime } from "../lib/formatTime";
 
 // Every track in album order, with its chapter.
@@ -172,7 +173,7 @@ export function PlayerDock() {
     <>
       <audio
         ref={audioRef}
-        src={track.audioPath}
+        src={audioSrc(track.audioPath)}
         preload="none"
         onPlay={() => {
           setPlaying(true);

@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import React from "react";
 import { CARD_STYLES, CHAPTERS, CHAPTER_ACCENTS } from "../data/chapters";
+import { audioSrc } from "../lib/audioSrc";
 import { formatTime } from "../lib/formatTime";
 
 function Waveform({ accent, accentB, active, index }) {
@@ -67,7 +68,7 @@ function ChapterPlayer({ chapter, accent, accentB, cardIndex }) {
   React.useEffect(() => {
     const E = audioRef.current;
     if (E) {
-      E.src = track.audioPath;
+      E.src = audioSrc(track.audioPath);
       E.load();
       setProgress(0);
       setCurrentTime(0);
@@ -134,7 +135,7 @@ function ChapterPlayer({ chapter, accent, accentB, cardIndex }) {
     <div className="e-deck overflow-hidden">
       <audio
         ref={audioRef}
-        src={track.audioPath}
+        src={audioSrc(track.audioPath)}
         onPlay={() =>
           window.dispatchEvent(
             new CustomEvent("e404-audio-play", {
