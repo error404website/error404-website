@@ -59,7 +59,7 @@ export const CHAPTERS = [
         number: 7,
         title: "GOSPEL_OUT",
         audioPath: "/audio/gospel_out.mp3",
-        duration: "3:43",
+        duration: "3:45",
       },
       {
         number: 8,
