@@ -150,8 +150,6 @@ export function BootSequence({ onComplete }) {
         aria-hidden="true"
       />
       <span className="e-bscan" aria-hidden={true} />
-      <span className="e-bc tl" aria-hidden={true} />
-      <span className="e-bc br" aria-hidden={true} />
       <div className={"e-bterm" + (draining ? " out" : "")} aria-hidden="true">
         <div>
           <b>&gt;</b> RECOVERING ARCHIVE_404
@@ -168,8 +166,8 @@ export function BootSequence({ onComplete }) {
         <span className="e-bterm-cur" />
       </div>
       <p className="sr-only">Recovering ARCHIVE_404: 20 of 20 files intact.</p>
-      <span className="e-bbar" style={{ animationDuration: `${TOTAL_MS}ms` }} aria-hidden={true} />
-      <button type="button" className="e-bskip" onClick={finish}>
+      {/* visually hidden; appears only when focused, e.g. by a screen reader (tap / any key also skips) */}
+      <button type="button" className="e-bskip e-bskip-hidden" onClick={finish}>
         SKIP
       </button>
     </motion.div>

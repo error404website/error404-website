@@ -2953,3 +2953,19 @@ body {
     animation: none;
   }
 }
+
+/* intro: the SKIP button is visually hidden and only appears when it receives focus,
+   e.g. from a screen reader (tapping anywhere or pressing any key already skips) */
+.e-bskip-hidden:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
