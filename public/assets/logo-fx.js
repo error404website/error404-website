@@ -1,5 +1,5 @@
 /* ERROR_404 logo behaviours
-   hero    : outline cut-out with "signal overload" glitch bursts every 4–6 s
+   hero    : outline cut-out + spotlight reveal (light kept inside the letters) + "signal overload" glitch bursts every 4–6 s
    nav     : signature draw-on (replays on hover)
    closing : spotlight reveal (cursor torch, wanders when idle)
    Attaches to the React-rendered logos once they mount; marks hosts with data-fx. */
@@ -53,6 +53,11 @@
       `<svg class="fx-lit" viewBox="${VB}" role="img" aria-label="ERROR404">${gradDef(id)}<path fill="url(#${id})" fill-rule="evenodd" d="${D}"/></svg>`;
     host.appendChild(layer);
     if (reduce) { layer.classList.add('all-lit'); return; }
+    torch(layer);
+  }
+
+  /* ---------- torch: follows the pointer (wanders when idle); drives --x/--y/--r ---------- */
+  function torch(layer) {
     let tx = 0, ty = 0, x = null, y = null, last = -1e9, visible = false;
     new IntersectionObserver(es => es.forEach(e => visible = e.isIntersecting)).observe(layer);
     const track = (cx, cy) => { const r = layer.getBoundingClientRect(); tx = cx - r.left; ty = cy - r.top; last = performance.now(); };
@@ -75,12 +80,16 @@
     host.dataset.fx = 'hero';
     const out = cls => `<svg class="${cls}" viewBox="${VB}" aria-hidden="true"><path fill-rule="evenodd" d="${D}"/></svg>`;
     const layer = document.createElement('div');
-    layer.className = 'e-fx-layer e-fx-glitch';
+    const id = 'efx' + (++uid);
+    layer.className = 'e-fx-layer e-fx-spot e-fx-glitch';
     layer.innerHTML =
-      `<svg class="fx-base" viewBox="${VB}" role="img" aria-label="ERROR404"><path fill-rule="evenodd" d="${D}"/></svg>` +
+      `<span class="e-fx-bloom" aria-hidden="true"></span>` +
+      `<svg class="fx-base" viewBox="${VB}" aria-hidden="true"><path fill-rule="evenodd" d="${D}"/></svg>` +
+      `<svg class="fx-lit" viewBox="${VB}" role="img" aria-label="ERROR404">${gradDef(id)}<path fill="url(#${id})" fill-rule="evenodd" d="${D}"/></svg>` +
       out('fx-gm') + out('fx-gc') + out('fx-s1') + out('fx-s2');
     host.appendChild(layer);
-    if (reduce) return;
+    if (reduce) { layer.classList.add('all-lit'); return; }
+    torch(layer);
     const section = host.closest('section');
     let visible = false;
     new IntersectionObserver(es => es.forEach(e => visible = e.isIntersecting)).observe(layer);
