@@ -34,6 +34,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Fixed
 
+- Tablet nav: between 768 and 1023 px the full row of links didn't fit, and the DOWNLOAD button ran off the right edge (by 116 px at 768). Tablets in portrait now get the phone-style nav (logo, ↓ DOWNLOAD and the >_ menu), and the links row starts at 1024 px.
 - Player dock icons render the same on every device. The ⏮ ⏭ ☰ ✕ characters, which iPhones and iPads turned into coloured emoji, are now drawn SVGs: thin square-capped « » chevrons, queue lines and close cross, matching the >_ menu icon. The ▶ playing-track marker in the dock queue and the chapter tracklists is forced to text style for the same reason.
 - Logo effects update straight away for returning visitors. `logo-fx.js` is served from `/assets/` (cached for a week, no hashed name), so browsers could keep running an old copy after a deploy. Its `<script>` tag is now stamped with a hash of the file at build time (`?v=…`), which changes only when the file does.
 - Logo flashlight (closing logo, and now back on the hero alongside the Signal Overload glitch): its purple glow no longer spills onto the background. It is now masked to the letter shapes, so the light only shows inside the cut-out (slightly brighter there to compensate), and it follows the cursor by moving the gradient, not a layer, so nothing can escape in Safari.
