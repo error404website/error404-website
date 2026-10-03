@@ -25,8 +25,8 @@ Open [`src/config.js`](src/config.js) and set:
 
 | Setting | What it is |
 |---|---|
-| `GITHUB_OWNER` | Your GitHub username or organisation |
-| `GITHUB_REPO` | This repository's name (default `error404-site`) |
+| `GITHUB_OWNER` | GitHub username (`error404website`) |
+| `GITHUB_REPO` | This repository's name (`error404-website`) |
 
 These two values drive:
 - **VIEW PROJECT** in the end credits and the GitHub mark in the footer.
