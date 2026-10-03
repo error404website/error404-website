@@ -355,7 +355,7 @@ export function Collective() {
               <p>
                 <Name>ERROR_404</Name>
                 {
-                  " Collective is a multimedia music project exploring the collapse of promised futures and the memories left behind. Blending UK grime, future garage, hyperpop, metal and immersive visual storytelling, the collective creates powerful audiovisual experiences that document life in an era defined by economic instability, technological disruption and social fragmentation."
+                  " Collective is a multimedia music project exploring the collapse of promised futures and the memories left behind. Built on hyperpop, cut with metalcore and 2-step, and told through immersive visual storytelling, the collective creates powerful audiovisual experiences that document life in an era defined by economic instability, technological disruption and social fragmentation."
                 }
               </p>
               <p>
@@ -415,7 +415,7 @@ export function Collective() {
                 },
                 {
                   k: "SOUND",
-                  v: "GRIME · GARAGE · HYPERPOP · METAL",
+                  v: "HYPERPOP · METALCORE · 2-STEP",
                 },
                 {
                   k: "FORMAT",

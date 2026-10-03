@@ -55,7 +55,7 @@ Four chapters. Twenty recovered files. One transmission.
 | **03 THE WRECKAGE** | THE_WRECKAGE · READ · COME_HOME · CHANGED_THE_LOCK · DOWN_THE_FRONT |
 | **04 WHOLE**        | WHOLE · ENOUGH · OPEN_SKY · ALL_OF_ME · BETTER_DAYS                 |
 
-Written and performed by **NULLSAINT** and **CACHEGHOST**. UK grime, future garage, hyperpop and metal, presented as a recovered transmission.
+Written and performed by **NULLSAINT** and **CACHEGHOST**. Hyperpop at its core, with metalcore and 2-step, presented as a recovered transmission.
 
 ## What's inside the site
 

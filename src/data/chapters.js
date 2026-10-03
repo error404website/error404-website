@@ -5,7 +5,7 @@ export const CHAPTERS = [
     title: "ORIGIN",
     description:
       "The reconstruction does not begin with a choice. It begins with a context. A country hollowed out by austerity, its working infrastructure replaced with the performance of one. A generation that entered adulthood during a financial crash and was still trying to find its footing when a pandemic removed the floor entirely. ORIGIN does not ask for sympathy. It asks you to look clearly at the forces that shape a person before they have the language to name them. The chapter of early mornings and double shifts. Of watching people with fewer skills and more confidence ascend past you on an escalator you were never told existed. The weight of a system that calls itself a meritocracy while running on inherited position. The subject is being built here, not by decisions, but by pressure. By the specific silence of a locked-down city. By the particular exhaustion of working hard and arriving nowhere. Five tracks that move like memory: compressed, non-linear, emotionally exact. You do not need to have lived this version of the story to recognise its shape. Everyone carries an origin. Most people spend their whole lives inside it without ever stepping back far enough to see it.",
-    tags: ["UK Grime", "Future Garage", "Hyperpop Metal"],
+    tags: ["Hyperpop", "Metalcore", "2-Step"],
     artwork: "/assets/artwork/origin.png",
     tracks: [
       {
@@ -46,7 +46,7 @@ export const CHAPTERS = [
     title: "THE FEED",
     description:
       "Somewhere between the third hour of scrolling and the moment you forgot what you opened your phone to find, something was taken from you. Not all at once. Quietly, in increments small enough to miss. THE FEED is the chapter of the attention economy: the years spent inside a machine designed to convert loneliness into content and anxiety into engagement. Of living through the period when artificial intelligence stopped being a concept and became a colleague, a competitor, a mirror that reflects everything except what you actually look like. The subject is awake here but not yet standing. Aware that something is wrong without the language to explain it. Aware that every tool offered to fix the feeling is made by the same system producing it. The chapter lives in the lag between knowing and acting. The buffering cursor. The notification that arrives at the exact moment you were about to think clearly. Five tracks built from the sonic texture of that condition: 2-step rhythms beneath hyperpop distortion, the sound of a machine running too many processes at once. Waking up does not feel like clarity. It feels like suddenly noticing the dimensions of a room you have been standing in for years.",
-    tags: ["UK Grime", "Future Garage", "Hyperpop Metal"],
+    tags: ["Hyperpop", "Metalcore", "2-Step"],
     artwork: "/assets/artwork/the-feed.png",
     tracks: [
       {
@@ -87,7 +87,7 @@ export const CHAPTERS = [
     title: "THE WRECKAGE",
     description:
       "There is data the machine cannot process. Not because it is absent, but because the act of processing it changes what it is. THE WRECKAGE is the chapter where the archive encounters material it has no category for. Grief that arrives nine months late and pins you to a Tuesday afternoon in a supermarket car park. Love that was real and is over and somehow stays both things at once. Friendship tested past any reasonable threshold, surviving anyway, which feels less like triumph and more like standing in a field after a storm checking yourself for damage. Loss that is not death but absence: of people, of versions of yourself you were not ready to let go, of futures planned in enough detail that their disappearance left specific empty rooms. The chapter does not resolve any of this. It does not offer the arc that grief counsellors and streaming platforms both prefer. It sits inside the wreckage and takes inventory. Five tracks that use strings not for comfort but for mass. The particular density of feeling that has nowhere left to go. The machine, encountering data it cannot model, does the only honest thing: it records without interpreting. It holds the frequency. It does not name it.",
-    tags: ["UK Grime", "Future Garage", "Hyperpop Metal"],
+    tags: ["Hyperpop", "Metalcore", "2-Step"],
     artwork: "/assets/artwork/the-wreckage.png",
     tracks: [
       {
@@ -128,7 +128,7 @@ export const CHAPTERS = [
     title: "WHOLE",
     description:
       "Reassembly is not the same as restoration. WHOLE is the chapter where the subject stops trying to return to a previous state and begins, carefully, to accept that the current one is not a corruption of something better. It is the thing itself. Every version that did not work. Every decision made from fear and called pragmatism. Every morning that cost more than it looked like from the outside. Every person who stayed and every person who left. WHOLE does not pretend that carrying all of this is comfortable. It knows that integration costs more than erasure. It also knows the alternative: the curated self, the managed presentation, the life performed for an audience that will rank it by the algorithm in seconds. And it finds that alternative unbearable. Five tracks that earn their euphoria through the weight of the three chapters before them. Hyperpop maximalism with real architecture underneath. The final transmission from a machine that began this process as an archive and ends it without a clean classification. Reconstruction logged as complete. The process does not end here, it becomes something else. You were always going to arrive at this. The wreckage was the route, not the destination.",
-    tags: ["UK Grime", "Future Garage", "Hyperpop Metal"],
+    tags: ["Hyperpop", "Metalcore", "2-Step"],
     artwork: "/assets/artwork/whole.png",
     tracks: [
       {
