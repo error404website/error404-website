@@ -1288,15 +1288,21 @@
   -webkit-mask: none;
   mask: none;
 }
+/* the torch glow: a full-size layer masked to the letter shapes, so the light only
+   shows inside the cut-out (never on the background). The glow follows the cursor
+   through the gradient's centre, not by moving a layer, so nothing can escape the
+   logo in Safari. */
 .e-fx-bloom {
   position: absolute;
-  left: 0;
-  top: 0;
-  width: calc(var(--r, 150px) * 2.4);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  transform: translate(calc(var(--x, 50%) - 50%), calc(var(--y, 50%) - 50%));
-  background: radial-gradient(circle, rgba(161, 0, 255, 0.22), transparent 65%);
+  inset: 0;
+  background: radial-gradient(
+    circle calc(var(--r, 150px) * 1.3) at var(--x, 50%) var(--y, 50%),
+    rgba(255, 0, 229, 0.38),
+    rgba(161, 0, 255, 0.26) 45%,
+    transparent 100%
+  );
+  -webkit-mask: url(/assets/error404logo.svg) center / 100% 100% no-repeat;
+  mask: url(/assets/error404logo.svg) center / 100% 100% no-repeat;
   pointer-events: none;
 }
 .e-fx-spot.all-lit .e-fx-bloom {
@@ -1908,9 +1914,6 @@ body {
 [data-fx="hero"] .e-fx-spot .fx-base path {
   stroke: rgba(244, 244, 248, 0.62);
   stroke-width: 1.6;
-}
-[data-fx="hero"] .e-fx-bloom {
-  background: radial-gradient(circle, rgba(161, 0, 255, 0.3), transparent 65%);
 }
 /* footer GitHub mark in the signature gradient */
 .e-fbar-gh {
