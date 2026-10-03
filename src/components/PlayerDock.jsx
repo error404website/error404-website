@@ -61,16 +61,7 @@ function PlayKey({ playing, onClick, label }) {
         "e-playbtn" + (playing ? " on" : "") + " flex items-center justify-center shrink-0 focus:outline-none"
       }
     >
-      {playing ? (
-        <span className="flex gap-[3px]" aria-hidden="true">
-          <span className="w-[3px] h-3 bg-void rounded-full" />
-          <span className="w-[3px] h-3 bg-void rounded-full" />
-        </span>
-      ) : (
-        <svg width="10" height="12" viewBox="0 0 10 12" fill="none" aria-hidden="true">
-          <path d="M1 1l8 5-8 5V1z" fill="#F4F4F8" />
-        </svg>
-      )}
+      {playing ? <span className="e-pp" aria-hidden="true" /> : <span className="e-pi" aria-hidden="true" />}
     </button>
   );
 }

@@ -1504,20 +1504,38 @@ body {
 .e-deck .rounded-full {
   border-radius: 0;
 }
+/* ▶ / ❚❚ keys (chapter players + dock): no box, just the icon in the magenta → cyan
+   gradient, in a 44px tap target. Hover and playing add a soft gradient glow. */
 .e-playbtn {
   width: 44px;
   height: 44px;
-  background:
-    linear-gradient(#07080f, #07080f) padding-box,
-    linear-gradient(90deg, #ff00e5, #00efff) border-box;
-  border: 1px solid transparent;
-  transition: box-shadow 0.25s;
+  background: none;
+  border: 0;
+  transition: filter 0.25s;
+}
+.e-playbtn:hover,
+.e-playbtn:focus-visible {
+  filter: drop-shadow(0 0 6px rgba(255, 0, 229, 0.75)) drop-shadow(0 0 12px rgba(0, 239, 255, 0.4));
 }
 .e-playbtn.on {
+  filter: drop-shadow(0 0 5px rgba(255, 0, 229, 0.55));
+}
+.e-pi,
+.e-pp {
+  display: block;
   background: linear-gradient(90deg, #ff00e5, #00efff);
 }
-.e-playbtn:hover {
-  box-shadow: 0 0 20px -6px rgba(255, 0, 229, 0.6);
+.e-pi {
+  width: 13px;
+  height: 15px;
+  margin-left: 3px;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+.e-pp {
+  width: 12px;
+  height: 14px;
+  -webkit-mask: linear-gradient(90deg, #000 0 34%, transparent 34% 66%, #000 66%);
+  mask: linear-gradient(90deg, #000 0 34%, transparent 34% 66%, #000 66%);
 }
 .e-playbtn:focus-visible {
   outline: 1px solid #ff00e5;
@@ -2193,33 +2211,8 @@ body {
   transform: none;
   background-position: 0% 0;
 }
-/* chapter player ▶ buttons: foil edge when paused; while a track plays the whole
-   button fills with the rotating foil (the dark pause bars sit on top) */
-.e-playbtn {
-  background:
-    linear-gradient(#07080f, #07080f) padding-box,
-    conic-gradient(from var(--e-foil), #ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5) border-box;
-  border: 1px solid transparent;
-  animation: e-foil-spin 6s linear infinite;
-  box-shadow:
-    0 0 18px -6px rgba(255, 0, 229, 0.55),
-    0 0 32px -12px rgba(0, 239, 255, 0.5);
-}
-.e-playbtn.on {
-  background: conic-gradient(from var(--e-foil), #ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5) border-box;
-  animation-duration: 3s;
-  box-shadow:
-    0 0 22px -4px rgba(255, 0, 229, 0.7),
-    0 0 40px -10px rgba(0, 239, 255, 0.6);
-}
-.e-playbtn:hover {
-  box-shadow:
-    0 0 24px -4px rgba(255, 0, 229, 0.7),
-    0 0 44px -10px rgba(0, 239, 255, 0.6);
-}
 @media (prefers-reduced-motion: reduce) {
-  .e-b1,
-  .e-playbtn {
+  .e-b1 {
     animation: none;
   }
 }
@@ -2587,12 +2580,6 @@ body {
   background: #000;
   padding-bottom: env(safe-area-inset-bottom);
 }
-/* the play key's inside matches the bar (paused state; playing fills with foil) */
-.e-dock .e-playbtn:not(.on) {
-  background:
-    linear-gradient(#000, #000) padding-box,
-    conic-gradient(from var(--e-foil), #ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5) border-box;
-}
 .e-dock-row {
   max-width: 80rem;
   margin: 0 auto;
@@ -2706,23 +2693,22 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 34px;
-  padding: 0 12px;
-  border: 1px solid rgba(244, 244, 248, 0.2);
+  min-height: 44px;
+  padding: 0 4px;
   font-size: 9px;
   letter-spacing: 0.24em;
   color: rgba(244, 244, 248, 0.7);
   white-space: nowrap;
-  transition:
-    border-color 0.2s,
-    color 0.2s;
+  transition: color 0.2s;
 }
 .e-dock-qbtn:hover,
-.e-dock-qbtn:focus-visible,
 .q-open .e-dock-qbtn {
-  border-color: rgba(255, 0, 229, 0.5);
   color: #f4f4f8;
-  outline: none;
+}
+.e-dock-qbtn:focus-visible {
+  color: #f4f4f8;
+  outline: 1px solid rgba(255, 0, 229, 0.6);
+  outline-offset: 2px;
 }
 .e-dock-led {
   width: 5px;
