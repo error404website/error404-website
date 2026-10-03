@@ -2071,37 +2071,37 @@ body {
 }
 
 /* ===== split button: 01 holo foil =====
-   An iridescent foil edge (a conic gradient rotated with transform, so the GPU spins
-   it without repainting) and a holographic sheen that sweeps each half on hover. */
+   An iridescent foil edge and a holographic sheen that sweeps each half on hover.
+   The foil is the 1px border's own background, its angle animated through a
+   registered custom property, so nothing is drawn outside the button. (An
+   oversized rotating layer escapes overflow:hidden in Safari.) Browsers without
+   @property show the same foil, just static. */
+@property --e-foil {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
 .e-split {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
-  padding: 1px;
-  border: 0;
-  background: none;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#07080f, #07080f) padding-box,
+    conic-gradient(from var(--e-foil), #ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5) border-box;
+  animation: e-foil-spin 6s linear infinite;
   box-shadow:
     0 0 22px -6px rgba(255, 0, 229, 0.55),
     0 0 40px -12px rgba(0, 239, 255, 0.5);
 }
-.e-split::before {
-  content: "";
-  position: absolute;
-  inset: -400%;
-  z-index: -1;
-  background: conic-gradient(#ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5);
-  animation: e-foil-spin 6s linear infinite;
-  will-change: transform;
-}
 @keyframes e-foil-spin {
   to {
-    transform: rotate(1turn);
+    --e-foil: 360deg;
   }
 }
 .e-split-bk,
 .e-split-dl {
   position: relative;
   overflow: hidden;
+  /* clip-path as well: Safari doesn't clip a transitioning child with overflow alone */
+  clip-path: inset(0);
   background: linear-gradient(180deg, #0d0e18, #06070d);
 }
 .e-split-bk {
@@ -2144,7 +2144,7 @@ body {
     linear-gradient(rgba(255, 0, 229, 0.1), rgba(255, 0, 229, 0.1)), linear-gradient(180deg, #151026, #08070f);
 }
 @media (prefers-reduced-motion: reduce) {
-  .e-split::before {
+  .e-split {
     animation: none;
   }
   .e-split-bk::after,
