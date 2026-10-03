@@ -48,7 +48,7 @@ export function Nav({ onDownloadOpen }) {
   }, []);
   React.useEffect(() => {
     const u = () => {
-      if (window.innerWidth >= 768) {
+      if (window.innerWidth >= 1024) {
         setMenuOpen(false);
       }
     };
@@ -129,7 +129,7 @@ export function Nav({ onDownloadOpen }) {
               </span>
             </span>
           </a>
-          <div ref={linksRef} className="hidden md:flex items-center gap-1">
+          <div ref={linksRef} className="hidden lg:flex items-center gap-1">
             {NAV_LINKS.map(({ label, href }) => {
               const f = activeHref === href;
               return (
@@ -172,7 +172,7 @@ export function Nav({ onDownloadOpen }) {
             <button
               onClick={() => setMenuOpen((u) => !u)}
               className={
-                "e4-burger md:hidden w-11 h-11 flex items-center justify-center -mr-2 focus:outline-none" +
+                "e4-burger lg:hidden w-11 h-11 flex items-center justify-center -mr-2 focus:outline-none" +
                 (menuOpen ? " is-open" : "")
               }
               aria-label={menuOpen ? "Close menu" : "Open menu"}
@@ -261,7 +261,7 @@ export function Nav({ onDownloadOpen }) {
         aria-label="Mobile navigation"
         aria-hidden={!menuOpen}
         inert={menuOpen ? undefined : ""}
-        className={"e4-menu fixed inset-0 z-40 md:hidden overflow-hidden" + (menuOpen ? " is-open" : "")}
+        className={"e4-menu fixed inset-0 z-40 lg:hidden overflow-hidden" + (menuOpen ? " is-open" : "")}
       >
         {[0, 1, 2, 3, 4, 5].map((u) => (
           <div className="e4-sl" style={{ "--i": u }} key={u} />
