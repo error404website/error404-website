@@ -157,7 +157,20 @@ export function Nav({ onDownloadOpen }) {
               <span className="e4-ic" aria-hidden={true}>
                 <svg className="e4-p" viewBox="0 0 22 22" fill="none">
                   <path d="M3 6l6 5-6 5" stroke="#F4F4F8" strokeWidth="1.8" strokeLinecap="square" />
-                  <rect className="e4-cur" x="11" y="15" width="8" height="2" fill="#FF00E5" />
+                  <defs>
+                    <linearGradient
+                      id="e4-cur-grad"
+                      gradientUnits="userSpaceOnUse"
+                      x1="11"
+                      y1="0"
+                      x2="19"
+                      y2="0"
+                    >
+                      <stop offset="0" stopColor="#FF00E5" />
+                      <stop offset="1" stopColor="#00EFFF" />
+                    </linearGradient>
+                  </defs>
+                  <rect className="e4-cur" x="11" y="15" width="8" height="2" fill="url(#e4-cur-grad)" />
                 </svg>
                 <svg className="e4-x" viewBox="0 0 22 22" fill="none">
                   <path d="M5 5l12 12M17 5L5 17" stroke="#F4F4F8" strokeWidth="1.8" strokeLinecap="square" />
