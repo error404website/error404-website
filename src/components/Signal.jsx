@@ -113,9 +113,25 @@ function Field({ id, errorId, label, tag, children, error, required }) {
   );
 }
 
+// Browsers render an empty date field differently (Safari shows today's date,
+// iOS shows nothing), so the field draws its own placeholder in the visitor's
+// date order, e.g. DD / MM / YYYY in the UK or MM / DD / YYYY in the US.
+const DATE_PLACEHOLDER = (() => {
+  const names = { day: "DD", month: "MM", year: "YYYY" };
+  try {
+    return new Intl.DateTimeFormat(undefined, { day: "2-digit", month: "2-digit", year: "numeric" })
+      .formatToParts(new Date(2000, 0, 2))
+      .filter((part) => names[part.type])
+      .map((part) => names[part.type])
+      .join(" / ");
+  } catch {
+    return "DD / MM / YYYY";
+  }
+})();
+
 const inputClass = (e) =>
   [
-    "w-full font-mono text-[0.82rem] text-ghost placeholder:text-ghost/12",
+    "e-input w-full font-mono text-[0.82rem] text-ghost",
     "px-4 py-4 outline-none transition-all duration-400",
     "border",
     e
@@ -738,17 +754,23 @@ export function Signal() {
                     />
                   </Field>
                   <Field id={fieldIds.date} label="EVENT DATE" tag="DATE_01">
-                    <input
-                      id={fieldIds.date}
-                      type="date"
-                      value={form.date}
-                      onChange={updateField("date")}
-                      onBlur={touchField("date")}
-                      className={inputClass(false) + " [color-scheme:dark]"}
-                      style={{
-                        caretColor: "#FF00E5",
-                      }}
-                    />
+                    <div className="e-date">
+                      <input
+                        id={fieldIds.date}
+                        type="date"
+                        value={form.date}
+                        onChange={updateField("date")}
+                        onBlur={touchField("date")}
+                        data-empty={form.date ? undefined : ""}
+                        className={inputClass(false) + " [color-scheme:dark]"}
+                        style={{
+                          caretColor: "#FF00E5",
+                        }}
+                      />
+                      <span className="e-date-ph" aria-hidden="true">
+                        {DATE_PLACEHOLDER}
+                      </span>
+                    </div>
                   </Field>
                 </div>
                 <div className="mb-7">

@@ -3,6 +3,13 @@
 All notable changes to the ERROR_404 website are recorded here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow the album releases.
 
+## [Unreleased]
+
+### Fixed
+
+- SIGNAL form: the event-date field now matches the other fields on every browser and screen size. Empty, it shows a grey DD / MM / YYYY placeholder in the visitor's own date order; Safari used to show today's date in purple and white, and iPhones showed nothing. A chosen date is white like the other answers, the field is the same height as its neighbours, and the calendar icon and selected segment use the site's colours.
+- Placeholder grey is now set explicitly; the old class never compiled, so it fell back to Tailwind's default.
+
 ## [1.0.0] — 2026-10-04
 
 The first release of the ARCHIVE_404 site from source.
