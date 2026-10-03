@@ -518,7 +518,7 @@ function ChapterCard({ chapter, index, onDownload }) {
               scale: 0.95,
             }}
             aria-label="Download the archive"
-            className="e-b1 flex items-center gap-2 font-mono text-[10px] tracking-[0.28em] px-4 py-3 sm:py-2 min-h-[44px] focus:outline-none focus-visible:ring-1 focus-visible:ring-magenta/50"
+            className="e-b1 flex items-center gap-2 font-mono text-[10px] tracking-[0.28em] px-4 py-3 sm:py-0 min-h-[44px] sm:min-h-[34px] focus:outline-none focus-visible:ring-1 focus-visible:ring-magenta/50"
           >
             <span className="relative z-10">DOWNLOAD</span>
             <motion.span
