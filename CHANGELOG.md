@@ -5,6 +5,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Changed
+
+- Intro rain is finer and has depth: the falling track names are drawn in three layers (7, 10 and 14 px; 6, 9 and 12 px on phones) instead of one size that scaled with the screen (about 23 px on a laptop). A dim, slow far layer, a mid layer and a few bright, fast near streams.
+
 ### Fixed
 
 - Page weight: the four chapter players no longer download their first track when the page loads (about 16 MB of MP3s on every visit). Audio now loads only when you press play, so a phone visit drops from about 17 MB to about 0.6 MB.

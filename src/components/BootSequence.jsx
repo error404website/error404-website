@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 import React from "react";
 import { CHAPTERS } from "../data/chapters";
 
-// Intro "M3 · the tracklist falls": code rain whose columns stream the album's own
-// track names, while a terminal readout counts the recovery to 20/20 FILES INTACT.
+// Intro "M3 · the tracklist falls": fine, three-layer code rain whose columns stream the
+// album's own track names, while a terminal readout counts the recovery to 20/20 FILES INTACT.
 // Then the streams drain and the intro fades into the hero.
 const TITLES = CHAPTERS.flatMap((c) => c.tracks.map((t) => t.title));
 const TOTAL_MS = 3900; // intro length
@@ -20,6 +20,14 @@ function columnColour(t) {
   return p.map((v, i) => Math.round(v + (q[i] - v) * u)).join(",");
 }
 
+// Three layers at different sizes give the rain depth: a dim, slow far layer, a mid layer,
+// and a few bright, fast near streams. Sizes are fixed in px (fs, then phone size).
+const LAYERS = [
+  { fs: 7, pfs: 6, speed: [170, 320], alpha: 0.45, glow: 0.6, head: 0.55, every: 1 },
+  { fs: 10, pfs: 9, speed: [320, 600], alpha: 0.8, glow: 0.9, head: 0.9, every: 2 },
+  { fs: 14, pfs: 12, speed: [620, 980], alpha: 1, glow: 1, head: 1, every: 7 },
+];
+
 function TracklistRain({ drainRef }) {
   const canvasRef = React.useRef(null);
   React.useEffect(() => {
@@ -32,40 +40,55 @@ function TracklistRain({ drainRef }) {
     cv.width = W * dpr;
     cv.height = H * dpr;
     ctx.scale(dpr, dpr);
-    const fs = Math.max(13, Math.round(W / 62));
-    const cols = Math.ceil(W / fs);
-    const rows = Math.ceil(H / fs);
-    // each column streams one track name, top to bottom, with a gap before it repeats
-    const words = Array.from({ length: cols }, (_, i) => TITLES[(i * 7) % TITLES.length] + "   ");
-    const drops = Array.from({ length: cols }, () => -Math.random() * rows);
-    const speed = Array.from({ length: cols }, () => 0.35 + Math.random() * 0.55);
-    const colour = Array.from({ length: cols }, (_, c) => columnColour(c / cols));
-    const charAt = (c, r) => words[c][((r % words[c].length) + words[c].length) % words[c].length];
-    ctx.font = `${fs}px 'Space Mono', monospace`;
     ctx.textBaseline = "top";
+    const phone = W < 768;
+    // each column streams one track name, top to bottom, with a gap before it repeats
+    const streams = [];
+    LAYERS.forEach((L, li) => {
+      const fs = phone ? L.pfs : L.fs;
+      const n = Math.ceil(W / fs);
+      for (let c = 0; c < n; c++) {
+        if ((c + li) % L.every) continue;
+        streams.push({
+          L,
+          fs,
+          x: c * fs,
+          word: TITLES[(c * 7 + li * 3) % TITLES.length] + "   ",
+          row: (-Math.random() * H * 0.6) / fs,
+          rows: Math.ceil(H / fs),
+          speed: (L.speed[0] + Math.random() * (L.speed[1] - L.speed[0])) / fs, // rows per second
+          colour: columnColour(c / n),
+        });
+      }
+    });
+    const charAt = (s, r) => s.word[((r % s.word.length) + s.word.length) % s.word.length];
     let raf;
     let last = performance.now();
     const frame = (now) => {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       const draining = drainRef.current;
-      ctx.fillStyle = `rgba(3,4,9,${draining ? 0.2 : 0.07})`;
+      ctx.fillStyle = `rgba(3,4,9,${draining ? 0.2 : 0.075})`;
       ctx.fillRect(0, 0, W, H);
-      for (let c = 0; c < cols; c++) {
-        if (drops[c] < -9000) continue;
-        drops[c] += speed[c] * dt * 54;
-        const r = Math.floor(drops[c]);
+      for (const s of streams) {
+        if (s.row < -9000) continue;
+        s.row += s.speed * dt;
+        const r = Math.floor(s.row);
         if (r < 0) continue;
-        const x = c * fs;
+        const { fs, L } = s;
         const y = r * fs;
-        ctx.fillStyle = `rgb(${colour[c]})`;
-        ctx.fillText(charAt(c, r - 1), x, y - fs);
+        ctx.font = `${fs}px 'Space Mono', monospace`;
+        ctx.globalAlpha = L.alpha;
+        ctx.fillStyle = `rgb(${s.colour})`;
+        ctx.fillText(charAt(s, r - 1), s.x, y - fs);
+        ctx.globalAlpha = L.head;
         ctx.fillStyle = "#F4F4F8";
-        ctx.shadowColor = `rgb(${colour[c]})`;
-        ctx.shadowBlur = fs * 0.8;
-        ctx.fillText(charAt(c, r), x, y);
+        ctx.shadowColor = `rgb(${s.colour})`;
+        ctx.shadowBlur = fs * L.glow;
+        ctx.fillText(charAt(s, r), s.x, y);
         ctx.shadowBlur = 0;
-        if (r > rows + 2) drops[c] = draining ? -9999 : -Math.random() * 20;
+        ctx.globalAlpha = 1;
+        if (r > s.rows + 2) s.row = draining ? -9999 : (-Math.random() * 240) / fs;
       }
       raf = requestAnimationFrame(frame);
     };
