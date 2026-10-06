@@ -143,10 +143,10 @@ Put the MP3 in `public/audio/` under the same name. CI fails the build if a list
 
 The site deploys automatically on **Netlify** from the `main` branch. `netlify.toml` sets the build (`npm run build` → `dist`, Node 22), long-term caching for hashed bundles, fonts and audio, and security headers.
 
-**The album download** (`ARCHIVE_404.zip`, about 153 MB) is too large for git, so it's attached to the [latest GitHub Release](https://github.com/error404website/error404-website/releases/latest). The site links to `/releases/latest/download/ARCHIVE_404.zip`, so publishing a new release with a new zip updates the download automatically:
+**The album download** (`ARCHIVE_404.zip`, about 155 MB) is too large for git, so it's attached to the [latest GitHub Release](https://github.com/error404website/error404-website/releases/latest). The site links to `/releases/latest/download/ARCHIVE_404.zip`, so publishing a new release with a new zip updates the download automatically:
 
 ```bash
-gh release create v1.2.0 ARCHIVE_404.zip --title "ARCHIVE_404 · v1.2.0" --notes-file release-notes.md --latest
+gh release create v1.3.0 ARCHIVE_404.zip --title "ARCHIVE_404 · v1.3.0" --notes-file release-notes.md --latest
 ```
 
 **Contact form:** submissions arrive under **Netlify → Site → Forms**.

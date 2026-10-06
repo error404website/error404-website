@@ -5,7 +5,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-10-06
+
+The remastered album: all 20 tracks and the download replaced with the final remasters.
+
 ### Changed
+
+- All 20 tracks on the site are the final remasters (ARCHIVE_404 REMASTERED FINAL), with the same filenames, so the dock, the chapter players and the queue pick them up. Each build re-stamps the tracks, so returning listeners get the new files instead of a cached copy.
+- Track durations updated to the remastered lengths (19 of 20 changed; for example ORIGIN 3:19 → 2:58, WHOLE 3:20 → 2:16, BETTER_DAYS 5:05 → 4:37).
+- The album download is the remastered `ARCHIVE_404.zip` (about 155 MB, the 20 MP3s without macOS metadata files), published as GitHub Release v1.2.0. The zips on the older releases are removed.
 
 - Intro rain is finer and has depth: the falling track names are drawn in three layers (7, 10 and 14 px; 6, 9 and 12 px on phones) instead of one size that scaled with the screen (about 23 px on a laptop). A dim, slow far layer, a mid layer and a few bright, fast near streams.
 
@@ -89,6 +97,7 @@ The first release of the ARCHIVE_404 site from source.
 | 03 THE WRECKAGE | THE_WRECKAGE · READ · COME_HOME · CHANGED_THE_LOCK · DOWN_THE_FRONT |
 | 04 WHOLE        | WHOLE · ENOUGH · OPEN_SKY · ALL_OF_ME · BETTER_DAYS                 |
 
-[Unreleased]: https://github.com/error404website/error404-website/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/error404website/error404-website/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/error404website/error404-website/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/error404website/error404-website/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/error404website/error404-website/releases/tag/v1.0.0
