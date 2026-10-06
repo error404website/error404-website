@@ -163,7 +163,7 @@ export function DownloadModal({ open, onClose }) {
                       20 TRACKS · MP3
                     </p>
                   </div>
-                  <span className="e-fsz">160 MB</span>
+                  <span className="e-fsz">155 MB</span>
                 </div>
                 <motion.button
                   onClick={startDownload}
