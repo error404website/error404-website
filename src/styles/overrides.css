@@ -1961,7 +1961,8 @@ body {
     bottom: auto;
     width: 100%;
     margin-top: 56px;
-    padding: 0 0 calc(12px + env(safe-area-inset-bottom));
+    /* no safe-area inset here: the player dock below already clears the home indicator */
+    padding: 0 0 12px;
   }
   .e-fbar-in {
     grid-template-columns: 1fr auto;
