@@ -7,6 +7,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Genres: 2-step is replaced by **glitchcore** everywhere on the site. The chapter-card tags now read Hyperpop · Metalcore · Glitchcore, along with the Collective sound line and intro, THE FEED description and the page keywords. Hyperpop stays first.
+- README: an animated recovery-terminal header (`docs/terminal.svg`) under the banner, a stats badge row (tracks, runtime, download size, Lighthouse scores, last transmission), the tracklist as a recovered file tree with the remastered lengths, and animated equaliser dividers (`docs/eq.svg`).
+
+### Changed
+
 - Stronger block on discovery: the site stays shared by direct link only. `robots.txt` now names about 100 search, AI, archive and SEO crawlers on top of blocking everyone. Every response (pages, audio, images, the 404 page and the netlify.app domains) carries an `X-Robots-Tag` noindex/noarchive/noimageindex/noai header. The site also opts out of text and data mining with `tdm-reservation`, `/.well-known/tdmrep.json` and `/ai.txt`.
 
 ### Changed
