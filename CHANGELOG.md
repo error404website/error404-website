@@ -5,6 +5,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Fixed
+
+- Footer on iPhones: the BACK TO TOP block no longer sits too high. The footer bar was adding the home-indicator safe area (about 34 px) that the player dock below it already reserves, leaving a ~61 px gap above the dock; it's now ~27 px.
+
 ## [1.2.0] — 2026-10-06
 
 The remastered album: all 20 tracks and the download replaced with the final remasters.
