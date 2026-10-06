@@ -154,7 +154,7 @@ gh release create v1.3.0 ARCHIVE_404.zip --title "ARCHIVE_404 · v1.3.0" --notes
 ### Notes
 
 - **Fluid scale:** the site is scaled with CSS `zoom` on large screens, and browsers don't rescale `vw`/`vh` under zoom. Size anything full-window as `calc(100vw / var(--ez, 1))`.
-- **Search engines:** `robots.txt` and the `robots` meta tag currently block all crawlers, AI crawlers included. Remove them when the site should be indexed.
+- **Search engines and AI:** the site is shared by direct link only. `robots.txt` blocks every crawler (search engines, AI training and AI search, archives, SEO tools), and every response carries `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex, noai, noimageai` (`netlify.toml`), matched by the `robots` meta tag. `tdm-reservation: 1`, `/.well-known/tdmrep.json` and `/ai.txt` opt out of text and data mining. To open the site to search later, remove all of these.
 - **Safari toolbar:** Safari 26 tints its toolbars from the fixed nav and the player dock, both `#000000`. It never tints in Private Browsing.
 - **Safari clipping:** Safari doesn't clip transformed (GPU-composited) children to `overflow: hidden`. Keep effects inside their box: animate a registered `@property`, a background position or a gradient centre rather than moving an oversized layer, and add `clip-path: inset(0)` when a child must move inside a clip.
 - **Icons:** draw UI icons as SVG or CSS shapes. iOS swaps characters like ⏮ ⏭ ☰ ▶ for coloured emoji (▶ is pinned to text with `U+FE0E`).

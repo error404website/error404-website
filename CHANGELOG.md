@@ -7,6 +7,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Stronger block on discovery: the site stays shared by direct link only. `robots.txt` now names about 100 search, AI, archive and SEO crawlers on top of blocking everyone. Every response (pages, audio, images, the 404 page and the netlify.app domains) carries an `X-Robots-Tag` noindex/noarchive/noimageindex/noai header. The site also opts out of text and data mining with `tdm-reservation`, `/.well-known/tdmrep.json` and `/ai.txt`.
+
+### Changed
+
 - THE WRECKAGE description: removed the closing line "It does not name it." so it matches the new description, which now ends on "It holds the frequency."
 
 ### Security

@@ -1,0 +1,3 @@
+# ai.txt: no AI training or text and data mining of any content on this site.
+User-Agent: *
+Disallow: /

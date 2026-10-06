@@ -36,3 +36,12 @@
     X-Frame-Options = "SAMEORIGIN"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+
+# Keep the site out of search engines, AI search/training and archives on every response
+# (pages, audio, images and the netlify.app domains too); it's shared by direct link only.
+# robots.txt and the robots meta tag say the same; tdm-reservation opts out of text and data mining.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive, nosnippet, noimageindex, noai, noimageai"
+    tdm-reservation = "1"
