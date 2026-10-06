@@ -5,6 +5,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Changed
+
+- THE WRECKAGE description: removed the closing line "It does not name it." so it matches the new description, which now ends on "It holds the frequency."
+
 ### Fixed
 
 - Footer on iPhones: the BACK TO TOP block no longer sits too high. The footer bar was adding the home-indicator safe area (about 34 px) that the player dock below it already reserves, leaving a ~61 px gap above the dock; it's now ~27 px.
