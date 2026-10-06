@@ -4,6 +4,10 @@
 
 <br />
 
+<img src="docs/terminal.svg" alt="Recovery terminal: RECOVERING ARCHIVE_404 · FILE 01–20/20 · 20/20 FILES INTACT · SIGNAL: LIVE · error404.run" width="100%" />
+
+<br />
+
 **ARCHIVE_404** — the debut project from **ERROR_404**.<br />
 Four chapters. Twenty recovered files. One transmission.
 
@@ -14,7 +18,15 @@ Four chapters. Twenty recovered files. One transmission.
 [![Release](https://img.shields.io/github/v/release/error404website/error404-website?style=flat-square&label=ARCHIVE_404&color=FF00E5&labelColor=030409)](https://github.com/error404website/error404-website/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/error404website/error404-website/total?style=flat-square&label=downloads&color=00EFFF&labelColor=030409)](https://github.com/error404website/error404-website/releases/latest)
 [![Licence](https://img.shields.io/badge/licence-all%20rights%20reserved-A100FF?style=flat-square&labelColor=030409)](LICENSE)
-[![Sound](https://img.shields.io/badge/sound-hyperpop%20·%20metalcore%20·%202--step-FF00E5?style=flat-square&labelColor=030409)](#the-archive)
+[![Sound](https://img.shields.io/badge/sound-hyperpop%20·%20metalcore%20·%20glitchcore-FF00E5?style=flat-square&labelColor=030409)](#the-archive)
+
+[![Tracks](https://img.shields.io/badge/tracks-20-FF00E5?style=flat-square&labelColor=030409)](#the-archive)
+[![Runtime](https://img.shields.io/badge/runtime-73%3A11-A100FF?style=flat-square&labelColor=030409)](#the-archive)
+[![Download](https://img.shields.io/badge/download-155%20MB-00EFFF?style=flat-square&labelColor=030409)](https://github.com/error404website/error404-website/releases/latest)
+[![Accessibility](https://img.shields.io/badge/a11y-100-4ade80?style=flat-square&logo=lighthouse&logoColor=F4F4F8&labelColor=030409)](https://error404.run)
+[![Best practices](https://img.shields.io/badge/best%20practices-100-4ade80?style=flat-square&logo=lighthouse&logoColor=F4F4F8&labelColor=030409)](https://error404.run)
+[![Performance (desktop)](https://img.shields.io/badge/perf%20%28desktop%29-97-4ade80?style=flat-square&logo=lighthouse&logoColor=F4F4F8&labelColor=030409)](https://error404.run)
+[![Last transmission](https://img.shields.io/github/last-commit/error404website/error404-website?style=flat-square&label=last%20transmission&color=FF00E5&labelColor=030409)](https://github.com/error404website/error404-website/commits/main)
 
 [![React](https://img.shields.io/badge/React-18-030409?style=flat-square&logo=react&logoColor=00EFFF)](https://react.dev)
 [![Vite](https://img.shields.io/badge/Vite-6-030409?style=flat-square&logo=vite&logoColor=FF00E5)](https://vitejs.dev)
@@ -26,7 +38,7 @@ Four chapters. Twenty recovered files. One transmission.
 
 </div>
 
----
+<p align="center"><img src="docs/eq.svg" alt="" width="100%" /></p>
 
 ## Screens
 
@@ -36,7 +48,7 @@ Four chapters. Twenty recovered files. One transmission.
 
 <table>
   <tr>
-    <td width="72%"><img src="docs/screenshot-catalogue.png" alt="Catalogue: THE FEED chapter card with hyperpop · metalcore · 2-step tags, the gradient play key, waveform and tracklist, with the dock below" /></td>
+    <td width="72%"><img src="docs/screenshot-catalogue.png" alt="Catalogue: THE FEED chapter card with hyperpop · metalcore · glitchcore tags, the gradient play key, waveform and tracklist, with the dock below" /></td>
     <td width="28%"><img src="docs/screenshot-mobile.png" alt="Phone: hero with the HYPERPOP MAXIMALISM tagline, the distressed menu icon and the dock playing 07 GOSPEL_OUT" /></td>
   </tr>
   <tr>
@@ -45,18 +57,41 @@ Four chapters. Twenty recovered files. One transmission.
   </tr>
 </table>
 
----
+<p align="center"><img src="docs/eq.svg" alt="" width="100%" /></p>
 
 ## The archive
 
-| Chapter             | Tracks                                                              |
-| ------------------- | ------------------------------------------------------------------- |
-| **01 ORIGIN**       | ORIGIN · LEFT_BEHIND · GRAFT · IMPACTED · EMPTY_CITY                |
-| **02 THE FEED**     | THE_FEED · GOSPEL_OUT · ENDLESS_GLOW · AWAKE · RECLAIMED            |
-| **03 THE WRECKAGE** | THE_WRECKAGE · READ · COME_HOME · CHANGED_THE_LOCK · DOWN_THE_FRONT |
-| **04 WHOLE**        | WHOLE · ENOUGH · OPEN_SKY · ALL_OF_ME · BETTER_DAYS                 |
+```
+ARCHIVE_404/
+├── 01_ORIGIN/
+│   ├── 01 origin.mp3 ................. 2:58
+│   ├── 02 left_behind.mp3 ............ 4:14
+│   ├── 03 graft.mp3 .................. 3:43
+│   ├── 04 impacted.mp3 ............... 4:34
+│   └── 05 empty_city.mp3 ............. 4:07
+├── 02_THE_FEED/
+│   ├── 06 the_feed.mp3 ............... 2:37
+│   ├── 07 gospel_out.mp3 ............. 3:51
+│   ├── 08 endless_glow.mp3 ........... 3:11
+│   ├── 09 awake.mp3 .................. 3:18
+│   └── 10 reclaimed.mp3 .............. 3:27
+├── 03_THE_WRECKAGE/
+│   ├── 11 the_wreckage.mp3 ........... 2:29
+│   ├── 12 read.mp3 ................... 3:31
+│   ├── 13 come_home.mp3 .............. 3:32
+│   ├── 14 changed_the_lock.mp3 ....... 4:05
+│   └── 15 down_the_front.mp3 ......... 4:07
+└── 04_WHOLE/
+    ├── 16 whole.mp3 .................. 2:16
+    ├── 17 enough.mp3 ................. 4:21
+    ├── 18 open_sky.mp3 ............... 3:56
+    ├── 19 all_of_me.mp3 .............. 4:07
+    └── 20 better_days.mp3 ............ 4:37
 
-Written and performed by **NULLSAINT** and **CACHEGHOST**. Hyperpop at its core, with metalcore and 2-step, presented as a recovered transmission.
+20 files · 73:11 · 155 MB · MP3 · ALL INTACT
+```
+
+Written and performed by **NULLSAINT** and **CACHEGHOST**. Hyperpop at its core, with metalcore and glitchcore, presented as a recovered transmission.
 
 ## What's inside the site
 
@@ -69,7 +104,7 @@ Written and performed by **NULLSAINT** and **CACHEGHOST**. Hyperpop at its core,
 - **End credits** footer, a wide-screen **telemetry gutter** (REC timecode and scroll position) and a branded **404**.
 - **One design system**: void black, a strict magenta → cyan duo, Bebas Neue / Space Mono / Inter, holo-foil buttons, gradient play keys, a distressed `>_` menu icon, viewfinder ticks and LED status chips. Everything animates on the GPU, respects Reduce Motion, and scales fluidly on large screens.
 
----
+<p align="center"><img src="docs/eq.svg" alt="" width="100%" /></p>
 
 ## Development
 
@@ -137,7 +172,7 @@ Put the MP3 in `public/audio/` under the same name. CI fails the build if a list
 | `?nointro`  | Skip the intro                                                              |
 | `?zoom=0.9` | Override the fluid scale (100% up to 1280px wide, easing to 85% at 1920px+) |
 
----
+<p align="center"><img src="docs/eq.svg" alt="" width="100%" /></p>
 
 ## Deployment
 
@@ -159,7 +194,7 @@ gh release create v1.3.0 ARCHIVE_404.zip --title "ARCHIVE_404 · v1.3.0" --notes
 - **Safari clipping:** Safari doesn't clip transformed (GPU-composited) children to `overflow: hidden`. Keep effects inside their box: animate a registered `@property`, a background position or a gradient centre rather than moving an oversized layer, and add `clip-path: inset(0)` when a child must move inside a clip.
 - **Icons:** draw UI icons as SVG or CSS shapes. iOS swaps characters like ⏮ ⏭ ☰ ▶ for coloured emoji (▶ is pinned to text with `U+FE0E`).
 
----
+<p align="center"><img src="docs/eq.svg" alt="" width="100%" /></p>
 
 <div align="center">
 
