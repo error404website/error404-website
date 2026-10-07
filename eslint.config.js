@@ -25,7 +25,7 @@ export default [
     },
   },
   {
-    files: ["*.config.js"],
-    languageOptions: { globals: { ...globals.node } },
+    files: ["*.config.js", "netlify/**/*.mjs", "scripts/**/*.mjs"],
+    languageOptions: { globals: { ...globals.node, Netlify: "readonly" } },
   },
 ];

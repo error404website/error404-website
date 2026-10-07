@@ -5,6 +5,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+
+- **Source Vault** at `/vault/`: a password-gated page with every track's stems, the Suno style prompts in all five production styles (colour-coded), original and Suno-optimised lyrics (same words, shorter section tags), a one-click Remix kit, a Camelot harmonic map, and each full song with its measured length, BPM and key (and how many detection models agree). It opens with the site's rain intro decrypting the 20 files, uses the site's menu, logo draw-on and end credits, and runs the track-name rain in the gutters on wide screens.
+- The access key, session and private content are handled by Netlify functions: the key is a Netlify environment variable, the session is a signed HttpOnly cookie, prompts/lyrics/analysis are committed only in encrypted form, and stems download through short-lived signed links from a private GitHub repo.
+
 ### Changed
 
 - End credits: the GitHub mark beside VIEW PROJECT → GITHUB now carries the magenta → cyan gradient, matching the GitHub mark in the footer bar.
