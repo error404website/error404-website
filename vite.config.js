@@ -43,5 +43,9 @@ export default defineConfig({
     // Hashed JS/CSS go to /_app so they can be cached forever without
     // colliding with the un-hashed files in public/assets.
     assetsDir: "_app",
+    // two pages: the site, and the password-gated Source Vault at /vault/
+    rollupOptions: {
+      input: { main: "index.html", vault: "vault/index.html" },
+    },
   },
 });

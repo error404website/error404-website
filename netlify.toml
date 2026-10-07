@@ -6,6 +6,22 @@
 [build.environment]
   NODE_VERSION = "22"
 
+# Source Vault server side: the key check, encrypted data and stem links (netlify/functions/vault-*.mjs)
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Cache-Control = "no-store"
+
+[[headers]]
+  for = "/vault/*"
+  [headers.values]
+    Cache-Control = "no-cache"
+    Referrer-Policy = "no-referrer"
+
 # Hashed JS/CSS bundles never change once published, so they can be cached forever.
 [[headers]]
   for = "/_app/*"

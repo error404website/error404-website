@@ -14,3 +14,6 @@ dist/
 
 # local editor / agent config
 .claude/
+
+# Source Vault private sources (only the encrypted netlify/vault-data.enc.json is committed)
+vault-private/

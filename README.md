@@ -135,6 +135,7 @@ public/                    copied as-is to the site root
 src/
   main.jsx · App.jsx       entry point and page order
   config.js                GitHub owner/repo and the album download URL
+  vault/                     Source Vault page script and styles (the page is vault/index.html)
   components/              BootSequence (intro), Nav, Hero, TaglineSwap, Collective,
                            Catalogue (chapter players), PlayerDock, Signal,
                            DownloadModal, Footer, Gutters, Name
@@ -185,6 +186,25 @@ gh release create v1.3.0 ARCHIVE_404.zip --title "ARCHIVE_404 · v1.3.0" --notes
 ```
 
 **Contact form:** submissions arrive under **Netlify → Site → Forms**.
+
+### Source Vault (`/vault/`)
+
+A private page for collaborators: every track's stems, the Suno prompts in all five production styles, original and Suno-optimised lyrics, and each song with its measured length, BPM and key. It opens with the access key, then plays a rain intro that "decrypts" the 20 files.
+
+The page itself is public code, so nothing private is in this repo in readable form:
+
+| Piece                     | Where it lives                                                                                                                                               |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Access key                | Netlify environment variable `VAULT_KEY`, checked by `netlify/functions/vault-unlock.mjs`                                                                    |
+| Session                   | Signed, HttpOnly cookie (`VAULT_SECRET`), valid 7 days                                                                                                       |
+| Prompts, lyrics, analysis | `netlify/vault-data.enc.json`, AES-256-GCM encrypted with `VAULT_DATA_KEY`; decrypted only by `vault-data.mjs` for a signed-in visitor                       |
+| Stems                     | Release `stems` on the private repo `error404website/error404-vault`; `vault-stem.mjs` hands out GitHub's 5-minute signed link (`VAULT_GH_TOKEN`, read-only) |
+
+**Netlify environment variables** (Site configuration → Environment variables, scope Functions, mark as secret): `VAULT_KEY`, `VAULT_SECRET`, `VAULT_DATA_KEY`, `VAULT_STEMS_REPO`, `VAULT_STEMS_TAG`, `VAULT_GH_TOKEN`. Local copies live in the git-ignored `.env.vault`.
+
+**Updating the prompts or analysis:** edit the files in the git-ignored `vault-private/`, run `npm run vault:encrypt`, and commit the new `netlify/vault-data.enc.json`.
+
+**Updating the stems:** upload the zips to the `stems` release on the private repo with the names `npm run vault:encrypt` prints (one per track, plus one per chapter for ALL STEMS, since GitHub caps a release file at 2 GB). Sizes appear in the vault automatically.
 
 ### Notes
 
