@@ -191,20 +191,20 @@ gh release create v1.3.0 ARCHIVE_404.zip --title "ARCHIVE_404 · v1.3.0" --notes
 
 A private page for collaborators: every track's stems, the Suno prompts in all five production styles, original and Suno-optimised lyrics, and each song with its measured length, BPM and key. It opens with the access key, then plays a rain intro that "decrypts" the 20 files.
 
-The page itself is public code, so nothing private is in this repo in readable form:
+The page is public code, so the private parts are locked:
 
-| Piece                     | Where it lives                                                                                                                                               |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Access key                | Netlify environment variable `VAULT_KEY`, checked by `netlify/functions/vault-unlock.mjs`                                                                    |
-| Session                   | Signed, HttpOnly cookie (`VAULT_SECRET`), valid 7 days                                                                                                       |
-| Prompts, lyrics, analysis | `netlify/vault-data.enc.json`, AES-256-GCM encrypted with `VAULT_DATA_KEY`; decrypted only by `vault-data.mjs` for a signed-in visitor                       |
-| Stems                     | Release `stems` on the private repo `error404website/error404-vault`; `vault-stem.mjs` hands out GitHub's 5-minute signed link (`VAULT_GH_TOKEN`, read-only) |
+| Piece                     | How it's protected                                                                                                                                                                                                                                                          |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Prompts, lyrics, analysis | `public/vault/data.enc.json`, AES-256-GCM with a key derived from **the access key itself** (PBKDF2-SHA256, 300,000 rounds). The browser opens it when the right key is typed; a wrong key can't.                                                                           |
+| Stem downloads            | Release `stems` on the private repo `error404website/error404-vault`. `netlify/functions/vault-stems.mjs` hands out GitHub's short-lived signed link, only to a visitor who proves they know the key (checked against `netlify/vault-proof.json`, which holds just a hash). |
 
-**Netlify environment variables** (Site configuration → Environment variables, scope Functions, mark as secret): `VAULT_KEY`, `VAULT_SECRET`, `VAULT_DATA_KEY`, `VAULT_STEMS_REPO`, `VAULT_STEMS_TAG`, `VAULT_GH_TOKEN`. Local copies live in the git-ignored `.env.vault`.
+**The one Netlify setting:** `VAULT_GH_TOKEN`, a fine-grained GitHub token with access to error404-vault only and **Contents: Read-only** (Site configuration → Environment variables, scope Functions, secret). Without it the page works and stems show SOON.
 
-**Updating the prompts or analysis:** edit the files in the git-ignored `vault-private/`, run `npm run vault:encrypt`, and commit the new `netlify/vault-data.enc.json`.
+**Changing the key, prompts or analysis:** edit `.env.vault` (`VAULT_KEY=…`) or the files in `vault-private/` (both git-ignored), run `npm run vault:encrypt`, and commit the two regenerated files.
 
-**Updating the stems:** upload the zips to the `stems` release on the private repo with the names `npm run vault:encrypt` prints (one per track, plus one per chapter for ALL STEMS, since GitHub caps a release file at 2 GB). Sizes appear in the vault automatically.
+**Updating the stems:** upload the zips to the `stems` release on the private repo using the names `npm run vault:encrypt` prints (one per track, plus one per chapter for ALL STEMS, since GitHub caps a release file at 2 GB). Sizes appear in the vault automatically.
+
+**Strength:** the key protects the files like a password on a zip. Someone could copy `data.enc.json` and try guesses offline, so use a long, unusual key if the contents need to stay secret from determined people.
 
 ### Notes
 

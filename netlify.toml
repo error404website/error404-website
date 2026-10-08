@@ -6,7 +6,7 @@
 [build.environment]
   NODE_VERSION = "22"
 
-# Source Vault server side: the key check, encrypted data and stem links (netlify/functions/vault-*.mjs)
+# Source Vault: the stems function (netlify/functions/vault-stems.mjs; needs VAULT_GH_TOKEN)
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"

@@ -3,4 +3,4 @@ node_modules
 public
 package-lock.json
 **/._*
-netlify/vault-data.enc.json
+netlify/vault-proof.json

@@ -1,5 +1,6 @@
-// Source Vault (/vault/). The page is public; everything private (prompts, lyrics, analysis, stem
-// links) comes from the vault functions (netlify/functions/vault-*.mjs) after the key is accepted.
+// Source Vault (/vault/). The page is public; the prompts, lyrics and analysis are locked with the
+// access key (public/vault/data.enc.json) and opened in the browser, and stem links come from
+// netlify/functions/vault-stems.mjs for visitors who prove they know the key.
 import "../styles/index.css";
 import "../styles/overrides.css";
 import "./vault.css";
@@ -363,19 +364,12 @@ $("#gateForm").addEventListener("submit", async (e) => {
   btn.disabled = true;
   say("> VERIFYING KEY…");
   try {
-    const r = await fetch("/api/vault/unlock", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      credentials: "same-origin",
-      body: JSON.stringify({ key: $("#pw").value }),
-    });
-    if (r.ok && (await loadData())) {
+    if (await unlockWith($("#pw").value)) {
       say("");
       $("#pw").blur();
       unlockSequence();
       return;
     }
-    if (r.status === 503) return say("> VAULT OFFLINE · TRY AGAIN LATER", true);
     const box = $(".gate-box");
     box.classList.remove("shake");
     void box.offsetWidth;
@@ -449,12 +443,12 @@ function startNav() {
   addEventListener("scroll", spy, { passive: true });
   spy();
 }
-$("#lockBtn").onclick = async () => {
+$("#lockBtn").onclick = () => {
   au.pause();
   try {
-    await fetch("/api/vault/lock", { method: "POST", credentials: "same-origin" });
+    sessionStorage.removeItem(SESSION);
   } catch {
-    /* reload anyway */
+    /* nothing stored */
   }
   location.reload();
 };
@@ -714,17 +708,17 @@ async function download(slug) {
   $("#xSpeed").textContent = "—";
   $("#xLeft").textContent = `${files.length} FILE${files.length > 1 ? "S" : ""}`;
   st("CONNECTING", "var(--amber)");
-  log.innerHTML = "&gt; HANDSHAKE · VAULT SESSION OK";
+  log.innerHTML = "&gt; HANDSHAKE · ACCESS KEY VERIFIED";
   let done = 0;
   for (const f of files) {
     let r;
     try {
-      r = await fetch(`/api/vault/stem?f=${encodeURIComponent(f.asset)}`, { credentials: "same-origin" });
+      r = await stemsApi({ f: f.asset });
     } catch {
       r = null;
     }
     if (!r || !r.ok) {
-      const why = r && r.status === 401 ? "SESSION EXPIRED · LOCK AND UNLOCK AGAIN" : "NOT UPLOADED YET";
+      const why = r && r.status === 401 ? "KEY NOT ACCEPTED · LOCK AND UNLOCK AGAIN" : "NOT UPLOADED YET";
       st(r && r.status === 401 ? "LOCKED" : "PENDING", "var(--amber)");
       log.innerHTML += `<br />&gt; ${esc(f.label)} · <em>${why}</em>`;
       continue;
@@ -1040,24 +1034,97 @@ function drawRuler() {
 }
 addEventListener("resize", drawRuler);
 
+/* ---------- unlocking: the data is locked with the access key itself ----------
+   public/vault/data.enc.json is AES-256-GCM with a key derived from the access key (PBKDF2-SHA256), so the
+   browser can only open it with the right key. A second derivation ("proof") lets the stems function check
+   the visitor knows the key. Both are kept for this tab only (sessionStorage), and LOCK forgets them. */
+const SESSION = "e404-vault";
 let SIZES = {},
   STEMS_READY = false,
   CHAPTERS = [],
-  loaded = false;
-async function loadData() {
-  if (loaded) return true;
-  const r = await fetch("/api/vault/data", { credentials: "same-origin" });
-  if (!r.ok) return false;
-  const d = await r.json();
+  PROOF = "",
+  loaded = false,
+  sealed = null;
+const b64 = {
+  to: (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))),
+  from: (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0)),
+};
+async function getSealed() {
+  if (!sealed) sealed = await (await fetch("/vault/data.enc.json", { cache: "no-cache" })).json();
+  return sealed;
+}
+async function derive(key, salt, iterations) {
+  const base = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(key.trim().toLowerCase()),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  );
+  return crypto.subtle.deriveBits(
+    { name: "PBKDF2", hash: "SHA-256", salt: b64.from(salt), iterations },
+    base,
+    256,
+  );
+}
+async function openVault(rawKey, proof) {
+  const s = await getSealed();
+  try {
+    const k = await crypto.subtle.importKey("raw", rawKey, "AES-GCM", false, ["decrypt"]);
+    const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64.from(s.iv) }, k, b64.from(s.data));
+    applyData(JSON.parse(new TextDecoder().decode(plain)));
+    PROOF = proof;
+    return true;
+  } catch {
+    return false; // wrong key: the authenticated decryption fails
+  }
+}
+async function unlockWith(key) {
+  if (!key.trim()) return false;
+  const s = await getSealed();
+  const [raw, proof] = await Promise.all([
+    derive(key, s.salt, s.iterations),
+    derive(key, s.proofSalt, s.iterations),
+  ]);
+  const ok = await openVault(raw, b64.to(proof));
+  if (ok)
+    try {
+      sessionStorage.setItem(SESSION, JSON.stringify({ k: b64.to(raw), p: b64.to(proof), salt: s.salt }));
+    } catch {
+      /* private browsing: the vault still works, it just asks again next time */
+    }
+  return ok;
+}
+async function stemsApi(body) {
+  return fetch("/api/vault/stems", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ proof: PROOF, ...body }),
+  });
+}
+async function loadSizes() {
+  try {
+    const r = await stemsApi({});
+    if (!r.ok) return;
+    const d = await r.json();
+    SIZES = d.sizes || {};
+    STEMS_READY = d.ready;
+  } catch {
+    /* offline: sizes just stay hidden */
+  }
+  const total = TRACKS.reduce((n, t) => n + (SIZES[t.asset] || 0), 0);
+  $("#stemTotal").textContent = STEMS_READY && total ? mb(total) : "SOON";
+  $("#allSize").textContent = STEMS_READY && total ? mb(total) : "SOON";
+  if (STEMS_READY) render();
+}
+function applyData(d) {
+  if (loaded) return;
   loaded = true;
   TRACKS = d.tracks;
   CHAPTERS = d.chapters;
   parsePrompts(d.prompts);
-  SIZES = d.stems.sizes || {};
-  STEMS_READY = d.stems.ready;
-  const total = TRACKS.reduce((n, t) => n + (SIZES[t.asset] || 0), 0);
-  $("#stemTotal").textContent = STEMS_READY && total ? mb(total) : "SOON";
-  $("#allSize").textContent = STEMS_READY && total ? mb(total) : "SOON";
+  $("#stemTotal").textContent = "SOON";
+  $("#allSize").textContent = "SOON";
   $("#masterBox").textContent = MASTER;
   $("#palette").innerHTML = PSTYLES.map(
     (p) =>
@@ -1066,12 +1133,17 @@ async function loadData() {
   render();
   drawWheel();
   side();
-  return true;
+  loadSizes();
 }
-// Already signed in (session cookie) → straight into the vault; otherwise the gate.
-loadData()
-  .then((ok) => {
-    if (ok) reveal();
-    else $("#pw").focus();
-  })
-  .catch(() => $("#pw").focus());
+// Unlocked earlier in this tab → straight into the vault; otherwise the gate.
+(async () => {
+  let saved = null;
+  try {
+    saved = JSON.parse(sessionStorage.getItem(SESSION) || "null");
+  } catch {
+    saved = null;
+  }
+  if (saved && (await getSealed()).salt === saved.salt && (await openVault(b64.from(saved.k), saved.p)))
+    reveal();
+  else $("#pw").focus();
+})().catch(() => $("#pw").focus());
