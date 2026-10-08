@@ -12,6 +12,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Source Vault: the access number is now **Nº404** everywhere (nav, phone menu, header seal, stats, end credits, unlock intro). With the stems uploaded, the "SOON" / "UPLOADING SOON" placeholders are gone: the STEMS stat counts the stems (220, each as WAV + MIDI), ALL STEMS shows its total size once the release answers, each track's stems tab shows its stem count, the intro line reads "full stems as WAV and MIDI", and a failed download now says UNAVAILABLE · TRY AGAIN instead of NOT UPLOADED YET.
 - Source Vault stems: the remastered stems are in. Each track's zip holds its WAV stems and MIDI files (10–12 stems per track, every one as WAV + MIDI), and the stem lists now match the real files. ALL STEMS hands over the 20 track zips one after another (a chapter zip would pass GitHub's 2 GB per-file cap). The per-stem WAV / MIDI chips are labels now, not mock-up buttons.
 - Source Vault phone menu: one link is always lit with the gradient, like the site's menu. At the top of the page that's PROMPTS, the first section.
 - Source Vault phone menu: it now opens exactly like the site's menu: full screen with the slat wipe, the SYS::OPEN chip, big outlined poster links with numbered captions (the section you're on fills with the gradient), and the split buttons at the bottom.
