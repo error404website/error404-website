@@ -246,7 +246,11 @@ body.live.stage-mode {
 .lv-menu .e4c-l {
   font-family: var(--head);
 }
-.lv-menu .e4c-link.on .e4c-l {
+/* the section you're on, and any link you hover or tab to, fills with the whole gradient
+   (the site's menu turns a hovered link solid white; here it lights the same way the active one does) */
+.lv-menu .e4c-link.on .e4c-l,
+.lv-menu .e4c-link:hover .e4c-l,
+.lv-menu .e4c-link:focus-visible .e4c-l {
   background: var(--grad);
   -webkit-background-clip: text;
   background-clip: text;
