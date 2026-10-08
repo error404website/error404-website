@@ -12,6 +12,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Source Vault identity: its own favicon (the vault's `>_` prompt in a gradient frame, with a 32 px PNG and an iPhone home-screen icon), page tags (title "Source Vault · ERROR_404", description "Restricted. Access key required.") and a share image for link previews: the logo beside the Nº 404 seal and ACCESS REQUIRED, in the same frame as the main site's. The tags never mention what's inside, and the vault stays noindex and blocked from search and AI crawlers.
 - Source Vault: the STYLES stat in the header is now GENRE: HYPERPOP (was STYLES: 5 + NONE).
 - Intros: the site intro and the vault's unlock intro now carry the ACCESS REQUIRED page's soft violet glow over the rain (one shared layer, same colour, size and position), in place of their dark edge vignette, so the gate → unlock hand-off keeps the same light.
 - Source Vault: the access number is now **Nº404** everywhere (nav, phone menu, header seal, stats, end credits, unlock intro). With the stems uploaded, the "SOON" / "UPLOADING SOON" placeholders are gone: the STEMS stat counts the stems (220, each as WAV + MIDI), ALL STEMS shows its total size once the release answers, each track's stems tab shows its stem count, the intro line reads "full stems as WAV and MIDI", and a failed download now says UNAVAILABLE · TRY AGAIN instead of NOT UPLOADED YET.
