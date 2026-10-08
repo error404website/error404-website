@@ -399,57 +399,6 @@ a {
   pointer-events: none;
   background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.3) 0 1px, transparent 1px 3px);
 }
-.vi-term {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 3;
-  transform: translate(-50%, -50%);
-  padding: 18px 22px;
-  min-width: min(460px, calc(100vw - 48px));
-  background: rgba(3, 4, 9, 0.78);
-  border: 1px solid rgba(244, 244, 248, 0.12);
-  font-family: var(--mono);
-  font-size: clamp(11px, 1.3vw, 15px);
-  letter-spacing: 0.08em;
-  line-height: 2;
-  color: var(--ghost);
-  white-space: nowrap;
-  text-shadow: 0 0 10px rgba(255, 0, 229, 0.5);
-  transition: opacity 0.4s;
-}
-.vi-term.out {
-  opacity: 0;
-}
-.vi-term b {
-  font-weight: 400;
-  color: var(--mag);
-}
-.vi-term i {
-  font-style: normal;
-  color: var(--cyan);
-}
-.vi-term .ok {
-  color: var(--led);
-}
-.vi-term .t {
-  margin-left: 1.2em;
-  color: rgba(244, 244, 248, 0.6);
-}
-@media (max-width: 520px) {
-  .vi-term .t {
-    display: block;
-    margin-left: 1.4em;
-  }
-}
-.vi-term .cur {
-  display: inline-block;
-  width: 0.6em;
-  height: 1.1em;
-  background: var(--grad);
-  vertical-align: -0.2em;
-  animation: blink 1s steps(2) infinite;
-}
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1089,8 +1038,15 @@ details.fold[open] summary::after {
   .toolbar {
     flex-wrap: wrap;
   }
+  /* chapter buttons wrap onto a second row instead of scrolling off the edge */
   .chips-scroll {
     flex: 1 1 100%;
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+  .chips-scroll .gbtn {
+    flex: 1 1 auto;
+    justify-content: center;
   }
   .search {
     flex: 1;
