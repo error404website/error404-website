@@ -28,13 +28,11 @@
 
     <!-- ================= GATE ================= -->
     <div class="gate scan" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-h">
+      <canvas class="gate-rain" id="gateRain" aria-hidden="true"></canvas>
       <form class="gate-box" id="gateForm" autocomplete="off">
+        <span class="vf" aria-hidden="true"></span>
         <div class="tg"><i></i>RESTRICTED · SOURCE VAULT</div>
-        <h1 id="gate-h">ACCESS<br /><span class="grad">REQUIRED.</span></h1>
-        <div class="term" id="term">
-          <b>&gt;</b> ARCHIVE_404 SOURCE FILES DETECTED<br /><b>&gt;</b> STEMS · PROMPTS · LYRICS ·
-          ANALYSIS<br /><b>&gt;</b> <em>ENTER ACCESS KEY</em>
-        </div>
+        <h1 id="gate-h">ACCESS <span class="grad">REQUIRED.</span></h1>
         <label class="field"
           ><span>&gt;_</span
           ><input
@@ -44,8 +42,8 @@
             spellcheck="false"
             aria-label="Access key"
             placeholder="ACCESS KEY"
-        /></label>
-        <button class="holo" type="submit">UNLOCK THE VAULT</button>
+          /><button class="go" type="submit" aria-label="Unlock the vault">→</button></label
+        >
         <div class="msg" id="msg" role="status" aria-live="polite"></div>
       </form>
     </div>

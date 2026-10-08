@@ -142,8 +142,26 @@ a {
   display: grid;
   place-items: center;
   padding: 24px 16px;
-  background:
-    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(161, 0, 255, 0.14), transparent 70%), var(--void);
+  background: var(--void);
+}
+/* the site's digital rain behind the card (public words only: track titles and stem types) */
+.gate-rain {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.gate::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(161, 0, 255, 0.14), transparent 70%);
+}
+.gate.scan::after {
+  z-index: 1;
 }
 .gate.out {
   opacity: 0;
@@ -155,18 +173,20 @@ a {
 .gate-box {
   position: relative;
   z-index: 2;
-  width: min(440px, 100%);
-  padding: 32px 26px 26px;
-  background: rgba(3, 4, 9, 0.85);
-  border: 1px solid var(--hair);
+  width: min(270px, 100%);
+  padding: 18px 16px 10px;
+  background: radial-gradient(closest-side, rgba(3, 4, 9, 0.92), rgba(3, 4, 9, 0.75) 70%, transparent);
 }
 .gate-box::before,
-.gate-box::after {
+.gate-box::after,
+.gate-box .vf::before,
+.gate-box .vf::after {
   content: "";
   position: absolute;
   width: 14px;
   height: 14px;
   border: 1px solid var(--mag);
+  pointer-events: none;
 }
 .gate-box::before {
   top: -1px;
@@ -181,9 +201,28 @@ a {
   border-top: 0;
   border-color: var(--cyan);
 }
+.gate-box .vf {
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+}
+.gate-box .vf::before {
+  top: 0;
+  right: 0;
+  border-left: 0;
+  border-bottom: 0;
+  border-color: var(--cyan);
+}
+.gate-box .vf::after {
+  bottom: 0;
+  left: 0;
+  border-right: 0;
+  border-top: 0;
+}
 .gate .tg {
   font-family: var(--mono);
-  font-size: 9px;
+  font-size: 8px;
+  white-space: nowrap;
   letter-spacing: 0.32em;
   color: var(--mag);
   display: flex;
@@ -205,30 +244,9 @@ a {
 .gate h1 {
   font-family: var(--head);
   font-weight: 400;
-  font-size: clamp(3rem, 13vw, 4.4rem);
+  font-size: 1.7rem;
   line-height: 0.86;
-  margin: 16px 0 12px;
-}
-.term {
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  color: var(--t2);
-  line-height: 1.9;
-  margin-bottom: 18px;
-  min-height: 68px;
-}
-.term b {
-  color: var(--mag);
-  font-weight: 400;
-}
-.term em {
-  font-style: normal;
-  color: var(--cyan);
-}
-.term i {
-  font-style: normal;
-  color: var(--led);
+  margin: 8px 0 10px;
 }
 .field {
   display: flex;
@@ -242,7 +260,7 @@ a {
 .field span {
   display: grid;
   place-items: center;
-  padding: 0 12px;
+  padding: 0 10px;
   font-family: var(--mono);
   color: var(--mag);
 }
@@ -255,20 +273,32 @@ a {
   color: var(--ghost);
   font-family: var(--mono);
   font-size: 16px;
-  letter-spacing: 0.2em;
-  padding: 14px 4px;
+  letter-spacing: 0.14em;
+  padding: 10px 2px;
 }
-.gate .holo {
-  width: 100%;
-  margin-top: 14px;
-  min-height: 50px;
+.field .go {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  flex: none;
+  font-family: var(--mono);
+  color: var(--ghost);
+  border-left: 1px solid var(--hair);
+}
+.field .go:hover,
+.field .go:focus-visible {
+  background: rgba(255, 0, 229, 0.12);
+  outline: none;
+}
+.field .go:disabled {
+  color: var(--t4);
 }
 .gate .msg {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 8.5px;
   letter-spacing: 0.22em;
   min-height: 16px;
-  margin-top: 14px;
+  margin-top: 8px;
   color: var(--t3);
 }
 .gate .msg.bad {
