@@ -165,8 +165,8 @@ a {
 .gate-box {
   position: relative;
   z-index: 2;
-  width: min(270px, 100%);
-  padding: 18px 16px 10px;
+  width: min(380px, 100%);
+  padding: 20px 18px 12px;
   background: radial-gradient(closest-side, rgba(3, 4, 9, 0.92), rgba(3, 4, 9, 0.75) 70%, transparent);
 }
 .gate-box::before,
@@ -238,23 +238,37 @@ a {
   font-weight: 400;
   font-size: 1.7rem;
   line-height: 0.86;
-  margin: 8px 0 10px;
+  margin: 8px 0 12px;
+}
+/* K4 · labelled key field: label + SHOW toggle, a calm 14 px field that fits a long key, full-width UNLOCK */
+.field-l {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+.field-l label,
+.field-l .show {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  color: var(--t3);
+}
+.field-l .show:hover,
+.field-l .show:focus-visible {
+  color: var(--cyan);
+  outline: none;
 }
 .field {
   display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 12px;
   border: 1px solid var(--hair);
   background: #05060c;
 }
 .field:focus-within {
-  border-color: rgba(255, 0, 229, 0.6);
-  box-shadow: 0 0 0 1px rgba(255, 0, 229, 0.25);
-}
-.field span {
-  display: grid;
-  place-items: center;
-  padding: 0 10px;
-  font-family: var(--mono);
-  color: var(--mag);
+  border-color: rgba(0, 239, 255, 0.5);
 }
 .field input {
   flex: 1;
@@ -263,27 +277,53 @@ a {
   border: 0;
   outline: 0;
   color: var(--ghost);
+  font-family: Inter, sans-serif;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+.field input::placeholder {
   font-family: var(--mono);
-  font-size: 16px;
-  letter-spacing: 0.14em;
-  padding: 10px 2px;
-}
-.field .go {
-  display: grid;
-  place-items: center;
-  width: 46px;
-  flex: none;
-  font-family: var(--mono);
-  color: var(--ghost);
-  border-left: 1px solid var(--hair);
-}
-.field .go:hover,
-.field .go:focus-visible {
-  background: rgba(255, 0, 229, 0.12);
-  outline: none;
-}
-.field .go:disabled {
+  font-size: 10px;
+  letter-spacing: 0.2em;
   color: var(--t4);
+}
+/* Safari's key / autofill button would take the field's space */
+.field input::-webkit-credentials-auto-fill-button,
+.field input::-webkit-contacts-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+  width: 0;
+  margin: 0;
+}
+.gate .go {
+  width: 100%;
+  height: 34px;
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.3em;
+  color: var(--ghost);
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#05060c, #05060c) padding-box,
+    var(--grad) border-box;
+}
+.gate .go:hover,
+.gate .go:focus-visible {
+  outline: none;
+  background:
+    linear-gradient(rgba(255, 0, 229, 0.1), rgba(0, 239, 255, 0.1)) padding-box,
+    var(--grad) border-box;
+}
+.gate .go:disabled {
+  color: var(--t4);
+}
+/* phones: 16 px while typing so iOS Safari doesn't zoom the page */
+@media (max-width: 760px) {
+  .field input {
+    font-size: 16px;
+  }
 }
 .gate .msg {
   font-family: var(--mono);

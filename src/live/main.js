@@ -9,6 +9,7 @@ import "../styles/overrides.css";
 import "../vault/vault.css";
 import "./live.css";
 import { audioSrc } from "../lib/audioSrc";
+import { keyField } from "../lib/keyField";
 import { rain, REDUCE } from "../lib/rain";
 import { Engine } from "./engine";
 import { PAD_DEFS, synthKit, vocalChop } from "./pads";
@@ -159,6 +160,7 @@ const TITLE_WORDS = [
   "SYNTH",
   "LIVE",
 ];
+keyField($("#pw"), $("#pwShow"));
 $("#gateForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const msg = $("#msg");

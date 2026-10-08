@@ -54,17 +54,22 @@
         <span class="vf" aria-hidden="true"></span>
         <div class="tg"><i></i>RESTRICTED · LIVE</div>
         <h1 id="gate-h">ACCESS <span class="grad">REQUIRED.</span></h1>
-        <label class="field"
-          ><span>&gt;_</span
-          ><input
+        <div class="field-l">
+          <label for="pw">ACCESS KEY</label
+          ><button class="show" id="pwShow" type="button" aria-controls="pw" aria-pressed="false">
+            SHOW
+          </button>
+        </div>
+        <div class="field">
+          <input
             id="pw"
             type="password"
             autocapitalize="off"
             spellcheck="false"
-            aria-label="Access key"
-            placeholder="ACCESS KEY"
-          /><button class="go" type="submit" aria-label="Unlock">→</button></label
-        >
+            placeholder="PASTE OR TYPE"
+          />
+        </div>
+        <button class="go" type="submit" aria-label="Unlock">UNLOCK →</button>
         <div class="msg" id="msg" role="status" aria-live="polite"></div>
       </form>
     </div>
