@@ -12,6 +12,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Audio: the 20 tracks' MP3 tags are cleaned and rewritten. The Suno links, "made with suno" comments and C2PA records are gone; each track now carries its title (e.g. LEFT_BEHIND), artist ERROR_404, album ARCHIVE_404, track n/20, year, genre, composers NULLSAINT · CACHEGHOST, its chapter, plain lyrics and the album artwork (with its own C2PA record stripped; the picture is unchanged). The audio itself is bit-for-bit unchanged.
 - HTTPS: every response now tells browsers to use https for error404.run and all its subdomains (www included) for two years, even from an `http://` link, and to fetch any stray `http://` file over https. The site is ready to be added to the browsers' built-in https list (hstspreload.org).
 - Source Vault identity: its own favicon (the vault's `>_` prompt in a gradient frame, with a 32 px PNG and an iPhone home-screen icon), page tags (title "Source Vault · ERROR_404", description "Restricted. Access key required.") and a share image for link previews: the logo beside the Nº 404 seal and ACCESS REQUIRED, in the same frame as the main site's. The tags never mention what's inside, and the vault stays noindex and blocked from search and AI crawlers.
 - Source Vault: the STYLES stat in the header is now GENRE: HYPERPOP (was STYLES: 5 + NONE).
