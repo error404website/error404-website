@@ -325,9 +325,12 @@ function startShow() {
     $$("[data-loop]").forEach((b) =>
       b.classList.toggle("on", !!engine.loop && engine.loop.bars === +b.dataset.loop),
     );
+    if (lyrRain) engine.playing ? lyrRain.resume() : lyrRain.pause();
     broadcast();
   };
   wireControls();
+  startMenu();
+  startLyricRain();
   requestAnimationFrame(frame);
   toast("SPACE = PLAY / PAUSE · PADS ON 1–4 Q–R A–F Z–V");
 }
@@ -378,6 +381,7 @@ function frame() {
   if (k !== frame.k) {
     frame.k = k;
     refreshVoxPads(k);
+    lyrRain?.words(songWords(song));
   }
   requestAnimationFrame(frame);
 }
@@ -657,6 +661,7 @@ function wireControls() {
     const p = $("#padsPanel");
     p.hidden = !p.hidden;
     $("#padsBtn").classList.toggle("on", !p.hidden);
+    $('[data-view="pads"]').classList.toggle("on", !p.hidden);
   };
   CTL.PADS = { press: () => $("#padsBtn").click() };
   // safety
@@ -664,26 +669,25 @@ function wireControls() {
     S.panic = !S.panic;
     engine.panic(S.panic);
     $("#panicBtn").classList.toggle("on", S.panic);
-    $("#panicBtn").textContent = S.panic ? "FADED · TAP TO RESTORE" : "PANIC · FADE";
+    $("#panicBtn span").textContent = S.panic ? "FADED · TAP TO RESTORE" : "PANIC · FADE";
   };
   CTL.PANIC = { press: () => $("#panicBtn").click() };
+  // LOCK (strip, nav, menu): one tap locks the console, hold 1 s to unlock
   let hold = 0;
-  const lockBtn = $("#lockBtn");
-  lockBtn.addEventListener("pointerdown", () => {
-    if (!S.locked) return setLock(true);
-    hold = setTimeout(() => setLock(false), 1000);
+  $$("[data-lock]").forEach((b) => {
+    b.addEventListener("pointerdown", () => {
+      if (!S.locked) return setLock(true);
+      hold = setTimeout(() => setLock(false), 1000);
+    });
+    b.addEventListener("pointerup", () => clearTimeout(hold));
+    b.addEventListener("pointerleave", () => clearTimeout(hold));
   });
-  lockBtn.addEventListener("pointerup", () => clearTimeout(hold));
-  lockBtn.addEventListener("pointerleave", () => clearTimeout(hold));
   $("#crowdBtn").onclick = () => {
     if (S.locked) return;
     CTL.VOX.set(S.crowd ? (S.voxBefore ?? 1) : ((S.voxBefore = S.vox), 0));
   };
   CTL.CROWD = { press: () => $("#crowdBtn").click() };
-  $("#stageBtn").onclick = () => {
-    window.open("/live/?stage", "e404-stage", "popup,width=1280,height=720");
-    setTimeout(broadcast, 800);
-  };
+  $("#stageBtn").onclick = openStage;
   $("#recBtn").onclick = toggleRec;
   $("#midiBtn").onclick = midi;
   addEventListener("keydown", (e) => {
@@ -699,11 +703,89 @@ function wireControls() {
   setInterval(meters, 60);
   setInterval(broadcast, 500);
 }
+function openStage() {
+  window.open("/live/?stage", "e404-stage", "popup,width=1280,height=720");
+  setTimeout(broadcast, 800);
+}
 function setLock(on) {
   S.locked = on;
   document.body.classList.toggle("lv-locked", on);
   $("#lockBtn").classList.toggle("on", on);
-  $("#lockBtn").textContent = on ? "🔒 LOCKED · HOLD" : "🔒 LOCK";
+  $("#lockBtn span").textContent = on ? "LOCKED · HOLD" : "LOCK";
+  $$(".e-split-dl[data-lock]").forEach((b) => (b.textContent = on ? "LOCKED · HOLD" : "LOCK ↺"));
+}
+
+/* ---------- the vault's menu: burger → slat wipe ---------- */
+function setMenu(o) {
+  const menu = $("#lvMenu"),
+    burger = $("#burger");
+  menu.classList.toggle("is-open", o);
+  menu.setAttribute("aria-hidden", !o);
+  menu.inert = !o;
+  burger.setAttribute("aria-expanded", o);
+  burger.classList.toggle("is-open", o);
+  burger.setAttribute("aria-label", o ? "Close menu" : "Open menu");
+}
+function startMenu() {
+  $("#burger").onclick = () => setMenu(!$("#lvMenu").classList.contains("is-open"));
+  addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && $("#lvMenu").classList.contains("is-open")) setMenu(false);
+  });
+  $$("[data-view]").forEach((a) =>
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      setMenu(false);
+      const v = a.dataset.view,
+        pads = $("#padsPanel");
+      if (v === "stage") return openStage();
+      if (v === "pads") return pads.hidden && $("#padsBtn").click();
+      if (!pads.hidden) $("#padsBtn").click();
+      if (v === "setlist") {
+        const li = $("#setl li.now") || $("#setl li");
+        li?.scrollIntoView({ block: "center", behavior: "smooth" });
+        $("#setl").classList.add("flash");
+        setTimeout(() => $("#setl").classList.remove("flash"), 1200);
+      }
+    }),
+  );
+  // the REC readout in the nav: Nº404 when idle, the recording's running time when recording
+  setInterval(() => {
+    const bk = $("#recBk");
+    bk.classList.toggle("lv-rec-on", !!rec);
+    bk.textContent = rec ? `REC ${fmt((Date.now() - rec.t0) / 1000)}` : "Nº404";
+    $("#recMenuBk").classList.toggle("lv-rec-on", !!rec);
+  }, 250);
+}
+
+/* ---------- digital rain behind the lyrics (R2), streaming the words of the song that's on ---------- */
+let lyrRain = null;
+function songWords(song) {
+  const w = [
+    ...new Set(
+      TL.lines
+        .filter((l) => l.n === song.n)
+        .flatMap((l) => l.text.toUpperCase().split(/\s+/))
+        .map((x) => x.replace(/[^A-Z0-9_']/g, ""))
+        .filter((x) => x.length > 2),
+    ),
+  ];
+  return w.length ? [song.title, ...w] : TITLE_WORDS;
+}
+function startLyricRain() {
+  if (REDUCE) return;
+  const cv = $("#lyrRain"),
+    song = () => TL.songs[engine.songAt(engine.now())];
+  const start = () => {
+    lyrRain?.stop();
+    lyrRain = rain(cv, songWords(song()));
+    if (!engine.playing) lyrRain.pause();
+  };
+  start();
+  let rt = 0;
+  addEventListener("resize", () => {
+    clearTimeout(rt);
+    rt = setTimeout(start, 250);
+  });
 }
 function meters() {
   if (!engine?.analyser) return;
@@ -815,12 +897,14 @@ function toggleRec() {
     a.click();
     rec = null;
     $("#recBtn").classList.remove("on");
-    $("#recTxt").textContent = "REC";
+    $("#recTxt").textContent = "● RECORD THE SHOW";
     toast("RECORDING SAVED TO YOUR DOWNLOADS");
   };
   rec.start(1000);
+  rec.t0 = Date.now();
   $("#recBtn").classList.add("on");
-  $("#recTxt").textContent = "● REC · TAP TO STOP";
+  $("#recTxt").textContent = "■ STOP RECORDING";
+  setMenu(false);
 }
 
 /* ---------- MIDI: connect, then learn (click a control, move a knob / hit a pad) ---------- */
@@ -849,6 +933,10 @@ async function midi() {
   }
   learnFor = learnFor ? null : "pick";
   document.body.classList.toggle("lv-learn", !!learnFor);
+  if (learnFor) {
+    setMenu(false); // the controls to learn are under the menu
+    toast("MIDI LEARN · CLICK A CONTROL, THEN MOVE A KNOB OR HIT A PAD");
+  }
   $("#midiTxt").textContent = learnFor ? "LEARN · CLICK A CONTROL" : `MIDI · ${midi.access.inputs.size} IN`;
 }
 document.addEventListener(
@@ -861,6 +949,7 @@ document.addEventListener(
     e.stopPropagation();
     learnFor = el.dataset.ctl;
     $("#midiTxt").textContent = `LEARN · MOVE A CONTROL FOR ${learnFor}`;
+    toast(`NOW MOVE A CONTROL FOR ${learnFor}`);
   },
   true,
 );
