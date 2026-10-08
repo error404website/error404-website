@@ -152,14 +152,6 @@ a {
   height: 100%;
   display: block;
 }
-.gate::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(161, 0, 255, 0.14), transparent 70%);
-}
 .gate.scan::after {
   z-index: 1;
 }
@@ -386,12 +378,6 @@ a {
   inset: 0;
   width: 100%;
   height: 100%;
-}
-.vi-vig {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse 70% 70% at 50% 50%, transparent 30%, rgba(3, 4, 9, 0.85) 100%);
 }
 .vi-scan {
   position: absolute;
