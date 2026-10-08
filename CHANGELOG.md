@@ -13,6 +13,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Live show menu: hovering (or tabbing to) a link now fills it with the whole magenta → cyan gradient, the same as the section you're on, instead of turning it solid white.
 - Live show: the nav logo now draws itself on when the show opens and replays on hover, like the Source Vault's (the site's logo-fx script).
 - Access gates (/vault/ and /live/): a calmer key field that fits a long key. The card is wider (380 px), the field is 14 px with tight spacing under a small ACCESS KEY label, a SHOW / HIDE toggle lets people check what they typed, and a full-width gradient-edged UNLOCK → button replaces the arrow. Safari's key icon no longer covers the field, and phones keep 16 px text so iOS doesn't zoom.
 - **Live show stage screen and menu:** the stage screen now has the cinematic look: full-screen rain (the playing song's words, paused with the show) under a vignette, the song name between gradient rules, and centred lyrics that shrink long lines to two. In the open menu the active link shows the whole magenta → cyan gradient (it was stretched across the screen, so only magenta showed).
