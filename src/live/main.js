@@ -314,6 +314,8 @@ const S = {
   filter: 0,
 };
 function startShow() {
+  if (startShow.done) return; // a double-click on START must not wire everything twice
+  startShow.done = true;
   $("#pre").hidden = true;
   $("#show").hidden = false;
   document.body.classList.add("showing");
@@ -372,7 +374,6 @@ function frame() {
     prev: $("#lyPrev"),
     cur: $("#lyCur"),
     nxt: $("#lyNxt"),
-    nxt2: $("#lyNxt2"),
   });
   renderCue(t, k);
   renderNext(t, k);
@@ -431,6 +432,8 @@ function renderLyrics(t, el) {
   } else if (nx && nx.t - t <= 4 * beat && nx.n === TL.songs[engine.songAt(t)].n) {
     el.cur.innerHTML = `<span class="lv-count">${Math.max(1, Math.ceil((nx.t - t) / beat))}…</span>`;
   } else el.cur.innerHTML = `<span class="lv-rest">♪</span>`;
+  // long lines (the narration) shrink so the sung line never runs past two lines
+  el.cur.style.setProperty("--fit", cur ? Math.min(1, 46 / Math.max(46, cur.text.length)).toFixed(3) : 1);
   const n1 = cur ? L[i + 1] : nx,
     n2 = cur ? L[i + 2] : L[i + 2];
   el.nxt.textContent = n1 ? n1.text : "";
@@ -517,30 +520,51 @@ function setVox(v) {
   $("#lyr").classList.toggle("crowd", S.crowd);
   broadcast();
 }
+// P2 · ring knobs: drag up / down (or a MIDI CC) to turn, double-click to reset. FILTER is bipolar.
+const R = 21,
+  K0 = 135; // the ring runs 270° from bottom-left (135°) clockwise
+const polar = (deg) => [26 + R * Math.cos((deg * Math.PI) / 180), 26 + R * Math.sin((deg * Math.PI) / 180)];
+const arc = (d0, d1) => {
+  if (Math.abs(d1 - d0) < 0.5) return "";
+  const [a, b] = [Math.min(d0, d1), Math.max(d0, d1)],
+    [x0, y0] = polar(a),
+    [x1, y1] = polar(b);
+  return `M${x0.toFixed(2)} ${y0.toFixed(2)}A${R} ${R} 0 ${b - a > 180 ? 1 : 0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)}`;
+};
+function knobHTML(n) {
+  return `<div class="lv-kn" data-knob="${n}" data-ctl="${n}"><svg viewBox="0 0 52 52" aria-hidden="true"><circle class="trk" cx="26" cy="26" r="${R}"/><path class="val" d=""/><line class="ptr" x1="26" y1="26" x2="26" y2="8"/></svg><span class="lv-lbl">${n}</span></div>`;
+}
 function buildStrip() {
-  $("#faders").innerHTML = FADERS.map(
-    ([n]) =>
-      `<div class="lv-fstrip"><span class="lv-lbl">${n}</span><div class="lv-meter"><b data-meter="${n}"></b></div><div class="lv-fader" data-fader="${n}" data-ctl="${n}"><div class="fill"></div><div class="cap2"></div></div></div>`,
-  ).join("");
-  for (const [n, get, set] of FADERS) {
-    const f = $(`[data-fader="${n}"]`);
+  const knobs = [...FADERS, ["FILTER", () => (S.filter + 1) / 2, (v) => setFilter(v * 2 - 1), true]];
+  $("#faders").innerHTML = knobs.map(([n]) => knobHTML(n)).join("");
+  for (const [n, get, set, bi] of knobs) {
+    const k = $(`[data-knob="${n}"]`),
+      val = $(".val", k),
+      ptr = $(".ptr", k);
     const paint = (v) => {
-      const h = f.clientHeight - 14;
-      $(".cap2", f).style.top = (1 - v) * h + "px";
-      $(".fill", f).style.height = v * 100 + "%";
+      const deg = K0 + v * 270;
+      val.setAttribute("d", bi ? arc(270, deg) : arc(K0, deg));
+      const [x, y] = polar(deg);
+      ptr.setAttribute("x2", 26 + (x - 26) * 0.66);
+      ptr.setAttribute("y2", 26 + (y - 26) * 0.66);
+      k.setAttribute("aria-valuenow", Math.round(v * 100));
     };
     const apply = (v) => {
       v = Math.max(0, Math.min(1, v));
+      if (bi && Math.abs(v - 0.5) < 0.02) v = 0.5;
       set(v);
       paint(v);
     };
     CTL[n] = { set: apply };
+    k.setAttribute("role", "slider");
+    k.setAttribute("aria-label", n);
     paint(get());
-    f.addEventListener("pointerdown", (e) => {
+    k.addEventListener("pointerdown", (e) => {
       if (S.locked) return;
-      const r = f.getBoundingClientRect();
-      const mv = (ev) => apply(1 - (ev.clientY - r.top) / r.height);
-      mv(e);
+      e.preventDefault();
+      const y0 = e.clientY,
+        v0 = get();
+      const mv = (ev) => apply(v0 + (y0 - ev.clientY) / 160);
       const up = () => {
         removeEventListener("pointermove", mv);
         removeEventListener("pointerup", up);
@@ -548,29 +572,15 @@ function buildStrip() {
       addEventListener("pointermove", mv);
       addEventListener("pointerup", up);
     });
-    f.addEventListener("dblclick", () => !S.locked && apply(n === "VOX" ? 1 : n === "MASTER" ? 0.9 : 0.8));
+    k.addEventListener(
+      "dblclick",
+      () => !S.locked && apply(n === "VOX" ? 1 : n === "MASTER" ? 0.9 : bi ? 0.5 : 0.8),
+    );
   }
-  // filter knob: bipolar
-  const kn = $("#filterKnob");
-  const setF = (v) => {
-    S.filter = Math.max(-1, Math.min(1, v));
-    engine.setFilter(Math.abs(S.filter) < 0.04 ? 0 : S.filter);
-    kn.style.setProperty("--r", S.filter * 135 + "deg");
-  };
-  CTL.FILTER = { set: (v) => setF(v * 2 - 1) };
-  kn.addEventListener("pointerdown", (e) => {
-    if (S.locked) return;
-    const y0 = e.clientY,
-      v0 = S.filter;
-    const mv = (ev) => setF(v0 + (y0 - ev.clientY) / 120);
-    const up = () => {
-      removeEventListener("pointermove", mv);
-      removeEventListener("pointerup", up);
-    };
-    addEventListener("pointermove", mv);
-    addEventListener("pointerup", up);
-  });
-  kn.addEventListener("dblclick", () => setF(0));
+}
+function setFilter(v) {
+  S.filter = Math.max(-1, Math.min(1, v));
+  engine.setFilter(Math.abs(S.filter) < 0.04 ? 0 : S.filter);
 }
 function wireControls() {
   $("#playBtn").onclick = () => !S.locked && (engine.playing ? engine.pause() : engine.play());
@@ -694,7 +704,7 @@ function wireControls() {
   $("#recBtn").onclick = toggleRec;
   $("#midiBtn").onclick = midi;
   addEventListener("keydown", (e) => {
-    if (e.target.closest("input,select,textarea") || e.metaKey || e.ctrlKey) return;
+    if (e.target.closest?.("input,select,textarea") || e.metaKey || e.ctrlKey) return;
     if (e.code === "Space") {
       e.preventDefault();
       $("#playBtn").click();
@@ -703,7 +713,6 @@ function wireControls() {
     const pad = PAD_DEFS.find((p) => p.key === e.key.toUpperCase());
     if (pad && !e.repeat) hitPad(pad);
   });
-  setInterval(meters, 60);
   setInterval(broadcast, 500);
 }
 function openStage() {
@@ -729,10 +738,18 @@ function setMenu(o) {
   burger.classList.toggle("is-open", o);
   burger.setAttribute("aria-label", o ? "Close menu" : "Open menu");
 }
+function setDrawer(o) {
+  $("#drawer").hidden = !o;
+  $('[data-view="setlist"]').classList.toggle("on", o);
+  if (o) ($("#setl li.now") || $("#setl li"))?.scrollIntoView({ block: "center" });
+}
 function startMenu() {
+  $("#drawerX").onclick = () => setDrawer(false);
   $("#burger").onclick = () => setMenu(!$("#lvMenu").classList.contains("is-open"));
   addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && $("#lvMenu").classList.contains("is-open")) setMenu(false);
+    if (e.key !== "Escape") return;
+    if ($("#lvMenu").classList.contains("is-open")) setMenu(false);
+    else if (!$("#drawer").hidden) setDrawer(false);
   });
   $$("[data-view]").forEach((a) =>
     a.addEventListener("click", (e) => {
@@ -743,12 +760,7 @@ function startMenu() {
       if (v === "stage") return openStage();
       if (v === "pads") return pads.hidden && $("#padsBtn").click();
       if (!pads.hidden) $("#padsBtn").click();
-      if (v === "setlist") {
-        const li = $("#setl li.now") || $("#setl li");
-        li?.scrollIntoView({ block: "center", behavior: "smooth" });
-        $("#setl").classList.add("flash");
-        setTimeout(() => $("#setl").classList.remove("flash"), 1200);
-      }
+      setDrawer(v === "setlist");
     }),
   );
   // the REC readout in the nav: Nº404 when idle, the recording's running time when recording
@@ -810,19 +822,6 @@ function startLyricRain() {
   addEventListener("resize", () => {
     clearTimeout(rt);
     rt = setTimeout(start, 250);
-  });
-}
-function meters() {
-  if (!engine?.analyser) return;
-  const a = new Float32Array(engine.analyser.fftSize);
-  engine.analyser.getFloatTimeDomainData(a);
-  let pk = 0;
-  for (const x of a) pk = Math.max(pk, Math.abs(x));
-  const lvl = Math.min(1, pk);
-  $$("[data-meter]").forEach((m) => {
-    const n = m.dataset.meter;
-    const f = n === "VOX" ? S.vox : n === "MASTER" ? S.master : S.eq[n.toLowerCase()];
-    m.style.height = Math.min(100, lvl * 100 * (0.6 + 0.5 * f)) + "%";
   });
 }
 
