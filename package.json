@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check": "npm run lint && npm run format:check && npm run build",
-    "vault:encrypt": "node scripts/vault-encrypt.mjs"
+    "vault:encrypt": "node scripts/vault-encrypt.mjs",
+    "live:encrypt": "node scripts/live-encrypt.mjs"
   },
   "dependencies": {
     "framer-motion": "^11.18.2",

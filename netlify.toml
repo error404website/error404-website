@@ -22,6 +22,19 @@
     Cache-Control = "no-cache"
     Referrer-Policy = "no-referrer"
 
+# Live show (/live/): private like the vault; the instrumentals are encrypted and never change name
+[[headers]]
+  for = "/live/*"
+  [headers.values]
+    Cache-Control = "no-cache"
+    Referrer-Policy = "no-referrer"
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+
+[[headers]]
+  for = "/live/inst/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
 # Hashed JS/CSS bundles never change once published, so they can be cached forever.
 [[headers]]
   for = "/_app/*"
