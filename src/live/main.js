@@ -311,8 +311,8 @@ const S = {
   panic: false,
   locked: false,
   vox: 1,
-  master: 0.9,
-  eq: { low: 0.8, mid: 0.8, high: 0.8 },
+  master: 1,
+  eq: { low: 1, mid: 1, high: 1 },
   filter: 0,
 };
 function startShow() {
@@ -574,10 +574,7 @@ function buildStrip() {
       addEventListener("pointermove", mv);
       addEventListener("pointerup", up);
     });
-    k.addEventListener(
-      "dblclick",
-      () => !S.locked && apply(n === "VOX" ? 1 : n === "MASTER" ? 0.9 : bi ? 0.5 : 0.8),
-    );
+    k.addEventListener("dblclick", () => !S.locked && apply(bi ? 0.5 : 1));
   }
 }
 function setFilter(v) {
