@@ -2904,6 +2904,16 @@ body {
 }
 
 /* ===== intro M3: terminal readout over the tracklist rain (BootSequence) ===== */
+/* the violet glow over the rain: one layer shared by the site intro, the vault gate and the vault's
+   unlock intro, so the gate → unlock hand-off keeps the same light */
+.e-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(161, 0, 255, 0.14), transparent 70%);
+}
+
 /* intro readout card (site intro + vault unlock): the vault gate's viewfinder card. No box, four
    corner ticks, the rain fading to dark behind the text; a tag, a small title, the readout lines and
    a gradient bar that fills with the 00 → 20 count. */

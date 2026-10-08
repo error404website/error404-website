@@ -165,13 +165,7 @@ export function BootSequence({ onComplete }) {
       key="boot"
     >
       <TracklistRain drainRef={drainRef} />
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: "radial-gradient(ellipse 70% 70% at 50% 50%, transparent 30%, rgba(3,4,9,0.85) 100%)",
-        }}
-        aria-hidden="true"
-      />
+      <div className="e-glow" aria-hidden="true" />
       <span className="e-bscan" aria-hidden={true} />
       <div className={"e-icard" + (draining ? " out" : "")} aria-hidden="true">
         <span className="e-icard-vf" />
