@@ -12,7 +12,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
-- Source Vault: the STYLES stat in the header now reads HYPERPOP (was 5 + NONE).
+- Source Vault: the STYLES stat in the header is now GENRE: HYPERPOP (was STYLES: 5 + NONE).
 - Intros: the site intro and the vault's unlock intro now carry the ACCESS REQUIRED page's soft violet glow over the rain (one shared layer, same colour, size and position), in place of their dark edge vignette, so the gate → unlock hand-off keeps the same light.
 - Source Vault: the access number is now **Nº404** everywhere (nav, phone menu, header seal, stats, end credits, unlock intro). With the stems uploaded, the "SOON" / "UPLOADING SOON" placeholders are gone: the STEMS stat counts the stems (220, each as WAV + MIDI), ALL STEMS shows its total size once the release answers, each track's stems tab shows its stem count, the intro line reads "full stems as WAV and MIDI", and a failed download now says UNAVAILABLE · TRY AGAIN instead of NOT UPLOADED YET.
 - Intros: the readout card in both the site intro and the vault's unlock now matches the vault gate: no box, the four viewfinder corner ticks, the rain fading to dark behind it, a blinking tag (RECOVERY · ARCHIVE_404 / KEY ACCEPTED · SOURCE VAULT), a small title (RECOVERING FILES. / DECRYPTING VAULT.) and a gradient bar that fills with the 00 → 20 count.
