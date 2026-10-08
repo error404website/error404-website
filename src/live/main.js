@@ -13,6 +13,7 @@ import { keyField } from "../lib/keyField";
 import { rain, REDUCE } from "../lib/rain";
 import { Engine } from "./engine";
 import { PAD_DEFS, synthKit, vocalChop } from "./pads";
+import { makeRuler } from "./ruler";
 import { makeWave, WAVE_H } from "./wave";
 
 const $ = (s, el = document) => el.querySelector(s),
@@ -342,11 +343,13 @@ function startShow() {
   startMenu();
   startLyricRain();
   startWave();
+  drawRuler = makeRuler($("#ruler"), TL.songs);
   requestAnimationFrame(frame);
   toast("SPACE = PLAY / PAUSE · PADS ON 1–4 Q–R A–F Z–V");
 }
 
 /* lyrics, cues, counters: every frame */
+let drawRuler = null;
 function frame() {
   const t = engine.now();
   const k = engine.songAt(t);
@@ -385,6 +388,7 @@ function frame() {
   renderCue(t, k);
   renderNext(t, k);
   drawWave(t, k);
+  drawRuler?.(t, k);
   $$("#setl li").forEach((li, i) => {
     li.classList.toggle("now", i === k);
     li.classList.toggle("done", i < k);

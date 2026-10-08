@@ -13,6 +13,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Live show: a set timecode ruler under the nav (R1), like the Source Vault's: ticks every 1.5 s, the time every minute, a magenta notch and number at each song's start, and a gradient playhead a third of the way in while the whole set scrolls past.
 - Live show: the nav logo now draws itself on when the show opens and replays on hover, like the Source Vault's (the site's logo-fx script).
 - Access gates (/vault/ and /live/): a calmer key field that fits a long key. The card is wider (380 px), the field is 14 px with tight spacing under a small ACCESS KEY label, a SHOW / HIDE toggle lets people check what they typed, and a full-width gradient-edged UNLOCK → button replaces the arrow. Safari's key icon no longer covers the field, and phones keep 16 px text so iOS doesn't zoom.
 - **Live show stage screen and menu:** the stage screen now has the cinematic look: full-screen rain (the playing song's words, paused with the show) under a vignette, the song name between gradient rules, and centred lyrics that shrink long lines to two. In the open menu the active link shows the whole magenta → cyan gradient (it was stretched across the screen, so only magenta showed).

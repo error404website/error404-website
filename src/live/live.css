@@ -183,6 +183,15 @@ body.live.stage-mode {
   font-family: var(--mono);
   color: var(--ghost);
 }
+/* R1 · set timecode ruler under the nav (src/live/ruler.js draws it) */
+.lv-ruler {
+  flex: none;
+  display: block;
+  width: 100%;
+  height: 22px;
+  position: relative;
+  z-index: 1;
+}
 /* the vault's nav (A3): its .snav / .e4-lock / .e-split / .e4-burger, full width, burger at every size */
 .lv-nav {
   flex: none;
