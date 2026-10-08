@@ -13,6 +13,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Changed
 
 - Source Vault gate: the ACCESS REQUIRED card is much smaller (270 px: tag, one-line title, and the key field with a → button) and has no box, just four viewfinder corner ticks with the rain fading to dark behind it. The site's digital rain now runs behind it, streaming only public words (track titles and stem types) until the key is in.
+- Source Vault player: the dock now matches the site's player (borderless ▶ key, « » skips, title and chapter lines, the black bar), and the playing track's real waveform is the seek bar, with the times under it. The right-hand slot shows the tempo, key and Camelot code and opens a queue of all 20 files with their BPM; on phones it folds up like the site's dock.
 - End credits: the GitHub mark beside VIEW PROJECT → GITHUB now carries the magenta → cyan gradient, matching the GitHub mark in the footer bar.
 - README: new catalogue screenshot showing the Hyperpop · Metalcore · Glitchcore tags.
 

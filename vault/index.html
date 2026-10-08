@@ -309,7 +309,7 @@
         </div>
       </div>
     </footer>
-    <div class="dock-spacer" aria-hidden="true"></div>
+    <div class="e-dock-spacer" aria-hidden="true"></div>
 
     <div class="xfer scan" id="xfer" role="status" aria-live="polite">
       <div class="l1">
@@ -329,15 +329,99 @@
       <div class="rec-stamp" id="xStamp">RECOVERED</div>
     </div>
 
-    <div class="dock" id="dock" hidden>
-      <div class="prog"><i id="dockProg"></i></div>
-      <div class="in">
-        <button class="pk" id="dockPlay" aria-label="Play"><span class="tri"></span></button>
-        <div class="tt"><b id="dockT">— PRESS PLAY ON ANY TRACK</b><span id="dockS">SOURCE VAULT</span></div>
-        <span class="dch" id="dockChips"></span>
-        <span class="tm" id="dockTm">0:00 / 0:00</span>
+    <!-- the site's player dock (PlayerDock), with the track's real waveform as the seek bar -->
+    <section class="e-dock vdock" id="dock" aria-label="Source Vault player" hidden>
+      <div
+        id="dockQ"
+        class="e-dock-q"
+        role="dialog"
+        aria-label="Queue: all 20 files"
+        aria-hidden="true"
+        inert
+      >
+        <div class="e-dock-qh">
+          <span>QUEUE · 20 FILES</span><span class="e-dock-qpos" id="dockQpos">07 / 20</span
+          ><button type="button" class="e-dock-qx" id="dockQx" aria-label="Close queue">
+            <svg
+              viewBox="0 0 16 16"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="square"
+              aria-hidden="true"
+            >
+              <path d="M4 4l8 8M12 4l-8 8" />
+            </svg>
+          </button>
+        </div>
+        <div class="e-dock-ql" id="dockQl"></div>
       </div>
-    </div>
+      <div class="e-dock-bar">
+        <span class="e-dock-line" aria-hidden="true"><b id="dockLine"></b></span>
+        <div class="e-dock-row">
+          <button type="button" class="e-playbtn" id="dockPlay" aria-label="Play">
+            <span class="e-pi" aria-hidden="true"></span>
+          </button>
+          <button type="button" class="e-dock-sk e-dock-prev" id="dockPrev" aria-label="Previous track">
+            <svg
+              viewBox="0 0 16 16"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="square"
+              aria-hidden="true"
+            >
+              <path d="M8 3.5L3.5 8 8 12.5M13 3.5L8.5 8 13 12.5" />
+            </svg>
+          </button>
+          <button type="button" class="e-dock-sk e-dock-next" id="dockNext" aria-label="Next track">
+            <svg
+              viewBox="0 0 16 16"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="square"
+              aria-hidden="true"
+            >
+              <path d="M3 3.5L7.5 8 3 12.5M8 3.5L12.5 8 8 12.5" />
+            </svg>
+          </button>
+          <div class="e-dock-who">
+            <p class="e-dock-tt" id="dockT"></p>
+            <p class="e-dock-tc" id="dockS"></p>
+          </div>
+          <div class="e-dock-mid">
+            <div
+              class="vwseek"
+              id="dockWave"
+              role="slider"
+              tabindex="0"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-valuenow="0"
+            ></div>
+            <div class="e-dock-times"><span id="dockCur">0:00</span><span id="dockDur">0:00</span></div>
+          </div>
+          <button
+            type="button"
+            class="e-dock-qbtn vtele"
+            id="dockQbtn"
+            aria-expanded="false"
+            aria-controls="dockQ"
+          >
+            <span class="e-dock-led" aria-hidden="true"></span><span class="vt" id="dockBpm"></span
+            ><span class="vsep" aria-hidden="true"></span><span class="vt" id="dockKey"></span
+            ><span class="cam" id="dockCam"></span>
+          </button>
+        </div>
+      </div>
+    </section>
     <div class="toast" id="toast"></div>
     <audio id="au" preload="none"></audio>
 

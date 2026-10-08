@@ -641,10 +641,7 @@ function play(slug, at) {
     au.readyState >= 1 ? go() : au.addEventListener("loadedmetadata", go, { once: true });
   }
   au.play().catch(() => {});
-  $("#dockT").textContent = `${t.n} — ${t.title}`;
-  $("#dockS").textContent = `CHAPTER 0${t.ch} · ${t.chapter}`;
-  $("#dockChips").innerHTML =
-    `≈${t.bpm} BPM · ${t.key} <span class="cam" style="background:${camColour(t.camelot)}">${t.camelot}</span>`;
+  dockShow(t);
   const row = $(`.row[data-slug="${slug}"]`);
   if (row) buildSecs(row, t);
 }
@@ -664,21 +661,33 @@ function syncPlaying() {
     r.classList.toggle("playing", me && (on || au.currentTime > 0));
     $("[data-play]", r).innerHTML = me && on ? '<span class="bars"></span>' : '<span class="tri"></span>';
   });
-  $("#dockPlay").innerHTML = on ? '<span class="bars"></span>' : '<span class="tri"></span>';
+  if (!dockT) return;
+  const k = $("#dockPlay");
+  k.classList.toggle("on", on);
+  k.innerHTML = on
+    ? '<span class="e-pp" aria-hidden="true"></span>'
+    : '<span class="e-pi" aria-hidden="true"></span>';
+  k.setAttribute("aria-label", `${on ? "Pause" : "Play"} ${dockT.title}`);
+  $("#dock").classList.toggle("playing", on);
+  $$("#dockQl .e-trk").forEach((b) => {
+    const me = b.dataset.go === dockT.slug;
+    b.setAttribute("aria-pressed", me && on);
+    $(".e-dock-n", b).textContent = me && on ? "\u25B6\uFE0E" : b.dataset.n;
+  });
 }
 au.addEventListener("play", syncPlaying);
 au.addEventListener("pause", syncPlaying);
-au.addEventListener("ended", () => {
-  const i = TRACKS.findIndex((t) => t.slug === cur);
-  play(TRACKS[(i + 1) % TRACKS.length].slug, 0);
-});
+const step = (d) => {
+  const i = TRACKS.findIndex((t) => t.slug === dockT.slug);
+  play(TRACKS[(i + d + TRACKS.length) % TRACKS.length].slug, 0);
+};
+au.addEventListener("ended", () => step(1));
 au.addEventListener("timeupdate", () => {
   const t = TRACKS.find((x) => x.slug === cur);
   if (!t) return;
   const d = au.duration || t.duration,
     p = au.currentTime / d;
-  $("#dockProg").style.width = p * 100 + "%";
-  $("#dockTm").textContent = `${fmt(au.currentTime)} / ${fmt(d)}`;
+  dockProgress(au.currentTime, d);
   const row = $(`.row[data-slug="${cur}"]`);
   if (!row) return;
   if (!$("[data-secs] button", row)) buildSecs(row, t);
@@ -696,10 +705,96 @@ au.addEventListener("timeupdate", () => {
       `<span class="h">${esc(secs[si].name)} · FROM ≈${fmt(secs[si].start)}</span>${secs[si].lines.length ? secs[si].lines.slice(0, 4).map(esc).join("<br />") : "<span style='color:var(--t4)'>(instrumental)</span>"}`;
   }
 });
+
+/* the dock: the site's player bar, with the shown track's real waveform as the seek bar */
+let dockT = null;
+const DOCK_BARS = 150;
+function dockShow(t) {
+  if (dockT === t) return;
+  dockT = t;
+  $("#dockT").textContent = `${t.n} — ${t.title}`;
+  $("#dockS").textContent = `CHAPTER 0${t.ch} · ${t.chapter}`;
+  $("#dockDur").textContent = t.durationText;
+  $("#dockBpm").textContent = `≈${t.bpm} BPM`;
+  $("#dockKey").textContent = t.key.toUpperCase();
+  const c = $("#dockCam");
+  c.textContent = t.camelot;
+  c.style.background = camColour(t.camelot);
+  $("#dockQbtn").setAttribute("aria-label", `Queue, ${t.n} / 20 · ≈${t.bpm} BPM · ${t.key} (${t.camelot})`);
+  $("#dockQpos").textContent = `${t.n} / 20`;
+  const w = $("#dockWave");
+  w.setAttribute("aria-label", `Seek ${t.title}`);
+  w.innerHTML =
+    Array.from(
+      { length: DOCK_BARS },
+      (_, i) =>
+        `<i style="height:${Math.max(8, t.peaks[Math.floor((i / DOCK_BARS) * t.peaks.length)] * 100)}%"></i>`,
+    ).join("") + '<span class="ph"></span>';
+  $$("#dockQl .e-trk").forEach((b) => b.classList.toggle("cur", b.dataset.go === t.slug));
+  dockProgress(0, t.duration);
+  syncPlaying();
+}
+function dockProgress(at, d) {
+  const p = Math.min(at / d, 1) || 0;
+  $("#dockLine").style.width = p * 100 + "%";
+  $("#dockCur").textContent = fmt(at);
+  $("#dockDur").textContent = fmt(d);
+  const w = $("#dockWave");
+  w.setAttribute("aria-valuenow", Math.round(p * 100));
+  w.setAttribute("aria-valuetext", `${fmt(at)} of ${fmt(d)}`);
+  $$("i", w).forEach((b, i) => b.classList.toggle("p", i / DOCK_BARS < p));
+  $(".ph", w).style.left = p * 100 + "%";
+}
+// first visit: the dock waits on GOSPEL_OUT, like the site's player
+function dockInit() {
+  let ch = 0,
+    html = "";
+  for (const t of TRACKS) {
+    if (t.ch !== ch) {
+      ch = t.ch;
+      html += `<div class="e-dock-ch"><span><b>0${ch}</b> ${esc(t.chapter)}</span><span>${TRACKS.filter((x) => x.ch === ch).length} FILES</span></div>`;
+    }
+    html += `<button type="button" class="e-trk" data-go="${t.slug}" data-n="${t.n}" aria-label="Play track ${t.n}: ${esc(t.title)}, ${t.durationText}"><span class="e-dock-n">${t.n}</span><span class="e-trk-t">${esc(t.title)}</span><span class="e-dock-bpm">≈${t.bpm}</span><span class="e-dock-d">${t.durationText}</span></button>`;
+  }
+  $("#dockQl").innerHTML = html;
+  dockShow(TRACKS.find((t) => t.slug === "gospel_out") || TRACKS[0]);
+}
+function dockQueue(open) {
+  const q = $("#dockQ");
+  $("#dock").classList.toggle("q-open", open);
+  $("#dockQbtn").setAttribute("aria-expanded", open);
+  q.setAttribute("aria-hidden", !open);
+  q.inert = !open;
+  if (open) {
+    const list = $("#dockQl"),
+      c = $(".e-trk.cur", list);
+    if (c) list.scrollTop = c.offsetTop - list.clientHeight / 2 + c.clientHeight / 2;
+  }
+}
 $("#dockPlay").onclick = () => {
-  if (!cur) return play("gospel_out");
+  if (cur !== dockT.slug) return play(dockT.slug);
   au.paused ? au.play() : au.pause();
 };
+$("#dockNext").onclick = () => step(1);
+$("#dockPrev").onclick = () => (cur && au.currentTime > 3 ? (au.currentTime = 0) : step(-1));
+$("#dockQbtn").onclick = () => dockQueue(!$("#dock").classList.contains("q-open"));
+$("#dockQx").onclick = () => dockQueue(false);
+$("#dockQl").onclick = (e) => {
+  const b = e.target.closest("[data-go]");
+  if (!b) return;
+  if (cur === b.dataset.go) au.paused ? au.play() : au.pause();
+  else play(b.dataset.go, 0);
+};
+$("#dockWave").onclick = (e) => {
+  const r = e.currentTarget.getBoundingClientRect();
+  play(dockT.slug, Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)));
+};
+$("#dockWave").onkeydown = (e) => {
+  if (cur !== dockT.slug || !au.duration) return;
+  if (e.key === "ArrowRight") au.currentTime = Math.min(au.duration, au.currentTime + 5);
+  if (e.key === "ArrowLeft") au.currentTime = Math.max(0, au.currentTime - 5);
+};
+addEventListener("keydown", (e) => e.key === "Escape" && dockQueue(false));
 
 /* ---------- I · download moment ---------- */
 // The vault asks the server for a short-lived signed link to the zip on the private release,
@@ -1157,6 +1252,7 @@ function applyData(d) {
       `<div class="pal" style="--c:${SW[p.name][0]}">${icon(p.name)}<b>${p.name.toUpperCase()}</b><span>${esc(p.text)}</span></div>`,
   ).join("");
   render();
+  dockInit();
   drawWheel();
   side();
   loadSizes();

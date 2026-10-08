@@ -1811,81 +1811,96 @@ details.fold[open] summary::after {
     width: min(78vw, 600px);
   }
 }
-.dock-spacer {
-  height: calc(64px + env(safe-area-inset-bottom));
-}
-
-/* dock */
-.dock {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+/* player dock: the site's .e-dock (overrides.css) with the vault's parts. The seek bar is the
+   playing track's real waveform, and the right-hand slot shows its tempo, key and Camelot code
+   (and opens the queue). Phones keep the site's layout: key, title, skip, the Camelot chip and
+   the glowing line on top. */
+.vdock {
   z-index: 50;
-  background: #000;
-  padding-bottom: env(safe-area-inset-bottom);
 }
-.dock .in {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  height: 64px;
+.vdock .e-playbtn {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 0 28px;
+  justify-content: center;
+  flex: none;
 }
-.dock .prog {
+.vwseek {
+  position: relative;
+  height: 28px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  cursor: pointer;
+}
+.vwseek:focus-visible {
+  outline: 1px solid rgba(255, 0, 229, 0.6);
+  outline-offset: 4px;
+}
+.vwseek i {
+  flex: 1;
+  min-width: 1px;
+  border-radius: 1px;
+  background: rgba(244, 244, 248, 0.16);
+  pointer-events: none;
+}
+.vwseek i.p {
+  background: linear-gradient(180deg, var(--mag), var(--cyan));
+}
+.vwseek .ph {
   position: absolute;
+  top: -3px;
+  bottom: -3px;
   left: 0;
-  right: 0;
-  top: 0;
-  height: 2px;
-  background: rgba(244, 244, 248, 0.08);
+  width: 1px;
+  background: var(--ghost);
+  box-shadow: 0 0 6px var(--mag);
+  pointer-events: none;
 }
-.dock .prog i {
-  display: block;
-  height: 100%;
-  width: 0;
-  background: var(--grad);
-  box-shadow: 0 0 10px rgba(255, 0, 229, 0.6);
+.vtele {
+  gap: 10px;
 }
-.dock .pk {
-  border: 0;
+.vtele .vsep {
+  width: 1px;
+  height: 14px;
+  background: var(--hair);
 }
-.dock .tt {
+.vdock .e-dock-bpm {
+  flex: none;
+  width: 44px;
+  text-align: right;
+  font-size: 9px;
+  color: rgba(244, 244, 248, 0.4);
+}
+.vdock .e-dock-q .e-trk {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--t2);
+}
+.vdock .e-dock-q .e-trk:hover,
+.vdock .e-dock-q .e-trk.cur {
+  color: var(--ghost);
+}
+.vdock .e-trk-t {
   flex: 1;
   min-width: 0;
-  font-family: var(--mono);
-}
-.dock .tt b {
-  display: block;
-  font-weight: 400;
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.dock .tt span {
-  font-size: 9px;
-  letter-spacing: 0.24em;
-  color: var(--t3);
-}
-.dock .tm,
-.dock .dch {
-  font-family: var(--mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  color: var(--t3);
   white-space: nowrap;
 }
-@media (max-width: 700px) {
-  .dock .dch,
-  .dock .tm {
+@media (max-width: 1023px) {
+  .vtele .vt,
+  .vtele .vsep {
     display: none;
   }
-  .dock .in {
-    padding: 0 12px;
+}
+@media (max-width: 767px) {
+  .vtele .e-dock-led {
+    display: none;
   }
 }
 .toast {
