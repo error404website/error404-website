@@ -869,42 +869,48 @@ body.lv-learn [data-ctl] {
   }
 }
 
-/* ---------- stage screen ---------- */
+/* ---------- stage screen: the cinematic look, scaled for a projector ---------- */
 .lv-stage {
   position: fixed;
   inset: 0;
   background: #000;
   overflow: hidden;
 }
-.lv-stage canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.55;
-}
 .lv-stage-in {
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 6vw;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5vh 7vw;
 }
-.lv-stage-song {
-  font-family: var(--mono);
-  font-size: 14px;
-  letter-spacing: 0.4em;
-  color: var(--mag);
+.lv-lyr-stage {
+  max-width: none;
+}
+.lv-lyr-stage .lv-sec {
+  font-size: max(12px, 1.1vw);
+  margin-bottom: 4vh;
+}
+.lv-lyr-stage .lv-sec:not(:empty)::before,
+.lv-lyr-stage .lv-sec:not(:empty)::after {
+  width: 4vw;
+}
+.lv-lyr-stage .lv-prev {
+  font-size: 3vw;
+  margin-bottom: 2vh;
 }
 .lv-lyr-stage .lv-cur {
-  font-size: calc(var(--fit, 1) * 9vw);
+  font-size: calc(var(--fit, 1) * 8.4vw);
 }
-.lv-lyr-stage .lv-prev,
 .lv-lyr-stage .lv-nxt {
-  font-size: 4vw;
+  font-size: 3.4vw;
+  margin-top: 3vh;
 }
 body.crowd .lv-lyr-stage .lv-cur {
-  font-size: calc(var(--fit, 1) * 10.5vw);
+  font-size: calc(var(--fit, 1) * 9.6vw);
+}
+/* the open menu: each link only as wide as its word, so the active one shows the whole gradient */
+.lv-menu .e4c-l {
+  display: inline-block;
 }

@@ -1018,7 +1018,7 @@ function startStage() {
   document.body.classList.add("stage-mode");
   document.title = "Stage Screen · ARCHIVE_404 Live";
   $("#stage").hidden = false;
-  if (!REDUCE) rain($("#stageRain"), TITLE_WORDS);
+  const sky = REDUCE ? null : rain($("#stageRain"), TITLE_WORDS);
   let st = { t: 0, wall: Date.now(), playing: false, rate: 1 };
   if (bc) bc.onmessage = (e) => (st = e.data);
   const els = { sec: { textContent: "" }, prev: $("#stPrev"), cur: $("#stCur"), nxt: $("#stNxt") };
@@ -1026,7 +1026,12 @@ function startStage() {
   const loop = () => {
     const t = st.playing ? st.t + ((Date.now() - st.wall) / 1000) * st.rate : st.t;
     const k = songAtT(t);
-    $("#stSong").textContent = `${String(TL.songs[k].n).padStart(2, "0")} · ${TL.songs[k].title}`;
+    if (k !== loop.k) {
+      loop.k = k;
+      $("#stSong").textContent = `${String(TL.songs[k].n).padStart(2, "0")} · ${TL.songs[k].title}`;
+      sky?.words(songWords(TL.songs[k])); // the rain streams the words of the song that's on, like the show
+    }
+    if (sky) st.playing ? sky.resume() : sky.pause();
     document.body.classList.toggle("crowd", !!st.crowd);
     const save = engine;
     engine = fakeEngine;
