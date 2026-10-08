@@ -2904,53 +2904,160 @@ body {
 }
 
 /* ===== intro M3: terminal readout over the tracklist rain (BootSequence) ===== */
-.e-bterm {
+/* intro readout card (site intro + vault unlock): the vault gate's viewfinder card. No box, four
+   corner ticks, the rain fading to dark behind the text; a tag, a small title, the readout lines and
+   a gradient bar that fills with the 00 → 20 count. */
+.e-icard {
   position: absolute;
   left: 50%;
   top: 50%;
   z-index: 3;
   transform: translate(-50%, -50%);
-  padding: 18px 22px;
-  min-width: min(440px, calc(100vw - 48px));
-  background: rgba(3, 4, 9, 0.78);
-  border: 1px solid rgba(244, 244, 248, 0.12);
+  width: min(330px, calc(100vw - 40px));
+  padding: 18px 18px 14px;
+  background: radial-gradient(closest-side, rgba(3, 4, 9, 0.92), rgba(3, 4, 9, 0.75) 70%, transparent);
   font-family:
     Space Mono,
     monospace;
-  font-size: clamp(11px, 1.3vw, 15px);
-  letter-spacing: 0.08em;
-  line-height: 2;
   color: #f4f4f8;
-  white-space: nowrap;
-  text-shadow: 0 0 10px rgba(255, 0, 229, 0.5);
   transition: opacity 0.4s;
 }
-.e-bterm.out {
+@media (min-width: 768px) {
+  .e-icard {
+    width: 380px;
+    padding: 22px 22px 16px;
+  }
+}
+.e-icard.out {
   opacity: 0;
 }
-.e-bterm b {
+.e-icard::before,
+.e-icard::after,
+.e-icard-vf::before,
+.e-icard-vf::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid #ff00e5;
+  pointer-events: none;
+}
+.e-icard::before {
+  top: -1px;
+  left: -1px;
+  border-right: 0;
+  border-bottom: 0;
+}
+.e-icard::after {
+  bottom: -1px;
+  right: -1px;
+  border-left: 0;
+  border-top: 0;
+  border-color: #00efff;
+}
+.e-icard-vf {
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+}
+.e-icard-vf::before {
+  top: 0;
+  right: 0;
+  border-left: 0;
+  border-bottom: 0;
+  border-color: #00efff;
+}
+.e-icard-vf::after {
+  bottom: 0;
+  left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+.e-icard-tg {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 8px;
+  letter-spacing: 0.32em;
+  color: #ff00e5;
+  white-space: nowrap;
+}
+.e-icard-tg i {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+  animation: e4-blink 1.2s steps(1) infinite;
+}
+.e-icard-h {
+  font-family: "Bebas Neue", sans-serif;
+  font-weight: 400;
+  font-size: 1.7rem;
+  line-height: 0.86;
+  margin-bottom: 10px;
+}
+.e-icard-l {
+  min-height: 66px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  line-height: 2;
+  white-space: nowrap;
+  text-shadow: 0 0 10px rgba(255, 0, 229, 0.5);
+}
+@media (min-width: 768px) {
+  .e-icard-h {
+    font-size: 2rem;
+  }
+  .e-icard-l {
+    font-size: 12px;
+    min-height: 72px;
+  }
+}
+.e-icard-l b {
   font-weight: 400;
   color: #ff00e5;
 }
-.e-bterm i {
+.e-icard-l i {
   font-style: normal;
   color: #00efff;
 }
-.e-bterm-t {
+.e-icard-l .ok {
+  color: #4ade80;
+}
+.e-icard-t {
+  display: block;
   margin-left: 1.4em;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: rgba(244, 244, 248, 0.6);
 }
-.e-bterm-cur {
-  display: inline-block;
-  width: 0.6em;
-  height: 1.1em;
-  margin-top: 4px;
+.e-icard-bar {
+  position: relative;
+  height: 2px;
+  margin-top: 12px;
+  background: rgba(244, 244, 248, 0.1);
+}
+.e-icard-bar b {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
   background: linear-gradient(90deg, #ff00e5, #00efff);
-  vertical-align: -0.2em;
-  animation: e4-blink 1s steps(1) infinite;
+  box-shadow: 0 0 8px rgba(255, 0, 229, 0.7);
+  transition: width 0.15s;
+}
+.e-icard-tk {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: rgba(244, 244, 248, 0.28);
 }
 @media (prefers-reduced-motion: reduce) {
-  .e-bterm-cur {
+  .e-icard-tg i {
     animation: none;
   }
 }

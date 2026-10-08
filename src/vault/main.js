@@ -15,6 +15,10 @@ const mb = (b) => (b >= 1e9 ? (b / 1e9).toFixed(2) + " GB" : Math.round(b / 1e6)
 const esc = (s) =>
   s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const REDUCE = matchMedia("(prefers-reduced-motion: reduce)").matches;
+// The vault always opens at the top: typing the key on a phone scrolls the page behind the gate
+// (the keyboard pushes the field into view), and the browser may restore an old position on return.
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+const toTop = () => scrollTo({ top: 0, left: 0, behavior: "instant" });
 const toast = (t) => {
   const el = $("#toast");
   el.textContent = t;
@@ -187,6 +191,7 @@ let revealed = false;
 function reveal() {
   if (revealed) return;
   revealed = true;
+  toTop();
   $("#gate").classList.add("out");
   stopGateRain();
   document.body.classList.remove("locked");
@@ -338,20 +343,25 @@ function unlockSequence() {
     term = $("#viTerm");
   ov.hidden = false;
   ov.classList.remove("out");
+  toTop();
   $("#gate").classList.add("out");
   stopGateRain();
   const rain = vaultRain($("canvas", ov), stems.concat(titles));
   const T = [];
   const at = (ms, f) => T.push(setTimeout(f, ms));
-  const line = (i, extra = "") =>
-    `<div><b>&gt;</b> KEY ACCEPTED · <span class="ok">ACCESS Nº004</span></div><div><b>&gt;</b> DECRYPTING <i>${pad(i)}/20</i>${i ? `<span class="t">${titles[i - 1]}_STEMS.ZIP</span>` : ""}</div>${extra}<span class="cur"></span>`;
+  const line = (i, extra = "") => {
+    $("#viBar").style.width = (i / 20) * 100 + "%";
+    $("#viCount").textContent = `${pad(i)}/20`;
+    return `<div><b>&gt;</b> KEY ACCEPTED · <span class="ok">ACCESS Nº004</span></div><div><b>&gt;</b> DECRYPTING <i>${pad(i)}/20</i>${i ? `<span class="e-icard-t">${titles[i - 1]}_STEMS.ZIP</span>` : ""}</div>${extra}`;
+  };
+  const lines = $("#viLines");
   term.classList.remove("out");
-  term.innerHTML = line(0);
-  for (let i = 1; i <= 20; i++) at(250 + (i - 1) * 150, () => (term.innerHTML = line(i)));
+  lines.innerHTML = line(0);
+  for (let i = 1; i <= 20; i++) at(250 + (i - 1) * 150, () => (lines.innerHTML = line(i)));
   at(
     250 + 20 * 150,
     () =>
-      (term.innerHTML = line(
+      (lines.innerHTML = line(
         20,
         '<div><b>&gt;</b> <span class="ok">VAULT OPEN</span> · 20 FILES · WAV + MIDI</div>',
       )),
