@@ -273,75 +273,81 @@
 
       <div class="lv-pads" id="padsPanel" hidden></div>
 
+      <!-- L3 · two tiers: information on top (next song · safety), playing below (transport · knobs · fx · loops) -->
       <footer class="lv-strip">
-        <div class="lv-grp lv-transport">
-          <button class="lv-btn" id="prevBtn" type="button" aria-label="Previous song">
-            <svg
-              viewBox="0 0 16 16"
-              width="16"
-              height="16"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.6"
-              stroke-linecap="square"
-              aria-hidden="true"
-            >
-              <path d="M8 3.5L3.5 8 8 12.5M13 3.5L8.5 8 13 12.5" />
-            </svg>
-          </button>
-          <button class="lv-play" id="playBtn" type="button" aria-label="Play">
-            <span class="e-pi"></span>
-          </button>
-          <button class="lv-btn" id="nextBtn" type="button" aria-label="Next song">
-            <svg
-              viewBox="0 0 16 16"
-              width="16"
-              height="16"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.6"
-              stroke-linecap="square"
-              aria-hidden="true"
-            >
-              <path d="M3 3.5L7.5 8 3 12.5M8 3.5L12.5 8 8 12.5" />
-            </svg>
-          </button>
-        </div>
-        <div class="lv-grp lv-knobs" id="faders"></div>
-        <div class="lv-grp lv-fx">
-          <div class="lv-row">
-            <button class="lv-btn" data-fx="echo" data-ctl="ECHO"><span>ECHO</span></button>
-            <button class="lv-btn" data-fx="reverb" data-ctl="REVERB"><span>REVERB</span></button>
-            <button class="lv-btn" data-fx="crush" data-ctl="CRUSH"><span>CRUSH</span></button>
-            <button class="lv-btn" data-fx="roll" data-ctl="ROLL" title="Hold to roll">
-              <span>ROLL</span>
-            </button>
-            <button class="lv-btn" data-fx="tapestop" data-ctl="TAPE STOP"><span>TAPE STOP</span></button>
-            <button class="lv-btn" id="padsBtn" data-ctl="PADS"><span>PADS</span></button>
+        <div class="lv-tier lv-tier-info">
+          <div class="lv-next">
+            <span class="lv-lbl">NEXT · <span id="nxInto"></span></span>
+            <span class="lv-next-ttl" id="nxTitle">—</span>
+            <span class="lv-lbl">IN <b id="nxIn">—</b></span>
+            <span id="nxMeta" hidden></span>
           </div>
-          <div class="lv-row">
-            <button class="lv-btn" data-loop="1" data-ctl="LOOP 1"><span>LOOP 1</span></button>
-            <button class="lv-btn" data-loop="2" data-ctl="LOOP 2"><span>LOOP 2</span></button>
-            <button class="lv-btn" data-loop="4" data-ctl="LOOP 4"><span>LOOP 4</span></button>
-            <button class="lv-btn" data-loop="8" data-ctl="LOOP 8"><span>LOOP 8</span></button>
-            <button class="lv-btn" id="rehBtn" data-ctl="REHEARSE" title="Loop this section at 85% speed">
-              <span>REHEARSE</span>
+          <div class="lv-grp lv-safety">
+            <button class="lv-btn lv-panic" id="panicBtn" data-ctl="PANIC"><span>PANIC · FADE</span></button>
+            <button class="lv-btn" id="lockBtn" data-lock title="Hold for 1 s to unlock">
+              <span>LOCK</span>
             </button>
+            <button class="lv-btn" id="crowdBtn" data-ctl="CROWD"><span>CROWD · VOX OFF</span></button>
+            <button class="lv-btn on" id="stageBtn"><span>STAGE ↗</span></button>
           </div>
         </div>
-        <div class="lv-grp lv-safety">
-          <button class="lv-btn lv-panic" id="panicBtn" data-ctl="PANIC"><span>PANIC · FADE</span></button>
-          <button class="lv-btn" id="lockBtn" data-lock title="Hold for 1 s to unlock">
-            <span>LOCK</span>
-          </button>
-          <button class="lv-btn" id="crowdBtn" data-ctl="CROWD"><span>CROWD · VOX OFF</span></button>
-          <button class="lv-btn on" id="stageBtn"><span>STAGE ↗</span></button>
-        </div>
-        <div class="lv-next">
-          <span class="lv-lbl">NEXT · <span id="nxInto"></span></span>
-          <span class="lv-next-ttl" id="nxTitle">—</span>
-          <span class="lv-lbl">IN <b id="nxIn">—</b></span>
-          <span id="nxMeta" hidden></span>
+        <div class="lv-tier lv-tier-play">
+          <div class="lv-grp lv-transport">
+            <button class="lv-btn" id="prevBtn" type="button" aria-label="Previous song">
+              <svg
+                viewBox="0 0 16 16"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="square"
+                aria-hidden="true"
+              >
+                <path d="M8 3.5L3.5 8 8 12.5M13 3.5L8.5 8 13 12.5" />
+              </svg>
+            </button>
+            <button class="lv-play" id="playBtn" type="button" aria-label="Play">
+              <span class="e-pi"></span>
+            </button>
+            <button class="lv-btn" id="nextBtn" type="button" aria-label="Next song">
+              <svg
+                viewBox="0 0 16 16"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="square"
+                aria-hidden="true"
+              >
+                <path d="M3 3.5L7.5 8 3 12.5M8 3.5L12.5 8 8 12.5" />
+              </svg>
+            </button>
+          </div>
+          <div class="lv-grp lv-knobs" id="faders"></div>
+          <div class="lv-grp lv-fx">
+            <div class="lv-row">
+              <button class="lv-btn" data-fx="echo" data-ctl="ECHO"><span>ECHO</span></button>
+              <button class="lv-btn" data-fx="reverb" data-ctl="REVERB"><span>REVERB</span></button>
+              <button class="lv-btn" data-fx="crush" data-ctl="CRUSH"><span>CRUSH</span></button>
+              <button class="lv-btn" data-fx="roll" data-ctl="ROLL" title="Hold to roll">
+                <span>ROLL</span>
+              </button>
+              <button class="lv-btn" data-fx="tapestop" data-ctl="TAPE STOP"><span>TAPE STOP</span></button>
+              <button class="lv-btn" id="padsBtn" data-ctl="PADS"><span>PADS</span></button>
+            </div>
+            <span class="lv-fx-div" aria-hidden="true"></span>
+            <div class="lv-row">
+              <button class="lv-btn" data-loop="1" data-ctl="LOOP 1"><span>LOOP 1</span></button>
+              <button class="lv-btn" data-loop="2" data-ctl="LOOP 2"><span>LOOP 2</span></button>
+              <button class="lv-btn" data-loop="4" data-ctl="LOOP 4"><span>LOOP 4</span></button>
+              <button class="lv-btn" data-loop="8" data-ctl="LOOP 8"><span>LOOP 8</span></button>
+              <button class="lv-btn" id="rehBtn" data-ctl="REHEARSE" title="Loop this section at 85% speed">
+                <span>REHEARSE</span>
+              </button>
+            </div>
+          </div>
         </div>
       </footer>
       <div class="lv-toast" id="toast" role="status" aria-live="polite"></div>
