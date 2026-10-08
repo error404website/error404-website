@@ -1,13 +1,14 @@
 // The site's three-layer digital rain (7 / 10 / 14 px columns streaming words, magenta → violet →
 // cyan across the screen), as used by the Source Vault's gate and unlock intro. Shared by /live/.
+// Fills the canvas's own box (the whole window for the gates, the lyrics panel for the show).
 export const REDUCE =
   typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 export function rain(cv, words) {
   const ctx = cv.getContext("2d"),
     dpr = Math.min(2, devicePixelRatio || 1),
-    W = innerWidth,
-    H = innerHeight,
+    W = cv.clientWidth || innerWidth,
+    H = cv.clientHeight || innerHeight,
     phone = W < 768;
   cv.width = W * dpr;
   cv.height = H * dpr;
@@ -26,7 +27,8 @@ export function rain(cv, words) {
     return p.map((v, i) => Math.round(v + (q[i] - v) * u)).join(",");
   };
   const streams = [];
-  let drain = false,
+  let pool = words,
+    drain = false,
     raf = 0,
     last = performance.now();
   LAYERS.forEach((L, li) => {
@@ -71,7 +73,10 @@ export function rain(cv, words) {
       ctx.fillText(s.w[r % L], s.x, y);
       ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
-      if (r > s.rows + 2) s.row = drain ? -9999 : (-Math.random() * 240) / s.fs;
+      if (r > s.rows + 2) {
+        s.row = drain ? -9999 : (-Math.random() * 240) / s.fs;
+        s.w = pool[Math.floor(Math.random() * pool.length)] + "   "; // a recycled column picks up the current words
+      }
     }
     raf = requestAnimationFrame(frame);
   };
@@ -82,6 +87,19 @@ export function rain(cv, words) {
     },
     stop() {
       cancelAnimationFrame(raf);
+      raf = 0;
+    },
+    pause() {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    },
+    resume() {
+      if (raf) return;
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    },
+    words(w) {
+      if (w && w.length) pool = w;
     },
   };
 }

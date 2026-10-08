@@ -8,6 +8,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 ### Added
 
 - **Live show** at `/live/` (same access key as the Source Vault): preload the whole set for offline use, karaoke lines that fill word by word with stage cues and a next-song countdown, gapless playback, and a performance console (VOX / CROWD, EQ, filter, effects, loops, rehearse, 16 quantised pads with live vocal chops, panic, lock, recording, MIDI learn) plus a stage-screen window for a projector.
+
+### Changed
+
+- **Live show on brand:** the Source Vault's nav and slat menu (LYRICS · PADS · SETLIST · STAGE SCREEN, MIDI, record, lock), chromatic-text console buttons like the nav links, the vault's digital rain behind the lyrics (words of the song that's playing, paused with the show), and no brand text on the stage screen.
 - **Source Vault** at `/vault/`: a password-gated page with every track's stems, the Suno style prompts in all five production styles (colour-coded), original and Suno-optimised lyrics (same words, shorter section tags), a one-click Remix kit, a Camelot harmonic map, and each full song with its measured length, BPM and key (and how many detection models agree). It opens with the site's rain intro decrypting the 20 files, uses the site's menu, logo draw-on and end credits, and runs the track-name rain in the gutters on wide screens.
 - Password-only: the prompts, lyrics and analysis are committed only in encrypted form, locked with the access key itself and opened in the browser. Stems download through short-lived signed links from a private GitHub repo, handed out by one small Netlify function to visitors who prove they know the key (one Netlify setting: `VAULT_GH_TOKEN`).
 

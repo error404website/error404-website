@@ -74,27 +74,142 @@
 
     <!-- ================= SHOW (M1 · lyrics-first) ================= -->
     <main class="lv" id="show" hidden>
-      <header class="lv-top">
-        <span class="lv-brand">ERROR_404<small>LIVE · Nº404</small></span>
-        <span class="lv-chip" id="offChip"
-          ><i></i><span id="offTxt">PRELOADED 20/20 · OFFLINE READY</span></span
-        >
-        <span class="lv-sp"></span>
-        <span class="lv-lbl">BAR</span><span class="lv-stat" id="barNum">0.0</span>
-        <span class="lv-beats" id="beats" aria-hidden="true"><i class="one"></i><i></i><i></i><i></i></span>
-        <span class="lv-lbl">BPM</span><span class="lv-stat" id="bpm">—</span> <span class="lv-lbl">KEY</span
-        ><span class="lv-cam" id="cam">—</span> <span class="lv-lbl">SET</span
-        ><span class="lv-stat" id="setClock">0:00</span>
-        <button class="lv-chip" id="midiBtn" type="button" title="MIDI: click to connect, then LEARN">
-          <i></i><span id="midiTxt">MIDI</span>
-        </button>
-        <button class="lv-chip lv-rec" id="recBtn" type="button" title="Record the show">
-          <i></i><span id="recTxt">REC</span>
-        </button>
-      </header>
+      <!-- the vault's nav (A3): logo lockup, show readouts, REC | LOCK, the glitch burger -->
+      <nav class="snav site-nav lv-nav" aria-label="Live show">
+        <div class="nav-glass"></div>
+        <div class="snav-in">
+          <span class="e4-lock" aria-label="ERROR404 Live show"
+            ><img
+              src="/assets/error404logo.svg"
+              alt="ERROR404"
+              width="1414"
+              height="348"
+              draggable="false"
+              class="e4-lock-logo lv-logo"
+            /><span aria-hidden="true" class="e4-lock-div"></span
+            ><span class="e4-lock-tag">LIVE<br />SHOW</span></span
+          >
+          <span class="lv-sp"></span>
+          <span class="lv-tele"
+            ><span class="lv-lbl">BAR</span><span class="lv-stat" id="barNum">0.0</span
+            ><span class="lv-beats" id="beats" aria-hidden="true"
+              ><i class="one"></i><i></i><i></i><i></i></span
+          ></span>
+          <span class="lv-tele"><span class="lv-lbl">BPM</span><span class="lv-stat" id="bpm">—</span></span>
+          <span class="lv-tele"><span class="lv-lbl">KEY</span><span class="lv-cam" id="cam">—</span></span>
+          <span class="lv-tele"
+            ><span class="lv-lbl">SET</span><span class="lv-stat" id="setClock">0:00</span></span
+          >
+          <span class="e-split lv-split"
+            ><span class="e-split-bk" id="recBk">Nº404</span
+            ><button class="e-split-dl" type="button" data-lock title="Lock the console · hold 1 s to unlock">
+              LOCK ↺
+            </button></span
+          ><button
+            class="e4-burger"
+            id="burger"
+            type="button"
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="lvMenu"
+          >
+            <span class="e4-ic" aria-hidden="true"
+              ><svg class="e4-p" viewBox="0 0 24 24" fill="none">
+                <defs>
+                  <linearGradient id="lv-cg" gradientUnits="userSpaceOnUse" x1="12" y1="0" x2="21.5" y2="0">
+                    <stop offset="0" stop-color="#FF00E5" />
+                    <stop offset="1" stop-color="#00EFFF" />
+                  </linearGradient>
+                  <filter id="lv-tf" x="-25%" y="-25%" width="150%" height="150%">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.62" numOctaves="3" seed="4" />
+                    <feDisplacementMap
+                      in="SourceGraphic"
+                      scale="1.9"
+                      xChannelSelector="R"
+                      yChannelSelector="G"
+                    />
+                  </filter>
+                </defs>
+                <g filter="url(#lv-tf)">
+                  <path d="M3 5.5l7.2 6.5L3 18.5" stroke="#F4F4F8" stroke-width="3" stroke-linecap="square" />
+                  <rect class="e4-cur" x="12" y="15.9" width="9.5" height="3" fill="url(#lv-cg)" />
+                  <path
+                    d="M5.1 7.6l1.2-.4M8.6 10.9l.9.9M5.4 16.2l1.3.2M15.2 17.6v-.9M18.8 17.7v-.8"
+                    stroke="#000"
+                    stroke-width=".8"
+                  />
+                </g></svg
+              ><svg class="e4-x" viewBox="0 0 24 24" fill="none">
+                <g filter="url(#lv-tf)">
+                  <path
+                    d="M4.5 4.5l15 15M19.5 4.5l-15 15"
+                    stroke="#F4F4F8"
+                    stroke-width="3"
+                    stroke-linecap="square"
+                  />
+                </g></svg
+            ></span>
+          </button>
+        </div>
+      </nav>
+      <!-- the site's open menu: slat wipe, SYS::OPEN chip, outlined poster links, split buttons -->
+      <div
+        class="lv-menu e4-menu"
+        id="lvMenu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Live show menu"
+        aria-hidden="true"
+        inert
+      >
+        <div class="e4-sl" style="--i: 0"></div>
+        <div class="e4-sl" style="--i: 1"></div>
+        <div class="e4-sl" style="--i: 2"></div>
+        <div class="e4-sl" style="--i: 3"></div>
+        <div class="e4-sl" style="--i: 4"></div>
+        <div class="e4-sl" style="--i: 5"></div>
+        <div class="e4-inner">
+          <div class="e4-sys">
+            <span class="e8c" style="--c: #ff00e5"><i></i><span>SYS::OPEN</span></span>
+          </div>
+          <div class="lv-menu-grid">
+            <nav class="e4-nav" aria-label="Live show views">
+              <a href="#lyr" data-view="lyrics" class="e4c-link on"
+                ><span class="e4c-l">LYRICS</span><span class="e4c-s"><b>01</b>KARAOKE · CUES</span></a
+              >
+              <a href="#padsPanel" data-view="pads" class="e4c-link"
+                ><span class="e4c-l">PADS</span><span class="e4c-s"><b>02</b>16 · QUANTISED</span></a
+              >
+              <a href="#setl" data-view="setlist" class="e4c-link"
+                ><span class="e4c-l">SETLIST</span><span class="e4c-s"><b>03</b>20 SONGS · 72:04</span></a
+              >
+              <a href="/live/?stage" data-view="stage" class="e4c-link"
+                ><span class="e4c-l">STAGE SCREEN</span><span class="e4c-s"><b>04</b>OPEN ↗</span></a
+              >
+            </nav>
+            <div class="vm-ft lv-menu-ft">
+              <span class="e-split e-split-menu"
+                ><span class="e-split-bk" id="offTxt">OFFLINE 20/20</span
+                ><button class="e-split-dl" id="midiBtn" type="button">
+                  <span id="midiTxt">MIDI LEARN</span>
+                </button></span
+              ><span class="e-split e-split-menu"
+                ><span class="e-split-bk lv-rec-bk" id="recMenuBk">REC</span
+                ><button class="e-split-dl" id="recBtn" type="button">
+                  <span id="recTxt">● RECORD THE SHOW</span>
+                </button></span
+              ><span class="e-split e-split-menu"
+                ><span class="e-split-bk">Nº404</span
+                ><button class="e-split-dl" type="button" data-lock>LOCK ↺</button></span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="lv-body">
         <div class="lv-main">
+          <canvas class="lv-lyr-rain" id="lyrRain" aria-hidden="true"></canvas>
           <div class="lv-cue" id="cue">
             <span>▲ NEXT</span><b id="cueName"></b><span id="cueNote"></span
             ><span class="lv-cue-bars" id="cueBars"></span>
@@ -160,29 +275,33 @@
         </div>
         <div class="lv-fx">
           <div class="lv-row">
-            <button class="lv-btn" data-fx="echo" data-ctl="ECHO">ECHO</button>
-            <button class="lv-btn" data-fx="reverb" data-ctl="REVERB">REVERB</button>
-            <button class="lv-btn" data-fx="crush" data-ctl="CRUSH">CRUSH</button>
-            <button class="lv-btn" data-fx="roll" data-ctl="ROLL" title="Hold to roll">ROLL</button>
-            <button class="lv-btn" data-fx="tapestop" data-ctl="TAPE STOP">TAPE STOP</button>
+            <button class="lv-btn" data-fx="echo" data-ctl="ECHO"><span>ECHO</span></button>
+            <button class="lv-btn" data-fx="reverb" data-ctl="REVERB"><span>REVERB</span></button>
+            <button class="lv-btn" data-fx="crush" data-ctl="CRUSH"><span>CRUSH</span></button>
+            <button class="lv-btn" data-fx="roll" data-ctl="ROLL" title="Hold to roll">
+              <span>ROLL</span>
+            </button>
+            <button class="lv-btn" data-fx="tapestop" data-ctl="TAPE STOP"><span>TAPE STOP</span></button>
           </div>
           <div class="lv-row">
-            <button class="lv-btn" data-loop="1" data-ctl="LOOP 1">LOOP 1</button>
-            <button class="lv-btn" data-loop="2" data-ctl="LOOP 2">LOOP 2</button>
-            <button class="lv-btn" data-loop="4" data-ctl="LOOP 4">LOOP 4</button>
-            <button class="lv-btn" data-loop="8" data-ctl="LOOP 8">LOOP 8</button>
-            <button class="lv-btn" id="padsBtn" data-ctl="PADS">PADS</button>
+            <button class="lv-btn" data-loop="1" data-ctl="LOOP 1"><span>LOOP 1</span></button>
+            <button class="lv-btn" data-loop="2" data-ctl="LOOP 2"><span>LOOP 2</span></button>
+            <button class="lv-btn" data-loop="4" data-ctl="LOOP 4"><span>LOOP 4</span></button>
+            <button class="lv-btn" data-loop="8" data-ctl="LOOP 8"><span>LOOP 8</span></button>
+            <button class="lv-btn" id="padsBtn" data-ctl="PADS"><span>PADS</span></button>
             <button class="lv-btn" id="rehBtn" data-ctl="REHEARSE" title="Loop this section at 85% speed">
-              REHEARSE
+              <span>REHEARSE</span>
             </button>
           </div>
         </div>
         <span class="lv-sp"></span>
         <div class="lv-safety">
-          <button class="lv-btn lv-panic" id="panicBtn" data-ctl="PANIC">PANIC · FADE</button>
-          <button class="lv-btn" id="lockBtn" title="Hold for 1 s to unlock">🔒 LOCK</button>
-          <button class="lv-btn" id="crowdBtn" data-ctl="CROWD">CROWD · VOX OFF</button>
-          <button class="lv-btn on" id="stageBtn">STAGE SCREEN ↗</button>
+          <button class="lv-btn lv-panic" id="panicBtn" data-ctl="PANIC"><span>PANIC · FADE</span></button>
+          <button class="lv-btn" id="lockBtn" data-lock title="Hold for 1 s to unlock">
+            <span>LOCK</span>
+          </button>
+          <button class="lv-btn" id="crowdBtn" data-ctl="CROWD"><span>CROWD · VOX OFF</span></button>
+          <button class="lv-btn on" id="stageBtn"><span>STAGE SCREEN ↗</span></button>
         </div>
       </footer>
       <div class="lv-toast" id="toast" role="status" aria-live="polite"></div>
@@ -200,7 +319,6 @@
           <div class="lv-nxt" id="stNxt"></div>
         </div>
       </div>
-      <div class="lv-stage-brand">ERROR_404 <span class="grad">ARCHIVE_404</span></div>
     </section>
 
     <script type="module" src="/src/live/main.js"></script>
