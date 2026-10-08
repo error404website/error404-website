@@ -352,7 +352,7 @@ function unlockSequence() {
   const line = (i, extra = "") => {
     $("#viBar").style.width = (i / 20) * 100 + "%";
     $("#viCount").textContent = `${pad(i)}/20`;
-    return `<div><b>&gt;</b> KEY ACCEPTED · <span class="ok">ACCESS Nº004</span></div><div><b>&gt;</b> DECRYPTING <i>${pad(i)}/20</i>${i ? `<span class="e-icard-t">${titles[i - 1]}_STEMS.ZIP</span>` : ""}</div>${extra}`;
+    return `<div><b>&gt;</b> KEY ACCEPTED · <span class="ok">ACCESS Nº404</span></div><div><b>&gt;</b> DECRYPTING <i>${pad(i)}/20</i>${i ? `<span class="e-icard-t">${titles[i - 1]}_STEMS.ZIP</span>` : ""}</div>${extra}`;
   };
   const lines = $("#viLines");
   term.classList.remove("out");
@@ -541,7 +541,7 @@ function rowHTML(t) {
       </div>
       <div class="tab" data-pane="stems">
         <div class="stems">${t.stems.map((s) => `<div class="stem"><span>${s.name.toUpperCase()}</span><span class="fmt">${s.wav ? "<i>WAV</i>" : ""}${s.mid ? "<i>MIDI</i>" : ""}</span></div>`).join("")}</div>
-        <div class="boxbar"><span class="count">${esc(t.asset.toUpperCase())} · WAV + MIDI${STEMS_READY ? "" : " · UPLOADING SOON"}</span><button class="holo" data-dl="${t.slug}">↓ DOWNLOAD STEMS${SIZES[t.asset] ? " · " + mb(SIZES[t.asset]) : ""}</button></div>
+        <div class="boxbar"><span class="count">${esc(t.asset.toUpperCase())} · ${t.stems.length} STEMS · WAV + MIDI</span><button class="holo" data-dl="${t.slug}">↓ DOWNLOAD STEMS${SIZES[t.asset] ? " · " + mb(SIZES[t.asset]) : ""}</button></div>
       </div>
       <div class="tab" data-pane="analysis"><div class="an">
         <div class="card"><div class="k">LENGTH</div><div class="v">${t.durationText}</div><div class="s">${t.duration.toFixed(1)} s, read from the remastered file.</div></div>
@@ -852,8 +852,9 @@ async function download(slug) {
       r = null;
     }
     if (!r || !r.ok) {
-      const why = r && r.status === 401 ? "KEY NOT ACCEPTED · LOCK AND UNLOCK AGAIN" : "NOT UPLOADED YET";
-      st(r && r.status === 401 ? "LOCKED" : "PENDING", "var(--amber)");
+      const why =
+        r && r.status === 401 ? "KEY NOT ACCEPTED · LOCK AND UNLOCK AGAIN" : "UNAVAILABLE · TRY AGAIN";
+      st(r && r.status === 401 ? "LOCKED" : "NO SIGNAL", "var(--amber)");
       log.innerHTML += `<br />&gt; ${esc(f.label)} · <em>${why}</em>`;
       continue;
     }
@@ -1238,16 +1239,16 @@ async function stemsApi(body) {
 async function loadSizes() {
   try {
     const r = await stemsApi({});
-    if (!r.ok) return;
-    const d = await r.json();
-    SIZES = d.sizes || {};
-    STEMS_READY = d.ready;
+    if (r.ok) {
+      const d = await r.json();
+      SIZES = d.sizes || {};
+      STEMS_READY = d.ready;
+    }
   } catch {
     /* offline: sizes just stay hidden */
   }
   const total = TRACKS.reduce((n, t) => n + (SIZES[t.asset] || 0), 0);
-  $("#stemTotal").textContent = STEMS_READY && total ? mb(total) : "SOON";
-  $("#allSize").textContent = STEMS_READY && total ? mb(total) : "SOON";
+  $("#allSize").textContent = STEMS_READY && total ? mb(total) : "—";
   if (STEMS_READY) render();
 }
 function applyData(d) {
@@ -1255,8 +1256,9 @@ function applyData(d) {
   loaded = true;
   TRACKS = d.tracks;
   parsePrompts(d.prompts);
-  $("#stemTotal").textContent = "SOON";
-  $("#allSize").textContent = "SOON";
+  // every stem comes as WAV + MIDI; the zip sizes arrive from the release (loadSizes)
+  $("#stemTotal").textContent = TRACKS.reduce((n, t) => n + t.stems.length, 0);
+  $("#allSize").textContent = "…";
   $("#masterBox").textContent = MASTER;
   $("#palette").innerHTML = PSTYLES.map(
     (p) =>
