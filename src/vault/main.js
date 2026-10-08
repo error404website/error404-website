@@ -722,9 +722,24 @@ au.addEventListener("timeupdate", () => {
 /* the dock: the site's player bar, with the shown track's real waveform as the seek bar */
 let dockT = null;
 const DOCK_BARS = 150;
+// lock screen / headphone controls: the same details as the site's player (PlayerDock)
+function dockMedia(t) {
+  if (!("mediaSession" in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new window.MediaMetadata({
+      title: t.title,
+      artist: "error_404",
+      album: `ARCHIVE_404 · ${t.chapter}`,
+      artwork: [{ src: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" }],
+    });
+  } catch {
+    // older browsers: no lock-screen details
+  }
+}
 function dockShow(t) {
   if (dockT === t) return;
   dockT = t;
+  dockMedia(t);
   $("#dockT").textContent = `${t.n} — ${t.title}`;
   $("#dockS").textContent = `CHAPTER 0${t.ch} · ${t.chapter}`;
   $("#dockDur").textContent = t.durationText;
@@ -790,6 +805,18 @@ $("#dockPlay").onclick = () => {
 };
 $("#dockNext").onclick = () => step(1);
 $("#dockPrev").onclick = () => (cur && au.currentTime > 3 ? (au.currentTime = 0) : step(-1));
+if ("mediaSession" in navigator) {
+  try {
+    navigator.mediaSession.setActionHandler("play", () =>
+      cur === dockT.slug ? au.play() : play(dockT.slug),
+    );
+    navigator.mediaSession.setActionHandler("pause", () => au.pause());
+    navigator.mediaSession.setActionHandler("nexttrack", () => $("#dockNext").click());
+    navigator.mediaSession.setActionHandler("previoustrack", () => $("#dockPrev").click());
+  } catch {
+    // older browsers: no lock-screen controls
+  }
+}
 $("#dockQbtn").onclick = () => dockQueue(!$("#dock").classList.contains("q-open"));
 $("#dockQx").onclick = () => dockQueue(false);
 $("#dockQl").onclick = (e) => {

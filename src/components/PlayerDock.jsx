@@ -137,7 +137,7 @@ export function PlayerDock() {
     try {
       navigator.mediaSession.metadata = new window.MediaMetadata({
         title: track.title,
-        artist: "ERROR_404",
+        artist: "error_404",
         album: `ARCHIVE_404 · ${track.chapter.title}`,
         artwork: [{ src: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" }],
       });
