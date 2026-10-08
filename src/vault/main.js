@@ -418,18 +418,20 @@ function startNav() {
   const burger = $("#burger"),
     menu = $("#vmenu");
   const setMenu = (o) => {
-    menu.hidden = !o;
+    menu.classList.toggle("is-open", o);
+    menu.setAttribute("aria-hidden", !o);
+    menu.inert = !o;
     burger.setAttribute("aria-expanded", o);
     burger.classList.toggle("is-open", o);
     burger.setAttribute("aria-label", o ? "Close menu" : "Open menu");
     document.body.classList.toggle("menu-open", o);
   };
-  burger.onclick = () => setMenu(menu.hidden);
+  burger.onclick = () => setMenu(!menu.classList.contains("is-open"));
   addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !menu.hidden) setMenu(false);
+    if (e.key === "Escape" && menu.classList.contains("is-open")) setMenu(false);
   });
   addEventListener("resize", () => {
-    if (innerWidth >= 1024 && !menu.hidden) setMenu(false);
+    if (innerWidth >= 1024 && menu.classList.contains("is-open")) setMenu(false);
   });
   $$("[data-nav]").forEach((a) =>
     a.addEventListener("click", (e) => {
