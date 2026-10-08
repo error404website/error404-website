@@ -9,14 +9,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - **Live show** at `/live/` (same access key as the Source Vault): preload the whole set for offline use, karaoke lines that fill word by word with stage cues and a next-song countdown, gapless playback, and a performance console (VOX / CROWD, EQ, filter, effects, loops, rehearse, 16 quantised pads with live vocal chops, panic, lock, recording, MIDI learn) plus a stage-screen window for a projector.
 
-### Changed
-
-- **Live show on brand:** the Source Vault's nav and slat menu (LYRICS · PADS · SETLIST · STAGE SCREEN, MIDI, record, lock), chromatic-text console buttons like the nav links, the vault's digital rain behind the lyrics (words of the song that's playing, paused with the show), and no brand text on the stage screen.
 - **Source Vault** at `/vault/`: a password-gated page with every track's stems, the Suno style prompts in all five production styles (colour-coded), original and Suno-optimised lyrics (same words, shorter section tags), a one-click Remix kit, a Camelot harmonic map, and each full song with its measured length, BPM and key (and how many detection models agree). It opens with the site's rain intro decrypting the 20 files, uses the site's menu, logo draw-on and end credits, and runs the track-name rain in the gutters on wide screens.
 - Password-only: the prompts, lyrics and analysis are committed only in encrypted form, locked with the access key itself and opened in the browser. Stems download through short-lived signed links from a private GitHub repo, handed out by one small Netlify function to visitors who prove they know the key (one Netlify setting: `VAULT_GH_TOKEN`).
 
 ### Changed
 
+- **Live show on brand:** the Source Vault's nav and slat menu (LYRICS · PADS · SETLIST · STAGE SCREEN, MIDI, record, lock), chromatic-text console buttons like the nav links, the vault's digital rain behind the lyrics (words of the song that's playing, paused with the show), and no brand text on the stage screen.
 - Audio: the 20 site MP3s no longer embed the 2.7 MB cover image (the players use their own artwork), so pages and the live preload load ~54 MB less. Audio unchanged.
 - Audio: the site now streams the live set versions of all 20 tracks at 320 kbps (from LIVE_SET/ARCHIVE_404): each starts on its first downbeat with the short changeovers built in, so the player's in-order playback flows like the live set (72:04). Track lengths on the site are updated to match. The ↓ DOWNLOAD zip (GitHub release v1.2.0) is replaced with the same 20 files: 223 MB, 320 kbps.
 - Player: lock screens and media controls now show the artist as error_404 (lowercase), matching the audio files' tags. The Source Vault's player now shows the same lock-screen details (title, error_404, ARCHIVE_404 · chapter, artwork) with play / pause / next / previous.
