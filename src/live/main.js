@@ -321,6 +321,11 @@ function startShow() {
   $("#pre").hidden = true;
   $("#show").hidden = false;
   document.body.classList.add("showing");
+  if (!window.__efx) {
+    const fx = document.createElement("script");
+    fx.src = $("#fx-src").content.firstElementChild.getAttribute("src");
+    document.body.appendChild(fx);
+  } // the site's logo behaviours: the nav logo draws itself on, and again on hover
   buildStrip();
   buildPads();
   buildSetlist();
