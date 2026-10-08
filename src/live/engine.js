@@ -73,7 +73,7 @@ export class Engine {
     this.pads = ctx.createGain();
     this.pads.gain.value = 0.9;
     this.master = ctx.createGain();
-    this.master.gain.value = 0.9;
+    this.master.gain.value = 1;
     this.post.connect(this.master);
     this.pads.connect(this.master);
     this.safety = new DynamicsCompressorNode(ctx, {
@@ -311,8 +311,9 @@ export class Engine {
     this.gI.gain.setTargetAtTime(1 - x, c, 0.015);
   }
   setEq(band, v) {
-    // v in 0..1, 0.8 = flat; below that cuts toward a kill (-40 dB), above boosts up to +6 dB
-    const db = v >= 0.8 ? ((v - 0.8) / 0.2) * 6 : v <= 0.02 ? -40 : -40 + (v / 0.8) * 40;
+    // v in 0..1, cut-only like a DJ mixer: 1 = flat (the song as mastered), turning down cuts the band
+    // (half way = -6 dB) to a kill (-40 dB) at the bottom; never a boost
+    const db = v >= 0.995 ? 0 : v <= 0.01 ? -40 : Math.max(-40, 20 * Math.log10(v));
     const node = { low: this.lo, mid: this.mid, high: this.hi }[band];
     if (node) node.gain.setTargetAtTime(db, this.ctx.currentTime, 0.02);
   }
@@ -344,7 +345,7 @@ export class Engine {
     const c = this.ctx.currentTime;
     this.master.gain.cancelScheduledValues(c);
     this.master.gain.setValueAtTime(this.master.gain.value, c);
-    this.master.gain.linearRampToValueAtTime(on ? 0 : (this.masterLevel ?? 0.9), c + (on ? sec : 0.3));
+    this.master.gain.linearRampToValueAtTime(on ? 0 : (this.masterLevel ?? 1), c + (on ? sec : 0.3));
   }
 
   // ---------- beat grid ----------

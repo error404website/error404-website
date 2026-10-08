@@ -546,16 +546,29 @@ body.lv-locked .lv-wave canvas {
   cursor: default;
 }
 
-/* the console: one low bar, dimmed until the mouse is on it */
+/* the console (L3): two tiers, dimmed until the mouse is on it.
+   top: the next song (name in the gradient) · safety; below: transport · knobs · fx · loops */
 .lv-strip {
   flex: none;
-  height: 96px;
   display: flex;
-  align-items: center;
-  gap: clamp(16px, 2.2vw, 34px);
+  flex-direction: column;
   padding: 0 clamp(16px, 2.6vw, 40px);
   background: linear-gradient(0deg, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.6));
   border-top: 1px solid var(--hair2);
+}
+.lv-tier {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2vw, 28px);
+}
+.lv-tier-info {
+  height: 48px;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--hair2);
+}
+.lv-tier-play {
+  min-height: 84px;
+  padding: 8px 0;
 }
 .lv-grp {
   display: flex;
@@ -603,6 +616,46 @@ body.lv-learn .lv-grp {
 .lv-knobs {
   gap: 14px;
 }
+.lv-fx {
+  margin-left: auto;
+  gap: 0;
+}
+.lv-row {
+  display: flex;
+  gap: 2px;
+}
+.lv-fx-div {
+  width: 1px;
+  height: 18px;
+  margin: 0 10px;
+  background: var(--hair);
+}
+.lv-safety {
+  gap: 4px;
+}
+.lv-next {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  min-width: 0;
+  white-space: nowrap;
+}
+.lv-next b {
+  color: var(--ghost);
+  font-weight: 400;
+}
+.lv-next-ttl {
+  font-family: var(--head);
+  font-size: 26px;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .lv-kn {
   display: flex;
   flex-direction: column;
@@ -637,40 +690,6 @@ body.lv-learn .lv-grp {
 .lv-kn .lv-lbl {
   font-size: 7.5px;
   letter-spacing: 0.24em;
-}
-.lv-fx {
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0;
-}
-.lv-row {
-  display: flex;
-  gap: 2px;
-}
-.lv-safety {
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 0 4px;
-}
-.lv-next {
-  margin-left: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  text-align: right;
-  gap: 3px;
-  min-width: 0;
-  white-space: nowrap;
-}
-.lv-next b {
-  color: var(--ghost);
-  font-weight: 400;
-}
-.lv-next-ttl {
-  font-family: var(--head);
-  font-size: 24px;
-  line-height: 1;
-  letter-spacing: 0.04em;
 }
 .lv-btn {
   position: relative;
@@ -750,7 +769,7 @@ body.lv-learn .lv-grp {
   position: absolute;
   left: max(40px, 8vw);
   right: max(40px, 8vw);
-  bottom: 176px;
+  bottom: 200px;
   z-index: 5;
   background: rgba(0, 0, 0, 0.94);
   border: 1px solid var(--hair);
@@ -797,7 +816,7 @@ body.lv-learn .lv-grp {
 }
 
 /* lock + MIDI learn */
-body.lv-locked .lv-strip > :not(.lv-safety),
+body.lv-locked .lv-tier-play,
 body.lv-locked .lv-pads,
 body.lv-locked .lv-setl {
   opacity: 0.4;
@@ -810,7 +829,7 @@ body.lv-learn [data-ctl] {
 .lv-toast {
   position: fixed;
   left: 50%;
-  bottom: 186px;
+  bottom: 210px;
   transform: translate(-50%, 10px);
   opacity: 0;
   font-size: 10px;
@@ -827,7 +846,16 @@ body.lv-learn [data-ctl] {
   transform: translate(-50%, 0);
 }
 
-/* narrower laptops: the console bar tightens, the next-song card goes */
+/* narrower laptops: the console tightens, and below 1380 px the fx and loops stack in two rows */
+@media (max-width: 1380px) {
+  .lv-fx {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  .lv-fx-div {
+    display: none;
+  }
+}
 @media (max-width: 1280px) {
   .lv-btn {
     padding: 0 7px;
@@ -838,14 +866,6 @@ body.lv-learn [data-ctl] {
   }
   .lv-padgrid {
     grid-template-columns: repeat(4, 1fr);
-  }
-}
-@media (max-width: 1180px) {
-  .lv-next {
-    display: none;
-  }
-  .lv-safety {
-    margin-left: auto;
   }
 }
 
