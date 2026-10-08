@@ -355,11 +355,12 @@
 
     <!-- ================= STAGE SCREEN (opened by STAGE SCREEN ↗, for a projector) ================= -->
     <section class="lv-stage" id="stage" hidden>
-      <canvas id="stageRain" aria-hidden="true"></canvas>
-      <div class="e-glow" aria-hidden="true"></div>
+      <!-- the live page's cinematic look (P2), for the audience: rain under a vignette, centred lyrics -->
+      <canvas class="lv-bg-rain" id="stageRain" aria-hidden="true"></canvas>
+      <div class="lv-vig" aria-hidden="true"></div>
       <div class="lv-stage-in">
-        <div class="lv-stage-song" id="stSong"></div>
         <div class="lv-lyr lv-lyr-stage">
+          <div class="lv-sec" id="stSong"></div>
           <div class="lv-prev" id="stPrev"></div>
           <div class="lv-cur" id="stCur"></div>
           <div class="lv-nxt" id="stNxt"></div>
