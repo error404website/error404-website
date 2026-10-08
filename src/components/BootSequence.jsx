@@ -173,20 +173,36 @@ export function BootSequence({ onComplete }) {
         aria-hidden="true"
       />
       <span className="e-bscan" aria-hidden={true} />
-      <div className={"e-bterm" + (draining ? " out" : "")} aria-hidden="true">
-        <div>
-          <b>&gt;</b> RECOVERING ARCHIVE_404
+      <div className={"e-icard" + (draining ? " out" : "")} aria-hidden="true">
+        <span className="e-icard-vf" />
+        <div className="e-icard-tg">
+          <i />
+          RECOVERY · ARCHIVE_404
         </div>
-        <div>
-          <b>&gt;</b> FILE <i>{pad(count)}/20</i>
-          {count > 0 && <span className="e-bterm-t">{TITLES[count - 1]}</span>}
+        <div className="e-icard-h">
+          RECOVERING <span className="e-grad">FILES.</span>
         </div>
-        {done && (
+        <div className="e-icard-l">
           <div>
-            <b>&gt;</b> <i>20/20 FILES INTACT</i>
+            <b>&gt;</b> RECOVERING ARCHIVE_404
           </div>
-        )}
-        <span className="e-bterm-cur" />
+          <div>
+            <b>&gt;</b> FILE <i>{pad(count)}/20</i>
+            {count > 0 && <span className="e-icard-t">{TITLES[count - 1]}</span>}
+          </div>
+          {done && (
+            <div>
+              <b>&gt;</b> <i>20/20 FILES INTACT</i>
+            </div>
+          )}
+        </div>
+        <div className="e-icard-bar">
+          <b style={{ width: `${(count / TITLES.length) * 100}%` }} />
+        </div>
+        <div className="e-icard-tk">
+          <span>20 FILES</span>
+          <span>{pad(count)}/20</span>
+        </div>
       </div>
       <p className="sr-only">Recovering ARCHIVE_404: 20 of 20 files intact.</p>
       {/* visually hidden; appears only when focused, e.g. by a screen reader (tap / any key also skips) */}
