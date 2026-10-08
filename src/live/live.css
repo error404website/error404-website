@@ -504,6 +504,42 @@ body.live.stage-mode {
   color: var(--t4);
 }
 
+/* ---------- W4 waveform strip ---------- */
+.lv-wave {
+  flex: none;
+  position: relative;
+  border-top: 1px solid var(--hair2);
+  background: #020308;
+}
+.lv-wave canvas {
+  display: block;
+  width: 100%;
+  cursor: pointer;
+}
+.lv-wave-read {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  right: 12px;
+  top: 5px;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--t2);
+  background: rgba(2, 3, 8, 0.8);
+  padding: 0 0 2px 8px;
+}
+.lv-wave-read b {
+  font-family: var(--head);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  color: var(--ghost);
+  margin-left: 6px;
+}
+body.lv-locked .lv-wave canvas {
+  cursor: default;
+}
+
 /* ---------- console strip ---------- */
 .lv-strip {
   flex: none;
@@ -828,6 +864,29 @@ body.lv-learn [data-ctl] {
   }
   .lv-padgrid {
     grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* shorter laptop screens: the waveform strip takes ~140 px, so the lyrics scale with the height */
+@media (max-height: 860px) {
+  .lv-body {
+    padding-top: 14px;
+    padding-bottom: 8px;
+  }
+  .lv-main {
+    gap: 12px;
+  }
+  .lv-cur {
+    font-size: min(7.4vw, 9vh);
+  }
+  .lv-prev {
+    font-size: min(3.2vw, 4vh);
+  }
+  .lv-nxt {
+    font-size: min(3.6vw, 4.6vh);
+  }
+  .lv-nxt2 {
+    display: none;
   }
 }
 

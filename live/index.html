@@ -8,12 +8,34 @@
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, noai, noimageai" />
     <meta name="tdm-reservation" content="1" />
     <meta name="referrer" content="no-referrer" />
-    <title>Live · ERROR_404</title>
-    <meta name="description" content="Restricted. Access key required." />
-    <link rel="icon" type="image/svg+xml" href="/vault/favicon.svg" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/vault/apple-touch-icon.png" />
-    <meta property="og:title" content="Live · ERROR_404" />
-    <meta property="og:description" content="Restricted. Access key required." />
+    <title>ARCHIVE_404 Live · ERROR_404</title>
+    <meta name="description" content="The live show. 20 songs, 72 minutes, one take. Access key required." />
+    <link rel="icon" type="image/svg+xml" href="/live/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/live/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/live/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="A404 LIVE" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://error404.run/live/" />
+    <meta property="og:site_name" content="ERROR_404" />
+    <meta property="og:title" content="ARCHIVE_404 Live · ERROR_404" />
+    <meta
+      property="og:description"
+      content="The live show. 20 songs, 72 minutes, one take. Access key required."
+    />
+    <meta property="og:image" content="https://error404.run/live/og-live.png" />
+    <meta
+      property="og:image:alt"
+      content="The ERROR_404 logo over the whole live set drawn as one waveform, shading from magenta to cyan, above the words ARCHIVE_404 LIVE"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ARCHIVE_404 Live · ERROR_404" />
+    <meta
+      name="twitter:description"
+      content="The live show. 20 songs, 72 minutes, one take. Access key required."
+    />
+    <meta name="twitter:image" content="https://error404.run/live/og-live.png" />
     <link rel="preload" href="/fonts/bebas-neue-400.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/fonts/fonts.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -230,6 +252,12 @@
           </div>
           <ol class="lv-setl" id="setl"></ol>
         </aside>
+      </div>
+
+      <!-- W4: scrolling deck (16 bars around the playhead) · the lines you sing · the song's sections -->
+      <div class="lv-wave" id="wave">
+        <span class="lv-wave-read" id="waveRead"></span>
+        <canvas id="waveCv" aria-label="Waveform and song sections: click the section map to jump"></canvas>
       </div>
 
       <div class="lv-pads" id="padsPanel" hidden></div>
