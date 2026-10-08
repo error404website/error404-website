@@ -449,7 +449,7 @@ function startNav() {
     }),
   );
   $$("[data-lock]").forEach((b) => (b.onclick = () => $("#lockBtn").click()));
-  // scroll spy: the active link is the last section whose top has passed under the menu (none while the header is in view)
+  // scroll spy: the active link is the last section whose top has passed under the menu (on the desktop bar, none while the header is in view)
   const spy = () => {
     const line = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--navh")) + 120;
     let cur = null;
@@ -461,8 +461,9 @@ function startNav() {
       });
     if (document.getElementById("vfoot").getBoundingClientRect().top < innerHeight * 0.5) cur = "vfoot";
     $$("[data-nav]").forEach((a) => {
-      const on = a.dataset.nav === cur,
-        desk = a.classList.contains("e8-link");
+      const desk = a.classList.contains("e8-link"),
+        // the phone menu always lights one link, like the site's: PROMPTS while the header is in view
+        on = a.dataset.nav === (desk ? cur : cur || "prompts");
       a.classList.toggle("active", on && desk);
       a.classList.toggle("on", on && !desk);
       on && desk ? a.setAttribute("aria-current", "location") : a.removeAttribute("aria-current");
