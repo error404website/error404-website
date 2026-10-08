@@ -229,41 +229,52 @@
         </div>
       </div>
 
-      <div class="lv-body">
-        <div class="lv-main">
-          <canvas class="lv-lyr-rain" id="lyrRain" aria-hidden="true"></canvas>
-          <div class="lv-cue" id="cue">
-            <span>▲ NEXT</span><b id="cueName"></b><span id="cueNote"></span
-            ><span class="lv-cue-bars" id="cueBars"></span>
-          </div>
-          <div class="lv-lyr" id="lyr" aria-live="off">
-            <div class="lv-sec" id="lySec"></div>
-            <div class="lv-prev" id="lyPrev"></div>
-            <div class="lv-cur" id="lyCur"></div>
-            <div class="lv-nxt" id="lyNxt"></div>
-            <div class="lv-nxt2" id="lyNxt2"></div>
-          </div>
+      <!-- P2 · cinematic: full-screen rain under a vignette, the lyrics centred, everything else low-key -->
+      <canvas class="lv-bg-rain" id="lyrRain" aria-hidden="true"></canvas>
+      <svg width="0" height="0" aria-hidden="true" style="position: absolute">
+        <defs>
+          <linearGradient id="lv-kg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#ff00e5" />
+            <stop offset="1" stop-color="#00efff" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="lv-vig" aria-hidden="true"></div>
+
+      <div class="lv-cue" id="cue">
+        <span>NEXT</span><b id="cueName"></b><span class="lv-cue-note" id="cueNote"></span
+        ><span class="lv-cue-bars" id="cueBars"></span>
+      </div>
+      <div class="lv-center">
+        <div class="lv-lyr" id="lyr" aria-live="off">
+          <div class="lv-sec" id="lySec"></div>
+          <div class="lv-prev" id="lyPrev"></div>
+          <div class="lv-cur" id="lyCur"></div>
+          <div class="lv-nxt" id="lyNxt"></div>
         </div>
-        <aside class="lv-side">
-          <div class="lv-next">
-            <span class="lv-lbl">NEXT SONG · <span id="nxInto"></span></span>
-            <span class="lv-next-ttl" id="nxTitle">—</span>
-            <span class="lv-lbl"><span id="nxMeta"></span> · IN <b id="nxIn">—</b></span>
-          </div>
-          <ol class="lv-setl" id="setl"></ol>
-        </aside>
       </div>
 
-      <!-- W4: scrolling deck (16 bars around the playhead) · the lines you sing · the song's sections -->
+      <!-- the setlist: a drawer from the right (menu → SETLIST), click a song to jump -->
+      <aside class="lv-drawer" id="drawer" aria-label="Setlist" hidden>
+        <div class="lv-drawer-hd">
+          <span class="lv-lbl">SETLIST · 20 SONGS · 72:04</span
+          ><button class="lv-btn" id="drawerX" type="button" aria-label="Close the setlist">
+            <span>✕</span>
+          </button>
+        </div>
+        <ol class="lv-setl" id="setl"></ol>
+      </aside>
+
+      <!-- the song as one slim waveform: played part in colour, section ticks, click to jump -->
       <div class="lv-wave" id="wave">
         <span class="lv-wave-read" id="waveRead"></span>
-        <canvas id="waveCv" aria-label="Waveform and song sections: click the section map to jump"></canvas>
+        <canvas id="waveCv" aria-label="Waveform and song sections: click to jump"></canvas>
       </div>
 
       <div class="lv-pads" id="padsPanel" hidden></div>
 
       <footer class="lv-strip">
-        <div class="lv-transport">
+        <div class="lv-grp lv-transport">
           <button class="lv-btn" id="prevBtn" type="button" aria-label="Previous song">
             <svg
               viewBox="0 0 16 16"
@@ -278,7 +289,7 @@
               <path d="M8 3.5L3.5 8 8 12.5M13 3.5L8.5 8 13 12.5" />
             </svg>
           </button>
-          <button class="lv-btn lv-play" id="playBtn" type="button" aria-label="Play">
+          <button class="lv-play" id="playBtn" type="button" aria-label="Play">
             <span class="e-pi"></span>
           </button>
           <button class="lv-btn" id="nextBtn" type="button" aria-label="Next song">
@@ -296,12 +307,8 @@
             </svg>
           </button>
         </div>
-        <div class="lv-faders" id="faders"></div>
-        <div class="lv-knob-wrap">
-          <div class="lv-knob" id="filterKnob" data-ctl="FILTER"></div>
-          <span class="lv-lbl">FILTER</span>
-        </div>
-        <div class="lv-fx">
+        <div class="lv-grp lv-knobs" id="faders"></div>
+        <div class="lv-grp lv-fx">
           <div class="lv-row">
             <button class="lv-btn" data-fx="echo" data-ctl="ECHO"><span>ECHO</span></button>
             <button class="lv-btn" data-fx="reverb" data-ctl="REVERB"><span>REVERB</span></button>
@@ -310,26 +317,31 @@
               <span>ROLL</span>
             </button>
             <button class="lv-btn" data-fx="tapestop" data-ctl="TAPE STOP"><span>TAPE STOP</span></button>
+            <button class="lv-btn" id="padsBtn" data-ctl="PADS"><span>PADS</span></button>
           </div>
           <div class="lv-row">
             <button class="lv-btn" data-loop="1" data-ctl="LOOP 1"><span>LOOP 1</span></button>
             <button class="lv-btn" data-loop="2" data-ctl="LOOP 2"><span>LOOP 2</span></button>
             <button class="lv-btn" data-loop="4" data-ctl="LOOP 4"><span>LOOP 4</span></button>
             <button class="lv-btn" data-loop="8" data-ctl="LOOP 8"><span>LOOP 8</span></button>
-            <button class="lv-btn" id="padsBtn" data-ctl="PADS"><span>PADS</span></button>
             <button class="lv-btn" id="rehBtn" data-ctl="REHEARSE" title="Loop this section at 85% speed">
               <span>REHEARSE</span>
             </button>
           </div>
         </div>
-        <span class="lv-sp"></span>
-        <div class="lv-safety">
+        <div class="lv-grp lv-safety">
           <button class="lv-btn lv-panic" id="panicBtn" data-ctl="PANIC"><span>PANIC · FADE</span></button>
           <button class="lv-btn" id="lockBtn" data-lock title="Hold for 1 s to unlock">
             <span>LOCK</span>
           </button>
           <button class="lv-btn" id="crowdBtn" data-ctl="CROWD"><span>CROWD · VOX OFF</span></button>
-          <button class="lv-btn on" id="stageBtn"><span>STAGE SCREEN ↗</span></button>
+          <button class="lv-btn on" id="stageBtn"><span>STAGE ↗</span></button>
+        </div>
+        <div class="lv-next">
+          <span class="lv-lbl">NEXT · <span id="nxInto"></span></span>
+          <span class="lv-next-ttl" id="nxTitle">—</span>
+          <span class="lv-lbl">IN <b id="nxIn">—</b></span>
+          <span id="nxMeta" hidden></span>
         </div>
       </footer>
       <div class="lv-toast" id="toast" role="status" aria-live="polite"></div>
