@@ -45,9 +45,14 @@
     Cache-Control = "public, max-age=604800"
 
 # Security headers for every page.
+# HSTS: browsers use https for error404.run and every subdomain (www too) for two years, even when a
+# link says http://. "preload" makes it eligible for the browsers' built-in https list (hstspreload.org).
+# upgrade-insecure-requests: any stray http:// file on a page is fetched over https instead.
 [[headers]]
   for = "/*"
   [headers.values]
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    Content-Security-Policy = "upgrade-insecure-requests"
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "SAMEORIGIN"
     Referrer-Policy = "strict-origin-when-cross-origin"
