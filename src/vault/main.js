@@ -530,7 +530,7 @@ function rowHTML(t) {
         <div class="boxbar"><span class="count" data-lcount></span><span class="kitbar"><button class="gbtn" data-copy-lyrics>COPY LYRICS</button><button class="holo" data-kit>⧉ COPY REMIX KIT</button></span></div>
       </div>
       <div class="tab" data-pane="stems">
-        <div class="stems">${t.stems.map((s) => `<div class="stem"><span>${s.name.toUpperCase()}</span><span class="fmt">${s.wav ? `<button data-toast="${s.name} WAV (MOCKUP)">WAV</button>` : ""}${s.mid ? `<button data-toast="${s.name} MIDI (MOCKUP)">MIDI</button>` : ""}</span></div>`).join("")}</div>
+        <div class="stems">${t.stems.map((s) => `<div class="stem"><span>${s.name.toUpperCase()}</span><span class="fmt">${s.wav ? "<i>WAV</i>" : ""}${s.mid ? "<i>MIDI</i>" : ""}</span></div>`).join("")}</div>
         <div class="boxbar"><span class="count">${esc(t.asset.toUpperCase())} · WAV + MIDI${STEMS_READY ? "" : " · UPLOADING SOON"}</span><button class="holo" data-dl="${t.slug}">↓ DOWNLOAD STEMS${SIZES[t.asset] ? " · " + mb(SIZES[t.asset]) : ""}</button></div>
       </div>
       <div class="tab" data-pane="analysis"><div class="an">
@@ -815,7 +815,7 @@ async function download(slug) {
   const t = slug === "all" ? null : TRACKS.find((x) => x.slug === slug);
   const files = t
     ? [{ asset: t.asset, label: `${t.n}_${t.title}_STEMS.ZIP` }]
-    : CHAPTERS.map((c) => ({ asset: c.asset, label: c.asset.toUpperCase() }));
+    : TRACKS.map((x) => ({ asset: x.asset, label: `${x.n}_${x.title}_STEMS.ZIP` })); // one zip per track: a chapter would pass GitHub's 2 GB per file
   clearTimeout(xHide);
   const X = $("#xfer"),
     log = $("#xLog");
@@ -826,7 +826,7 @@ async function download(slug) {
     $("#xState").style.color = c;
   };
   const total = files.reduce((n, f) => n + (SIZES[f.asset] || 0), 0);
-  $("#xName").textContent = t ? files[0].label : `ARCHIVE_404 · ALL STEMS · ${files.length} CHAPTER ZIPS`;
+  $("#xName").textContent = t ? files[0].label : `ARCHIVE_404 · ALL STEMS · ${files.length} ZIPS`;
   $("#xBar").style.width = "0";
   $("#xSize").textContent = total ? mb(total) : "—";
   $("#xSpeed").textContent = "—";
@@ -1165,7 +1165,6 @@ addEventListener("resize", drawRuler);
 const SESSION = "e404-vault";
 let SIZES = {},
   STEMS_READY = false,
-  CHAPTERS = [],
   PROOF = "",
   loaded = false,
   sealed = null;
@@ -1245,7 +1244,6 @@ function applyData(d) {
   if (loaded) return;
   loaded = true;
   TRACKS = d.tracks;
-  CHAPTERS = d.chapters;
   parsePrompts(d.prompts);
   $("#stemTotal").textContent = "SOON";
   $("#allSize").textContent = "SOON";

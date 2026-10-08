@@ -26,21 +26,15 @@ if (!key) throw new Error("VAULT_KEY missing from .env.vault");
 const analysis = JSON.parse(readFileSync("vault-private/vault-data.json", "utf8"));
 const prompts = readFileSync("vault-private/error_404_Archive_404_remix_prompts.md", "utf8");
 
-// Stem zips on the private release: one per track, and one per chapter for "all stems"
-// (a single 2.4 GB zip is over GitHub's 2 GB limit per release file).
-// (the June zip names/sizes in the analysis file are dropped: live sizes come from the release)
-const CHAPTERS = ["ORIGIN", "THE FEED", "THE WRECKAGE", "WHOLE"];
+// Stem zips on the private release: one per track (WAV + MIDI); "all stems" downloads all 20.
+// Even one chapter's zip would pass GitHub's 2 GB limit per release file.
+// (live sizes come from the release, so any zip name/size in the analysis file is dropped)
 const tracks = analysis.tracks.map((t) => {
   const out = { ...t, asset: `${t.n}_${t.slug}_stems.zip` };
   delete out.zip;
   return out;
 });
-const chapters = CHAPTERS.map((name, i) => ({
-  ch: i + 1,
-  name,
-  asset: `ARCHIVE_404_stems_0${i + 1}_${name.toLowerCase().replace(/ /g, "_")}.zip`,
-}));
-const payload = { tracks, chapters, prompts };
+const payload = { tracks, prompts };
 
 // data: the browser derives the same key from what the visitor types (WebCrypto PBKDF2) and decrypts
 const salt = randomBytes(16);
@@ -68,12 +62,10 @@ writeFileSync(
   "netlify/vault-proof.json",
   JSON.stringify({
     proof: createHash("sha256").update(proof).digest("hex"),
-    assets: [...tracks.map((t) => t.asset), ...chapters.map((ch) => ch.asset)],
+    assets: tracks.map((t) => t.asset),
   }) + "\n",
 );
 console.log(
   `Locked ${tracks.length} tracks and ${prompts.length} characters of prompts with the access key.`,
 );
-console.log(
-  "Stem zip names for the private release:\n  " + [...tracks, ...chapters].map((x) => x.asset).join("\n  "),
-);
+console.log("Stem zip names for the private release:\n  " + tracks.map((x) => x.asset).join("\n  "));
