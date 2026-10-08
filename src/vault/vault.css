@@ -522,7 +522,7 @@ a {
 .snav {
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 58;
 }
 .snav .nav-glass {
   position: absolute;
@@ -573,60 +573,34 @@ a {
     display: flex;
   }
 }
+/* the open menu is the site's .e4-menu (overrides.css): full screen under the nav bar, over the dock */
 .vmenu {
   position: fixed;
-  left: 0;
-  right: 0;
-  top: var(--navh);
-  bottom: 0;
-  z-index: 55;
-  background: #000;
-  padding: 22px 16px calc(24px + env(safe-area-inset-bottom));
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  inset: 0;
+  z-index: 56;
+  overflow: hidden;
 }
-.vmenu[hidden] {
-  display: none;
+@media (min-width: 1024px) {
+  .vmenu {
+    display: none;
+  }
 }
-.vmenu a[data-nav] {
+.vmenu .e4c-l {
   font-family: var(--head);
-  font-size: clamp(40px, 11vw, 56px);
-  line-height: 1.15;
-  color: var(--t2);
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  border-bottom: 1px solid var(--hair2);
-  padding: 8px 0;
+}
+.vmenu .e4c-link {
   text-decoration: none;
 }
-.vmenu a[data-nav] small {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.24em;
-  color: var(--t4);
-}
-.vmenu a.on {
-  color: var(--ghost);
-}
-.vmenu a.on span {
+.vmenu .e4c-link.on .e4c-l {
   background: var(--grad);
   -webkit-background-clip: text;
   background-clip: text;
+  -webkit-text-stroke: 0;
   color: transparent;
 }
 .vm-ft {
-  margin-top: auto;
   display: grid;
   gap: 8px;
-}
-.vm-ft .e-split {
-  width: 100%;
-}
-.vm-ft .e-split > * {
-  flex: 1;
-  min-height: 48px;
 }
 body.menu-open {
   overflow: hidden;

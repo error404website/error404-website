@@ -136,15 +136,47 @@
         </div>
       </div>
     </nav>
-    <div class="vmenu" id="vmenu" hidden>
-      <a href="#prompts" data-nav="prompts"><span>PROMPTS</span><small>5 STYLES</small></a
-      ><a href="#hmap" data-nav="hmap"><span>HARMONIC MAP</span><small>5B · 6A · 6B</small></a
-      ><a href="#tracks" data-nav="tracks"><span>TRACKS</span><small>20 FILES</small></a
-      ><a href="#vfoot" data-nav="vfoot"><span>CREDITS</span><small>END</small></a>
-      <div class="vm-ft">
-        <span class="e-split"
-          ><span class="e-split-bk">Nº004</span><button class="e-split-dl" data-lock>LOCK ↺</button></span
-        ><span class="e-split"><button class="e-split-dl" data-dl="all">↓ ALL STEMS</button></span>
+    <!-- the site's open menu (Nav.jsx): slat wipe, SYS::OPEN chip, outlined poster links, split buttons -->
+    <div
+      class="vmenu e4-menu"
+      id="vmenu"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Vault navigation"
+      aria-hidden="true"
+      inert
+    >
+      <div class="e4-sl" style="--i: 0"></div>
+      <div class="e4-sl" style="--i: 1"></div>
+      <div class="e4-sl" style="--i: 2"></div>
+      <div class="e4-sl" style="--i: 3"></div>
+      <div class="e4-sl" style="--i: 4"></div>
+      <div class="e4-sl" style="--i: 5"></div>
+      <div class="e4-inner">
+        <div class="e4-sys">
+          <span class="e8c" style="--c: #ff00e5"><i></i><span>SYS::OPEN</span></span>
+        </div>
+        <nav class="e4-nav" aria-label="Vault navigation links">
+          <a href="#prompts" data-nav="prompts" class="e4c-link"
+            ><span class="e4c-l">PROMPTS</span><span class="e4c-s"><b>01</b>5 STYLES</span></a
+          >
+          <a href="#hmap" data-nav="hmap" class="e4c-link"
+            ><span class="e4c-l">HARMONIC MAP</span><span class="e4c-s"><b>02</b>5B · 6A · 6B</span></a
+          >
+          <a href="#tracks" data-nav="tracks" class="e4c-link"
+            ><span class="e4c-l">TRACKS</span><span class="e4c-s"><b>03</b>20 FILES</span></a
+          >
+          <a href="#vfoot" data-nav="vfoot" class="e4c-link"
+            ><span class="e4c-l">CREDITS</span><span class="e4c-s"><b>04</b>END</span></a
+          >
+        </nav>
+        <div class="vm-ft">
+          <span class="e-split e-split-menu"
+            ><span class="e-split-bk">Nº004</span><button class="e-split-dl" data-lock>LOCK ↺</button></span
+          ><span class="e-split e-split-menu"
+            ><button class="e-split-dl" data-dl="all">↓ ALL STEMS</button></span
+          >
+        </div>
       </div>
     </div>
     <div class="ruler" id="ruler" aria-hidden="true" hidden></div>
