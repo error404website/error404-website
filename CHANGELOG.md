@@ -12,6 +12,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Source Vault phone menu: one link is always lit with the gradient, like the site's menu. At the top of the page that's PROMPTS, the first section.
 - Source Vault phone menu: it now opens exactly like the site's menu: full screen with the slat wipe, the SYS::OPEN chip, big outlined poster links with numbered captions (the section you're on fills with the gradient), and the split buttons at the bottom.
 - Source Vault menu: the links now follow the page, top to bottom: Prompts, Harmonic Map, Tracks, Credits (desktop nav and the phone menu).
 - Source Vault gate: the ACCESS REQUIRED card is much smaller (270 px: tag, one-line title, and the key field with a → button) and has no box, just four viewfinder corner ticks with the rain fading to dark behind it. The site's digital rain now runs behind it, streaming only public words (track titles and stem types) until the key is in.
