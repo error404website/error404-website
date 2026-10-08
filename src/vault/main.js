@@ -5,6 +5,7 @@ import "../styles/index.css";
 import "../styles/overrides.css";
 import "./vault.css";
 import { audioSrc } from "../lib/audioSrc";
+import { CHAPTERS as SITE_CHAPTERS } from "../data/chapters";
 
 const $ = (s, el = document) => el.querySelector(s),
   $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -187,6 +188,7 @@ function reveal() {
   if (revealed) return;
   revealed = true;
   $("#gate").classList.add("out");
+  stopGateRain();
   document.body.classList.remove("locked");
   $("#vault").hidden = false;
   $("#snav").hidden = false;
@@ -300,6 +302,29 @@ function vaultRain(cv, words) {
     },
   };
 }
+// The gate's rain: only public words before the key is in (the site's track titles and the stem types).
+const GATE_WORDS = [
+  ...SITE_CHAPTERS.flatMap((c) => c.tracks.map((t) => t.title)),
+  ...["VOCALS", "BACKING_VOCALS", "DRUMS", "BASS", "SYNTH", "GUITAR", "KEYBOARD", "STRINGS", "BRASS", "FX"],
+];
+let gateRain = null;
+function startGateRain() {
+  if (REDUCE) return;
+  gateRain?.stop();
+  gateRain = vaultRain($("#gateRain"), GATE_WORDS);
+}
+function stopGateRain() {
+  const r = gateRain;
+  gateRain = null;
+  if (r) setTimeout(() => r.stop(), 400); // after the gate's fade
+}
+startGateRain();
+let resizeT = 0;
+addEventListener("resize", () => {
+  if (!gateRain) return;
+  clearTimeout(resizeT);
+  resizeT = setTimeout(() => gateRain && startGateRain(), 200);
+});
 let introDone = null;
 function unlockSequence() {
   $("#viStatus").textContent = "Access granted. Opening the vault.";
@@ -314,6 +339,7 @@ function unlockSequence() {
   ov.hidden = false;
   ov.classList.remove("out");
   $("#gate").classList.add("out");
+  stopGateRain();
   const rain = vaultRain($("canvas", ov), stems.concat(titles));
   const T = [];
   const at = (ms, f) => T.push(setTimeout(f, ms));
