@@ -12,6 +12,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Audio: the site now streams the live set versions of all 20 tracks at 320 kbps (from LIVE_SET/ARCHIVE_404): each starts on its first downbeat with the short changeovers built in, so the player's in-order playback flows like the live set (72:04). Track lengths on the site are updated to match. The ↓ DOWNLOAD zip (GitHub release v1.2.0) is replaced with the same 20 files: 223 MB, 320 kbps.
 - Player: lock screens and media controls now show the artist as error_404 (lowercase), matching the audio files' tags. The Source Vault's player now shows the same lock-screen details (title, error_404, ARCHIVE_404 · chapter, artwork) with play / pause / next / previous.
 - Audio: the 20 tracks' MP3 tags are cleaned and rewritten. The Suno links, "made with suno" comments and C2PA records are gone; each track now carries its title (e.g. LEFT_BEHIND), artist error_404, album ARCHIVE_404, track n/20, year, genre, composers NULLSAINT · CACHEGHOST, its chapter, plain lyrics and the album artwork (with its own C2PA record stripped; the picture is unchanged). The audio itself is bit-for-bit unchanged.
 - HTTPS: every response now tells browsers to use https for error404.run and all its subdomains (www included) for two years, even from an `http://` link, and to fetch any stray `http://` file over https. The site is ready to be added to the browsers' built-in https list (hstspreload.org).
