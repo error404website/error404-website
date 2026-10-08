@@ -1553,16 +1553,14 @@ details.fold[open] summary::after {
   display: flex;
   gap: 4px;
 }
-.stem .fmt button {
+/* what each stem comes as (both are in the track's zip) */
+.stem .fmt i {
+  font-style: normal;
   font-size: 9px;
   letter-spacing: 0.14em;
   padding: 6px 7px;
   border: 1px solid var(--hair);
-  color: var(--t2);
-}
-.stem .fmt button:hover {
-  border-color: var(--cyan);
-  color: var(--cyan);
+  color: var(--t3);
 }
 .an {
   display: grid;

@@ -202,7 +202,7 @@ The page is public code, so the private parts are locked:
 
 **Changing the key, prompts or analysis:** edit `.env.vault` (`VAULT_KEY=…`) or the files in `vault-private/` (both git-ignored), run `npm run vault:encrypt`, and commit the two regenerated files.
 
-**Updating the stems:** upload the zips to the `stems` release on the private repo using the names `npm run vault:encrypt` prints (one per track, plus one per chapter for ALL STEMS, since GitHub caps a release file at 2 GB). Sizes appear in the vault automatically.
+**Updating the stems:** upload the zips to the `stems` release on the private repo using the names `npm run vault:encrypt` prints (one per track, holding `WAV/` and `MIDI/` folders; ALL STEMS downloads all 20, since even one chapter's zip would pass GitHub's 2 GB cap per release file). Sizes appear in the vault automatically.
 
 **Strength:** the key protects the files like a password on a zip. Someone could copy `data.enc.json` and try guesses offline, so use a long, unusual key if the contents need to stay secret from determined people.
 
