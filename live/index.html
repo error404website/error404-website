@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" />
+    <!-- kept out of every search engine and AI index, like the vault -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, noai, noimageai" />
+    <meta name="tdm-reservation" content="1" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Live · ERROR_404</title>
+    <meta name="description" content="Restricted. Access key required." />
+    <link rel="icon" type="image/svg+xml" href="/vault/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/vault/apple-touch-icon.png" />
+    <meta property="og:title" content="Live · ERROR_404" />
+    <meta property="og:description" content="Restricted. Access key required." />
+    <link rel="preload" href="/fonts/bebas-neue-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="locked live">
+    <!-- ================= GATE (the vault's, same key) ================= -->
+    <div class="gate scan" id="gate" role="dialog" aria-modal="true" aria-labelledby="gate-h">
+      <canvas class="gate-rain" id="gateRain" aria-hidden="true"></canvas>
+      <div class="e-glow" aria-hidden="true"></div>
+      <form class="gate-box" id="gateForm" autocomplete="off">
+        <span class="vf" aria-hidden="true"></span>
+        <div class="tg"><i></i>RESTRICTED · LIVE</div>
+        <h1 id="gate-h">ACCESS <span class="grad">REQUIRED.</span></h1>
+        <label class="field"
+          ><span>&gt;_</span
+          ><input
+            id="pw"
+            type="password"
+            autocapitalize="off"
+            spellcheck="false"
+            aria-label="Access key"
+            placeholder="ACCESS KEY"
+          /><button class="go" type="submit" aria-label="Unlock">→</button></label
+        >
+        <div class="msg" id="msg" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+
+    <!-- ================= PRELOAD + PRE-SHOW CHECK ================= -->
+    <section class="lv-pre" id="pre" hidden>
+      <canvas class="gate-rain" id="preRain" aria-hidden="true"></canvas>
+      <div class="e-glow" aria-hidden="true"></div>
+      <div class="lv-pre-card">
+        <span class="vf" aria-hidden="true"></span>
+        <div class="tg"><i class="ok"></i>KEY ACCEPTED · LIVE · Nº404</div>
+        <h1>ARCHIVE_404 <span class="grad">LIVE.</span></h1>
+        <p class="lv-pre-sub" id="preSub">20 SONGS · 72:04 · VOCAL + INSTRUMENTAL</p>
+        <button class="holo lv-big" id="preBtn" type="button">↓ PRELOAD THE SHOW</button>
+        <div class="lv-pbar" aria-hidden="true"><i id="preBar"></i></div>
+        <p class="lv-pre-stat" id="preStat" role="status" aria-live="polite">
+          EVERYTHING DOWNLOADS ONCE, THEN WORKS OFFLINE
+        </p>
+        <ul class="lv-check" id="check" hidden></ul>
+        <div class="lv-dev" id="devRow" hidden>
+          <label
+            >OUTPUT
+            <select id="outSel"></select
+          ></label>
+        </div>
+        <button class="holo lv-big" id="goBtn" type="button" hidden>START THE SHOW →</button>
+      </div>
+    </section>
+
+    <!-- ================= SHOW (M1 · lyrics-first) ================= -->
+    <main class="lv" id="show" hidden>
+      <header class="lv-top">
+        <span class="lv-brand">ERROR_404<small>LIVE · Nº404</small></span>
+        <span class="lv-chip" id="offChip"
+          ><i></i><span id="offTxt">PRELOADED 20/20 · OFFLINE READY</span></span
+        >
+        <span class="lv-sp"></span>
+        <span class="lv-lbl">BAR</span><span class="lv-stat" id="barNum">0.0</span>
+        <span class="lv-beats" id="beats" aria-hidden="true"><i class="one"></i><i></i><i></i><i></i></span>
+        <span class="lv-lbl">BPM</span><span class="lv-stat" id="bpm">—</span> <span class="lv-lbl">KEY</span
+        ><span class="lv-cam" id="cam">—</span> <span class="lv-lbl">SET</span
+        ><span class="lv-stat" id="setClock">0:00</span>
+        <button class="lv-chip" id="midiBtn" type="button" title="MIDI: click to connect, then LEARN">
+          <i></i><span id="midiTxt">MIDI</span>
+        </button>
+        <button class="lv-chip lv-rec" id="recBtn" type="button" title="Record the show">
+          <i></i><span id="recTxt">REC</span>
+        </button>
+      </header>
+
+      <div class="lv-body">
+        <div class="lv-main">
+          <div class="lv-cue" id="cue">
+            <span>▲ NEXT</span><b id="cueName"></b><span id="cueNote"></span
+            ><span class="lv-cue-bars" id="cueBars"></span>
+          </div>
+          <div class="lv-lyr" id="lyr" aria-live="off">
+            <div class="lv-sec" id="lySec"></div>
+            <div class="lv-prev" id="lyPrev"></div>
+            <div class="lv-cur" id="lyCur"></div>
+            <div class="lv-nxt" id="lyNxt"></div>
+            <div class="lv-nxt2" id="lyNxt2"></div>
+          </div>
+        </div>
+        <aside class="lv-side">
+          <div class="lv-next">
+            <span class="lv-lbl">NEXT SONG · <span id="nxInto"></span></span>
+            <span class="lv-next-ttl" id="nxTitle">—</span>
+            <span class="lv-lbl"><span id="nxMeta"></span> · IN <b id="nxIn">—</b></span>
+          </div>
+          <ol class="lv-setl" id="setl"></ol>
+        </aside>
+      </div>
+
+      <div class="lv-pads" id="padsPanel" hidden></div>
+
+      <footer class="lv-strip">
+        <div class="lv-transport">
+          <button class="lv-btn" id="prevBtn" type="button" aria-label="Previous song">
+            <svg
+              viewBox="0 0 16 16"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="square"
+              aria-hidden="true"
+            >
+              <path d="M8 3.5L3.5 8 8 12.5M13 3.5L8.5 8 13 12.5" />
+            </svg>
+          </button>
+          <button class="lv-btn lv-play" id="playBtn" type="button" aria-label="Play">
+            <span class="e-pi"></span>
+          </button>
+          <button class="lv-btn" id="nextBtn" type="button" aria-label="Next song">
+            <svg
+              viewBox="0 0 16 16"
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="square"
+              aria-hidden="true"
+            >
+              <path d="M3 3.5L7.5 8 3 12.5M8 3.5L12.5 8 8 12.5" />
+            </svg>
+          </button>
+        </div>
+        <div class="lv-faders" id="faders"></div>
+        <div class="lv-knob-wrap">
+          <div class="lv-knob" id="filterKnob" data-ctl="FILTER"></div>
+          <span class="lv-lbl">FILTER</span>
+        </div>
+        <div class="lv-fx">
+          <div class="lv-row">
+            <button class="lv-btn" data-fx="echo" data-ctl="ECHO">ECHO</button>
+            <button class="lv-btn" data-fx="reverb" data-ctl="REVERB">REVERB</button>
+            <button class="lv-btn" data-fx="crush" data-ctl="CRUSH">CRUSH</button>
+            <button class="lv-btn" data-fx="roll" data-ctl="ROLL" title="Hold to roll">ROLL</button>
+            <button class="lv-btn" data-fx="tapestop" data-ctl="TAPE STOP">TAPE STOP</button>
+          </div>
+          <div class="lv-row">
+            <button class="lv-btn" data-loop="1" data-ctl="LOOP 1">LOOP 1</button>
+            <button class="lv-btn" data-loop="2" data-ctl="LOOP 2">LOOP 2</button>
+            <button class="lv-btn" data-loop="4" data-ctl="LOOP 4">LOOP 4</button>
+            <button class="lv-btn" data-loop="8" data-ctl="LOOP 8">LOOP 8</button>
+            <button class="lv-btn" id="padsBtn" data-ctl="PADS">PADS</button>
+            <button class="lv-btn" id="rehBtn" data-ctl="REHEARSE" title="Loop this section at 85% speed">
+              REHEARSE
+            </button>
+          </div>
+        </div>
+        <span class="lv-sp"></span>
+        <div class="lv-safety">
+          <button class="lv-btn lv-panic" id="panicBtn" data-ctl="PANIC">PANIC · FADE</button>
+          <button class="lv-btn" id="lockBtn" title="Hold for 1 s to unlock">🔒 LOCK</button>
+          <button class="lv-btn" id="crowdBtn" data-ctl="CROWD">CROWD · VOX OFF</button>
+          <button class="lv-btn on" id="stageBtn">STAGE SCREEN ↗</button>
+        </div>
+      </footer>
+      <div class="lv-toast" id="toast" role="status" aria-live="polite"></div>
+    </main>
+
+    <!-- ================= STAGE SCREEN (opened by STAGE SCREEN ↗, for a projector) ================= -->
+    <section class="lv-stage" id="stage" hidden>
+      <canvas id="stageRain" aria-hidden="true"></canvas>
+      <div class="e-glow" aria-hidden="true"></div>
+      <div class="lv-stage-in">
+        <div class="lv-stage-song" id="stSong"></div>
+        <div class="lv-lyr lv-lyr-stage">
+          <div class="lv-prev" id="stPrev"></div>
+          <div class="lv-cur" id="stCur"></div>
+          <div class="lv-nxt" id="stNxt"></div>
+        </div>
+      </div>
+      <div class="lv-stage-brand">ERROR_404 <span class="grad">ARCHIVE_404</span></div>
+    </section>
+
+    <script type="module" src="/src/live/main.js"></script>
+  </body>
+</html>

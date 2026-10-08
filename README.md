@@ -206,6 +206,23 @@ The page is public code, so the private parts are locked:
 
 **Strength:** the key protects the files like a password on a zip. Someone could copy `data.enc.json` and try guesses offline, so use a long, unusual key if the contents need to stay secret from determined people.
 
+### Live show (`/live/`)
+
+The performance page for playing ARCHIVE_404 live, opened with **the same access key as the vault**. After the key it offers **PRELOAD THE SHOW**: all 20 songs in their live-set versions, twice (with and without vocals), about 350 MB, stored in the browser so the show runs with no network. A pre-show check confirms the files, offline copy, audio output, pads, memory and MIDI.
+
+The show screen (layout M1, lyrics-first) has karaoke lines that fill word by word, stage cues from the prompt notes ("▲ NEXT HOOK · screamed lead · 2 BARS"), a bar/beat counter, the next song with its tempo, key and changeover, and the setlist. The console strip has VOX (a true vocal level: the master crossfades with its instrumental) and CROWD, LOW / MID / HIGH EQ, MASTER, a filter, echo, reverb, crush, roll, tape stop, 1–8-bar loops, REHEARSE (loop the section at 85 %), 16 beat-quantised pads (keys 1–4, Q–R, A–F, Z–V; four of them are vocal chops cut live from the playing song's hooks), PANIC, LOCK (hold to unlock), REC (saves the performance), MIDI learn, and STAGE SCREEN ↗, a second window with big lyrics over the rain for a projector.
+
+| Piece                                                                | Where                                                                                             |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Timeline (songs, lyrics with word timings, cues, beats, MP3 padding) | `public/live/data.enc.json`, AES-256-GCM, key from the access key (PBKDF2-SHA256), like the vault |
+| Instrumentals                                                        | `public/live/inst/NN-<hash>.bin`, each AES-256-GCM with its own IV                                |
+| Masters                                                              | the site's own `/audio/*.mp3` (the live-set versions)                                             |
+| Offline                                                              | `public/live/sw.js` serves the preloaded files from Cache Storage                                 |
+
+Playback is gapless: each MP3 is trimmed to its true samples by finding a stored 64-sample fingerprint in the decode (browsers leave different amounts of MP3 priming), and songs are scheduled back to back on the Web Audio clock.
+
+**Rebuilding the data:** the timeline and instrumentals are made off-repo (lyrics aligned to vocals separated from the masters; the instrumental is the master minus that vocal, rendered on the live set's own seams), then placed in `vault-private/live/` (git-ignored) and locked with `npm run live:encrypt`.
+
 ### Notes
 
 - **Fluid scale:** the site is scaled with CSS `zoom` on large screens, and browsers don't rescale `vw`/`vh` under zoom. Size anything full-window as `calc(100vw / var(--ez, 1))`.
