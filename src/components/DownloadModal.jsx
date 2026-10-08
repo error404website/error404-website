@@ -160,10 +160,10 @@ export function DownloadModal({ open, onClose }) {
                       ARCHIVE_404.zip
                     </p>
                     <p className="font-mono text-[8px] text-ghost/25 tracking-[0.2em] mt-0.5">
-                      20 TRACKS · MP3
+                      20 TRACKS · MP3 · 320 KBPS
                     </p>
                   </div>
-                  <span className="e-fsz">155 MB</span>
+                  <span className="e-fsz">223 MB</span>
                 </div>
                 <motion.button
                   onClick={startDownload}
