@@ -5,6 +5,7 @@ import "../styles/index.css";
 import "../styles/overrides.css";
 import "./vault.css";
 import { audioSrc } from "../lib/audioSrc";
+import { keyField } from "../lib/keyField";
 import { CHAPTERS as SITE_CHAPTERS } from "../data/chapters";
 
 const $ = (s, el = document) => el.querySelector(s),
@@ -389,9 +390,10 @@ function unlockSequence() {
     ov.addEventListener("pointerdown", skip);
   }, 250); // after the Enter that submitted the key
 }
+keyField($("#pw"), $("#pwShow"));
 $("#gateForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const btn = $("#gateForm button");
+  const btn = $("#gateForm .go");
   if (btn.disabled) return;
   const say = (t, bad) => {
     $("#msg").className = bad ? "msg bad" : "msg";
