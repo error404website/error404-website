@@ -221,7 +221,7 @@ The show screen (layout M1, lyrics-first) has karaoke lines that fill word by wo
 
 Playback is gapless: each MP3 is trimmed to its true samples by finding a stored 64-sample fingerprint in the decode (browsers leave different amounts of MP3 priming), and songs are scheduled back to back on the Web Audio clock.
 
-**Rebuilding the data:** the timeline and instrumentals are made off-repo (lyrics aligned to vocals separated from the masters; the instrumental is the master minus that vocal, rendered on the live set's own seams), then placed in `vault-private/live/` (git-ignored) and locked with `npm run live:encrypt`.
+**Rebuilding the data:** the timeline and instrumentals are made off-repo (lyrics aligned to vocals separated from the masters; the instrumental is the master minus that vocal, rendered on the live set's own seams), then placed in `vault-private/live/` (git-ignored) and locked with `npm run live:encrypt`. The timeline also carries each song's waveform (peak plus low / mid / high energy, 25 points a second) for the waveform strip. Re-running the script keeps the last run's salt and any instrumental that hasn't changed, so a timeline-only update doesn't rewrite the ~170 MB of `.bin` files.
 
 ### Notes
 

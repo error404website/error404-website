@@ -12,6 +12,7 @@ import { audioSrc } from "../lib/audioSrc";
 import { rain, REDUCE } from "../lib/rain";
 import { Engine } from "./engine";
 import { PAD_DEFS, synthKit, vocalChop } from "./pads";
+import { makeWave, WAVE_H } from "./wave";
 
 const $ = (s, el = document) => el.querySelector(s),
   $$ = (s, el = document) => [...el.querySelectorAll(s)];
@@ -331,6 +332,7 @@ function startShow() {
   wireControls();
   startMenu();
   startLyricRain();
+  startWave();
   requestAnimationFrame(frame);
   toast("SPACE = PLAY / PAUSE · PADS ON 1–4 Q–R A–F Z–V");
 }
@@ -374,6 +376,7 @@ function frame() {
   });
   renderCue(t, k);
   renderNext(t, k);
+  drawWave(t, k);
   $$("#setl li").forEach((li, i) => {
     li.classList.toggle("now", i === k);
     li.classList.toggle("done", i < k);
@@ -757,6 +760,28 @@ function startMenu() {
   }, 250);
 }
 
+/* ---------- W4 waveform strip: deck, vocal lane, section map (click the map to jump) ---------- */
+let wave = null;
+function startWave() {
+  const cv = $("#waveCv");
+  cv.style.height = WAVE_H + "px";
+  wave = makeWave(cv, TL);
+  cv.addEventListener("click", (e) => {
+    if (S.locked) return;
+    const r = cv.getBoundingClientRect(),
+      k = engine.songAt(engine.now());
+    const t = wave.hit(e.clientX - r.left, e.clientY - r.top, k);
+    if (t != null) engine.seek(TL.songs[k].start + t);
+  });
+}
+function drawWave(t, k) {
+  if (!wave) return;
+  const o = wave.draw(t - TL.songs[k].start, k);
+  if (!o) return;
+  const read = `${esc(o.title)} · ${esc(o.read)}<b>${o.bars} BAR${o.bars === 1 ? "" : "S"}</b>`;
+  if (drawWave.read !== read) $("#waveRead").innerHTML = drawWave.read = read;
+}
+
 /* ---------- digital rain behind the lyrics (R2), streaming the words of the song that's on ---------- */
 let lyrRain = null;
 function songWords(song) {
@@ -993,6 +1018,7 @@ function broadcast() {
 function startStage() {
   document.body.classList.remove("locked");
   document.body.classList.add("stage-mode");
+  document.title = "Stage Screen · ARCHIVE_404 Live";
   $("#stage").hidden = false;
   if (!REDUCE) rain($("#stageRain"), TITLE_WORDS);
   let st = { t: 0, wall: Date.now(), playing: false, rate: 1 };
