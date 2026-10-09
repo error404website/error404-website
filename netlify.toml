@@ -35,6 +35,11 @@
   [headers.values]
     Cache-Control = "public, max-age=604800"
 
+[[headers]]
+  for = "/live/patch/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
 # Hashed JS/CSS bundles never change once published, so they can be cached forever.
 [[headers]]
   for = "/_app/*"

@@ -891,6 +891,265 @@ body.lv-learn [data-ctl] {
   }
 }
 
+/* ================= 01 · SETS drawer ================= */
+.lv-sets {
+  width: 380px;
+  bottom: 134px; /* stops above the console, so PANIC and LOCK stay reachable */
+}
+.lv-sb-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px 8px 16px;
+  border-bottom: 1px solid var(--hair2);
+}
+.lv-sb-row select,
+.lv-sb-row input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--ghost);
+  background: #05060c;
+  border: 1px solid var(--hair);
+  padding: 7px 8px;
+  color-scheme: dark;
+}
+.lv-sb-row input {
+  flex: none;
+  width: 110px;
+}
+.lv-sb-ends {
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--hair2);
+  color: var(--t2);
+}
+.lv-sb-ends:empty {
+  display: none;
+}
+.lv-sb {
+  flex: 1;
+  min-height: 80px;
+}
+.lv-sb li {
+  grid-template-columns: 22px 22px 1fr auto 22px;
+  align-items: center;
+  padding: 4px 12px 4px 8px;
+  cursor: default;
+}
+.lv-sb-t {
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lv-sb-h,
+.lv-sb-x {
+  font: inherit;
+  color: var(--t3);
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  cursor: grab;
+  touch-action: none;
+}
+.lv-sb-x {
+  cursor: pointer;
+}
+.lv-sb-h:hover,
+.lv-sb-x:hover,
+.lv-sb-h:focus-visible {
+  color: var(--ghost);
+}
+.lv-sb li.drag {
+  background: rgba(255, 0, 229, 0.12);
+}
+.lv-sb li.drop {
+  box-shadow: inset 0 2px 0 var(--mag);
+}
+.lv-sb.drop-end li:last-child {
+  box-shadow: inset 0 -2px 0 var(--mag);
+}
+.lv-sb-out {
+  padding: 8px 16px 2px;
+  border-top: 1px solid var(--hair2);
+}
+.lv-sb-off {
+  flex: none;
+  max-height: 22vh;
+}
+.lv-sb-off li {
+  color: var(--t4);
+}
+.lv-sb-foot {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px 8px 16px;
+  border-top: 1px solid var(--hair2);
+}
+.lv-sb-foot > .lv-lbl {
+  margin-right: auto;
+}
+.lv-sb-foot b {
+  font-family: var(--head);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: 0.04em;
+  color: var(--ghost);
+  margin-left: 6px;
+}
+.lv-sb-io {
+  justify-content: flex-end;
+}
+
+/* ================= 03 · hot cues (left, above the waveform) ================= */
+.lv-cues {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 2px);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  z-index: 2;
+}
+.lv-cues .lv-lbl {
+  margin-right: 6px;
+}
+.lv-cue-b {
+  min-height: 26px;
+  font-size: 8.5px;
+  letter-spacing: 0.18em;
+}
+.lv-cue-b b {
+  font-weight: 700;
+  color: var(--c);
+  margin-right: 4px;
+}
+.lv-cue-b.empty {
+  opacity: 0.55;
+}
+
+/* ================= 02 · show clock + 04 · safety (middle of the info tier) ================= */
+.lv-mid {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-width: 0;
+}
+.lv-tier-info .lv-next {
+  flex: none;
+}
+.lv-clock.over > span:first-child {
+  display: none; /* when over the curfew, the overrun and the skip say it */
+}
+.lv-clock {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  color: var(--t3);
+  white-space: nowrap;
+}
+.lv-clock b {
+  font-family: var(--head);
+  font-weight: 400;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  color: var(--ghost);
+  margin-left: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.lv-clock .lv-over {
+  color: var(--amber);
+  animation: blink 1s steps(2) infinite;
+}
+.lv-skip {
+  color: var(--amber);
+  border: 1px solid rgba(255, 184, 77, 0.45);
+}
+.lv-safe {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+  font-size: 8.5px;
+  letter-spacing: 0.24em;
+  color: var(--t2);
+  background: none;
+  border: 1px solid var(--hair);
+  padding: 6px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.lv-safe i {
+  width: 6px;
+  height: 6px;
+  background: var(--led);
+  box-shadow: 0 0 8px var(--led);
+}
+.lv-safe.bad {
+  color: var(--amber);
+  border-color: rgba(255, 184, 77, 0.45);
+}
+.lv-safe.bad i {
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber);
+}
+.lv-safe-panel {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  z-index: 8;
+  list-style: none;
+  min-width: 380px;
+  padding: 10px 12px;
+  background: rgba(3, 4, 9, 0.96);
+  border: 1px solid var(--hair);
+  box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.6);
+  display: grid;
+  gap: 6px;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--t2);
+}
+.lv-safe-panel[hidden] {
+  display: none;
+}
+.lv-safe-panel li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lv-safe-panel li i {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  background: var(--led);
+}
+.lv-safe-panel li.warn i {
+  background: var(--amber);
+}
+.lv-safe-panel li.na i {
+  background: var(--t4);
+}
+.lv-safe-panel em {
+  margin-left: auto;
+  font-style: normal;
+  color: var(--t4);
+  text-align: right;
+}
+@media (max-width: 1380px) {
+  .lv-clock span:nth-child(2) {
+    display: none;
+  }
+}
+
 /* ---------- stage screen: the cinematic look, scaled for a projector ---------- */
 .lv-stage {
   position: fixed;
