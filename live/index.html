@@ -243,6 +243,12 @@
                 </button></span
               >
               <span class="e-split e-split-menu"
+                ><span class="e-split-bk">LAYOUT</span
+                ><button class="e-split-dl" type="button" data-layout="auto">AUTO</button
+                ><button class="e-split-dl" type="button" data-layout="phone">PHONE</button
+                ><button class="e-split-dl" type="button" data-layout="desktop">DESKTOP</button></span
+              >
+              <span class="e-split e-split-menu"
                 ><span class="e-split-bk">CONTROL</span
                 ><button class="e-split-dl" type="button" data-open="ctrl">KEYLAB SETUP</button
                 ><button class="e-split-dl" type="button" data-open="remote">PHONE REMOTE</button></span
@@ -344,7 +350,15 @@
       <div class="lv-pads" id="padsPanel" hidden></div>
 
       <!-- L3 · two tiers: information on top (next song · safety), playing below (transport · knobs · fx · loops) -->
-      <footer class="lv-strip">
+      <footer class="lv-strip" id="strip">
+        <!-- phones (PH1): the console is a sheet you pull up; tabs choose what's in it -->
+        <button class="lv-grab" id="sheetGrab" type="button" aria-label="Open or close the console"></button>
+        <nav class="lv-tabs" id="sheetTabs" aria-label="Console">
+          <button class="lv-btn" type="button" data-tab="fx"><span>FX</span></button>
+          <button class="lv-btn" type="button" data-tab="pads"><span>PADS</span></button>
+          <button class="lv-btn" type="button" data-tab="mix"><span>MIX</span></button>
+          <button class="lv-btn" type="button" data-tab="set"><span>SET</span></button>
+        </nav>
         <div class="lv-tier lv-tier-info">
           <div class="lv-next">
             <span class="lv-lbl">NEXT · <span id="nxInto"></span></span>

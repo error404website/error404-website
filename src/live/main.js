@@ -331,6 +331,11 @@ async function preflight() {
       ? `ALBUM · 20 SONGS · ${fmt(TL.duration)}`
       : `${store.get("setName", "CUSTOM")} · ${ORDER.length} SONGS · ${fmt(TL.duration)}`,
   );
+  if (
+    /iP(hone|od|ad)/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  )
+    row(false, "IPHONE / IPAD", "FLIP THE SILENT SWITCH OFF · PLUG IN · KEEP THIS PAGE IN FRONT");
   row(
     "wakeLock" in navigator,
     "SCREEN STAYS AWAKE",
@@ -415,6 +420,7 @@ function startShow() {
     onCurfew: () => (clock.k = null),
   });
   startCues();
+  startLayout();
   startSafety({
     engine: () => engine,
     toast,
@@ -958,6 +964,81 @@ function syncLights() {
   }
 }
 
+/* ---------- the phone layout (PH1): the same parts, the console as a sheet ---------- */
+// AUTO switches by screen width (phones and portrait tablets, up to 900 px); PHONE / DESKTOP force it (menu → LAYOUT, saved in this browser).
+// On a phone the pads panel moves into the sheet and PANIC joins play / prev / next, so it's
+// always one tap away; everything goes back where it was on a wider screen.
+const PHONE_MQ = matchMedia("(max-width: 900px)");
+let phoneHome = null; // where the moved pieces live on the desktop
+function layout() {
+  const mode = store.get("layout", "auto"),
+    phone = mode === "phone" || (mode === "auto" && PHONE_MQ.matches);
+  $$("[data-layout]").forEach((b) => b.classList.toggle("on", b.dataset.layout === mode));
+  if (phone === document.body.classList.contains("phone")) return;
+  document.body.classList.toggle("phone", phone);
+  const strip = $("#strip"),
+    pads = $("#padsPanel"),
+    panic = $("#panicBtn");
+  if (phone) {
+    phoneHome = { padsNext: pads.nextElementSibling, panicNext: panic.nextElementSibling };
+    strip.appendChild(pads);
+    $(".lv-transport").appendChild(panic);
+    setTab(store.get("sheetTab", "fx"), false);
+  } else if (phoneHome) {
+    phoneHome.padsNext.before(pads);
+    phoneHome.panicNext.before(panic);
+    strip.classList.remove("open");
+    pads.hidden = true;
+    $("#padsBtn").classList.remove("on");
+  }
+  drawWave.read = null;
+}
+// a tab opens the sheet on it; the open tab again (or the handle) closes it
+function setTab(tab, open = true) {
+  const strip = $("#strip");
+  const same = strip.dataset.tab === tab && strip.classList.contains("open");
+  strip.dataset.tab = tab;
+  strip.classList.toggle("open", open && !same);
+  store.set("sheetTab", tab);
+  $$("[data-tab]").forEach((b) =>
+    b.classList.toggle("on", b.dataset.tab === tab && strip.classList.contains("open")),
+  );
+  $("#padsPanel").hidden = !(tab === "pads" && strip.classList.contains("open"));
+}
+function startLayout() {
+  layout();
+  PHONE_MQ.addEventListener?.("change", layout);
+  $$("[data-layout]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        store.set("layout", b.dataset.layout);
+        layout();
+      }),
+  );
+  $("#sheetTabs").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-tab]");
+    if (b) setTab(b.dataset.tab);
+  });
+  $("#sheetGrab").onclick = () =>
+    setTab($("#strip").dataset.tab || "fx", !$("#strip").classList.contains("open"));
+  // a downward swipe on the sheet closes it, an upward one opens it
+  let y0 = null;
+  $("#strip").addEventListener("touchstart", (e) => (y0 = e.touches[0].clientY), { passive: true });
+  $("#strip").addEventListener(
+    "touchend",
+    (e) => {
+      if (y0 == null || !document.body.classList.contains("phone")) return;
+      const dy = e.changedTouches[0].clientY - y0;
+      y0 = null;
+      if (Math.abs(dy) < 40) return;
+      const open = $("#strip").classList.contains("open");
+      if (dy > 0 && open) setTab($("#strip").dataset.tab, false);
+      if (dy < 0 && !open) setTab($("#strip").dataset.tab || "fx");
+    },
+    { passive: true },
+  );
+}
+
 /* ---------- 02 · show clock + curfew ---------- */
 const hhmm = (d) => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 function clock() {
@@ -1216,6 +1297,7 @@ function wireControls() {
     toast(`REHEARSING ${cur.name.toUpperCase()} · 85% · TAP AGAIN TO STOP`);
   };
   $("#padsBtn").onclick = () => {
+    if (document.body.classList.contains("phone")) return setTab("pads");
     const p = $("#padsPanel");
     p.hidden = !p.hidden;
     $("#padsBtn").classList.toggle("on", !p.hidden);
