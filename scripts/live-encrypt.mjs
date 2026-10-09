@@ -6,9 +6,11 @@
 //   .env.vault                          VAULT_KEY = the access key (the same one as the vault)
 //   vault-private/live/timeline.json    songs (+ byte sizes, MP3 padding), lyrics with word timings, cues, beats
 //   vault-private/live/inst/NN.mp3      the instrumental of each song (live-set version, 320 kbps)
+//   vault-private/live/patch/NN-head|tail-m|i.mp3   clean song ends for re-ordered sets (live_patches.py)
 // Writes (committed, unreadable without the key):
 //   public/live/data.enc.json           AES-256-GCM of the timeline, key = PBKDF2-SHA256(access key)
 //   public/live/inst/NN-<hash>.bin      each instrumental, AES-256-GCM with its own IV (listed in the timeline)
+//   public/live/patch/NN-<part><kind>-<hash>.bin   each set patch, the same way
 import { createCipheriv, createDecipheriv, createHash, pbkdf2Sync, randomBytes } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 
@@ -53,31 +55,53 @@ const seal = (buf) => {
 
 const keep = new Set();
 let reused = 0;
-mkdirSync("public/live/inst", { recursive: true });
-for (const s of tl.songs) {
-  const mp3 = readFileSync(`vault-private/live/inst/${String(s.n).padStart(2, "0")}.mp3`);
-  const was = prev?.songs.find((o) => o.n === s.n)?.inst;
-  if (was && existsSync(`public/live/inst/${was.file}`)) {
+// seal one private file into public/<dir>/, or keep the last run's copy if the source hasn't changed
+function lock(srcPath, dir, stem, was) {
+  const plain = readFileSync(srcPath);
+  if (was && existsSync(`public/live/${dir}/${was.file}`)) {
     try {
       if (
-        unseal(aes, Buffer.from(was.iv, "base64"), readFileSync(`public/live/inst/${was.file}`)).equals(mp3)
+        unseal(aes, Buffer.from(was.iv, "base64"), readFileSync(`public/live/${dir}/${was.file}`)).equals(
+          plain,
+        )
       ) {
-        s.inst = was;
-        keep.add(was.file);
+        keep.add(`${dir}/${was.file}`);
         reused++;
-        continue;
+        return was;
       }
     } catch {
       /* changed or unreadable: seal it again */
     }
   }
-  const { iv, data } = seal(mp3);
-  const file = `${String(s.n).padStart(2, "0")}-${createHash("sha256").update(data).digest("hex").slice(0, 10)}.bin`;
-  writeFileSync(`public/live/inst/${file}`, data);
-  s.inst = { file, iv, bytes: data.length };
-  keep.add(file);
+  const { iv, data } = seal(plain);
+  const file = `${stem}-${createHash("sha256").update(data).digest("hex").slice(0, 10)}.bin`;
+  writeFileSync(`public/live/${dir}/${file}`, data);
+  keep.add(`${dir}/${file}`);
+  return { file, iv, bytes: data.length };
 }
-for (const f of readdirSync("public/live/inst")) if (!keep.has(f)) rmSync(`public/live/inst/${f}`);
+mkdirSync("public/live/inst", { recursive: true });
+mkdirSync("public/live/patch", { recursive: true });
+let patches = 0;
+for (const s of tl.songs) {
+  const nn = String(s.n).padStart(2, "0"),
+    old = prev?.songs.find((o) => o.n === s.n);
+  s.inst = lock(`vault-private/live/inst/${nn}.mp3`, "inst", nn, old?.inst);
+  // clean head / tail patches for re-ordered sets (live_patches.py), master + instrumental
+  if (s.patch)
+    for (const part of ["head", "tail"])
+      for (const kind of ["m", "i"]) {
+        const src = `vault-private/live/patch/${nn}-${part}-${kind}.mp3`;
+        if (!existsSync(src)) continue;
+        Object.assign(
+          s.patch[part][kind],
+          lock(src, "patch", `${nn}-${part[0]}${kind}`, old?.patch?.[part]?.[kind]),
+        );
+        patches++;
+      }
+}
+for (const dir of ["inst", "patch"])
+  for (const f of readdirSync(`public/live/${dir}`))
+    if (!keep.has(`${dir}/${f}`)) rmSync(`public/live/${dir}/${f}`);
 const { iv, data } = seal(Buffer.from(JSON.stringify(tl), "utf8"));
 writeFileSync(
   "public/live/data.enc.json",
@@ -89,10 +113,8 @@ writeFileSync(
     data: data.toString("base64"),
   }) + "\n",
 );
-const total = readdirSync("public/live/inst").reduce(
-  (n, f) => n + readFileSync(`public/live/inst/${f}`).length,
-  0,
-);
+const size = (dir) =>
+  readdirSync(`public/live/${dir}`).reduce((n, f) => n + readFileSync(`public/live/${dir}/${f}`).length, 0);
 console.log(
-  `Locked the live timeline (${tl.lines.length} lines) and ${tl.songs.length} instrumentals (${Math.round(total / 1e6)} MB, ${reused} unchanged).`,
+  `Locked the live timeline (${tl.lines.length} lines), ${tl.songs.length} instrumentals (${Math.round(size("inst") / 1e6)} MB) and ${patches} set patches (${Math.round(size("patch") / 1e6)} MB); ${reused} files unchanged.`,
 );

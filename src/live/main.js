@@ -11,9 +11,14 @@ import "./live.css";
 import { audioSrc } from "../lib/audioSrc";
 import { keyField } from "../lib/keyField";
 import { rain, REDUCE } from "../lib/rain";
+import { CUE_COLOURS, CUE_IDS, cuesFor, setCue as saveCue } from "./cues";
 import { Engine } from "./engine";
 import { PAD_DEFS, synthKit, vocalChop } from "./pads";
 import { makeRuler } from "./ruler";
+import { startSafety, safetyRows } from "./safety";
+import { ALBUM, deriveTimeline, isAlbum, skipSuggestion } from "./set";
+import { makeSetBuilder } from "./setbuilder";
+import * as store from "./store";
 import { makeWave, WAVE_H } from "./wave";
 
 const $ = (s, el = document) => el.querySelector(s),
@@ -42,7 +47,8 @@ const b64 = {
 };
 let sealed = null,
   KEY = null,
-  TL = null;
+  BASE = null, // the decrypted timeline, album order
+  TL = null; // the running order in use (set.js); the album unless a set was loaded
 async function getSealed() {
   if (!sealed) sealed = await (await fetch("/live/data.enc.json", { cache: "no-cache" })).json();
   return sealed;
@@ -66,7 +72,9 @@ async function open(raw) {
   try {
     const k = await crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["decrypt"]);
     const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64.from(s.iv) }, k, b64.from(s.data));
-    TL = JSON.parse(new TextDecoder().decode(plain));
+    BASE = JSON.parse(new TextDecoder().decode(plain));
+    TL = BASE;
+    setOrder(store.get("order", ALBUM));
     KEY = k;
     return true;
   } catch {
@@ -99,9 +107,22 @@ async function decryptFile(buf, iv) {
   return crypto.subtle.decrypt({ name: "AES-GCM", iv: b64.from(iv) }, KEY, buf);
 }
 
-/* ---------- files: masters (/audio) + instrumentals (/live/inst, encrypted) ---------- */
+/* ---------- the running order ---------- */
+let ORDER = ALBUM;
+function setOrder(order) {
+  const ok = Array.isArray(order) && order.length && order.every((n) => BASE.songs.some((s) => s.n === n));
+  ORDER = ok ? [...new Set(order)] : ALBUM;
+  TL = isAlbum(ORDER) ? BASE : deriveTimeline(BASE, ORDER);
+}
+
+/* ---------- files: masters (/audio) + instrumentals (/live/inst) + set patches (/live/patch) ---------- */
+const PATCH = { hm: ["head", "m"], hi: ["head", "i"], tm: ["tail", "m"], ti: ["tail", "i"] };
 const urlFor = (song, kind) =>
-  kind === "m" ? audioSrc(`/audio/${song.slug}.mp3`) : `/live/inst/${song.inst.file}`;
+  kind === "m"
+    ? audioSrc(`/audio/${song.slug}.mp3`)
+    : kind === "i"
+      ? `/live/inst/${song.inst.file}`
+      : `/live/patch/${song.patch[PATCH[kind][0]][PATCH[kind][1]].file}`;
 const BYTES = new Map(); // "n:kind" -> ArrayBuffer (decrypted, ready to decode)
 async function fetchCached(url) {
   if ("caches" in window) {
@@ -120,9 +141,10 @@ async function fetchCached(url) {
 async function bytesFor(n, kind) {
   const key = `${n}:${kind}`;
   if (BYTES.has(key)) return BYTES.get(key);
-  const song = TL.songs.find((s) => s.n === n);
+  const song = BASE.songs.find((s) => s.n === n);
   let buf = await fetchCached(urlFor(song, kind));
   if (kind === "i") buf = await decryptFile(buf, song.inst.iv);
+  else if (PATCH[kind]) buf = await decryptFile(buf, song.patch[PATCH[kind][0]][PATCH[kind][1]].iv);
   BYTES.set(key, buf);
   return buf;
 }
@@ -196,23 +218,29 @@ function startPreload() {
   document.body.classList.remove("locked");
   $("#pre").hidden = false;
   if (!REDUCE) rain($("#preRain"), TITLE_WORDS);
-  const mb = TL.songs.reduce((n, s) => n + s.mBytes + s.inst.bytes, 0) / 1e6;
+  const mb = preloadJobs().reduce((n, j) => n + j[2], 0) / 1e6;
   $("#preSub").textContent =
     `${TL.songs.length} SONGS · ${fmt(TL.duration)} · VOCAL + INSTRUMENTAL · ${Math.round(mb)} MB`;
   $("#preBtn").onclick = preload;
   if ("serviceWorker" in navigator && import.meta.env.PROD)
     navigator.serviceWorker.register("/live/sw.js", { scope: "/live/" });
 }
+// every file the show can need: both versions of each song, and its clean set patches
+const preloadJobs = () =>
+  BASE.songs.flatMap((s) => [
+    [s, "m", s.mBytes],
+    [s, "i", s.inst.bytes],
+    ...(s.patch?.head?.m?.file
+      ? Object.keys(PATCH).map((k) => [s, k, s.patch[PATCH[k][0]][PATCH[k][1]].bytes])
+      : []),
+  ]);
 async function preload() {
   const btn = $("#preBtn");
   btn.disabled = true;
   btn.textContent = "PRELOADING…";
   engine = new Engine(TL, bytesFor);
   await engine.init(); // inside the click: lets the browser start audio
-  const jobs = TL.songs.flatMap((s) => [
-    [s, "m", s.mBytes],
-    [s, "i", s.inst.bytes],
-  ]);
+  const jobs = preloadJobs();
   const total = jobs.reduce((n, j) => n + j[2], 0);
   let done = 0,
     files = 0;
@@ -256,13 +284,10 @@ async function preflight() {
       `<li class="${ok ? "ok" : "warn"}"><i></i>${label}<em>${note}</em></li>`,
     );
   };
-  row(true, "SONGS + INSTRUMENTALS LOADED", `${TL.songs.length * 2} FILES`);
+  const files = preloadJobs().length;
+  row(true, "SONGS, INSTRUMENTALS + SET PATCHES LOADED", `${files} FILES`);
   const cached = "caches" in window ? (await (await caches.open(CACHE)).keys()).length : 0;
-  row(
-    cached >= TL.songs.length * 2,
-    "OFFLINE COPY",
-    cached ? `${cached} FILES IN THE BROWSER` : "NOT AVAILABLE HERE",
-  );
+  row(cached >= files, "OFFLINE COPY", cached ? `${cached} FILES IN THE BROWSER` : "NOT AVAILABLE HERE");
   let decodeOk = true;
   try {
     await engine.ready(0);
@@ -273,7 +298,21 @@ async function preflight() {
   row(
     decodeOk,
     "AUDIO DECODES",
-    decodeOk ? "SONGS 01–02 READY · GAPLESS" : "THIS BROWSER COULD NOT DECODE THE FILES",
+    decodeOk
+      ? `${TL.songs[0].title} + ${TL.songs[1]?.title || "—"} READY · GAPLESS`
+      : "THIS BROWSER COULD NOT DECODE THE FILES",
+  );
+  row(
+    true,
+    "SET",
+    isAlbum(ORDER)
+      ? `ALBUM · 20 SONGS · ${fmt(TL.duration)}`
+      : `${store.get("setName", "CUSTOM")} · ${ORDER.length} SONGS · ${fmt(TL.duration)}`,
+  );
+  row(
+    "wakeLock" in navigator,
+    "SCREEN STAYS AWAKE",
+    "wakeLock" in navigator ? "ON DURING THE SHOW" : "NOT IN THIS BROWSER · TURN OFF SLEEP IN SETTINGS",
   );
   row(
     engine.ctx.state === "running",
@@ -299,12 +338,17 @@ async function preflight() {
         .map((d) => `<option value="${d.deviceId}">${esc(d.label || "Output")}</option>`)
         .join("");
       $("#outSel").onchange = (e) =>
-        engine.ctx.setSinkId(e.target.value).catch(() => toast("COULD NOT SWITCH OUTPUT"));
+        engine.ctx
+          .setSinkId(e.target.value)
+          .then(() => (outputId = e.target.value))
+          .catch(() => toast("COULD NOT SWITCH OUTPUT"));
     }
   }
   $("#goBtn").hidden = false;
   $("#goBtn").onclick = startShow;
 }
+
+let outputId = "";
 
 /* ---------- the show ---------- */
 const S = {
@@ -329,7 +373,31 @@ function startShow() {
   } // the site's logo behaviours: the nav logo draws itself on, and again on hover
   buildStrip();
   buildPads();
-  buildSetlist();
+  setBuilder = makeSetBuilder($("#drawer"), {
+    base: () => BASE,
+    applied: () => ORDER,
+    playingIndex: () => (engine.playing || heard() > 0 ? engine.songAt(heard()) : -1),
+    isPlaying: () => engine.playing,
+    apply: applyOrder,
+    jumpTo: (n) => {
+      const k = TL.songs.findIndex((s) => s.n === n);
+      if (k < 0) return;
+      engine.seek(TL.songs[k].start);
+      engine.ready(k).then(() => !engine.playing && engine.onstate());
+    },
+    fmt,
+    esc,
+    toast,
+    locked: () => S.locked,
+    onCurfew: () => (clock.k = null),
+  });
+  startCues();
+  startSafety({
+    engine: () => engine,
+    toast,
+    outputId: () => outputId,
+    onChange: paintSafety,
+  });
   engine.onstate = () => {
     $("#playBtn").innerHTML = engine.playing ? '<span class="e-pp"></span>' : '<span class="e-pi"></span>';
     $("#playBtn").setAttribute("aria-label", engine.playing ? "Pause" : "Play");
@@ -344,6 +412,7 @@ function startShow() {
   startLyricRain();
   startWave();
   drawRuler = makeRuler($("#ruler"), TL.songs);
+  setInterval(clock, 250);
   requestAnimationFrame(frame);
   toast("SPACE = PLAY / PAUSE · PADS ON 1–4 Q–R A–F Z–V");
 }
@@ -425,12 +494,10 @@ function frame() {
   renderNext(t, k);
   drawWave(t, k);
   drawRuler?.(t, k);
-  $$("#setl li").forEach((li, i) => {
-    li.classList.toggle("now", i === k);
-    li.classList.toggle("done", i < k);
-  });
   if (k !== frame.k) {
     frame.k = k;
+    setBuilder?.render();
+    paintCues(k);
     refreshVoxPads(k);
     lyrRain?.words(songWords(song));
   }
@@ -531,19 +598,162 @@ function renderNext(t, k) {
     `≈${nx.bpm} BPM · ${esc(nx.key.toUpperCase())} <span class="lv-cam" style="background:${camColour(nx.cam)}">${nx.cam}</span>`;
   $("#nxIn").textContent = `${fmt(nx.start - t)} · ${Math.ceil((nx.start - t) / engine.barLen(t))} BARS`;
 }
-function buildSetlist() {
-  $("#setl").innerHTML = TL.songs
+/* ---------- 01 · sets: applying a running order ---------- */
+let setBuilder = null;
+// Stopped: the whole set loads and the playhead goes to its start. Playing: the songs up to the one
+// that's on stay as they are, the rest follow the new order, and the music carries on (a 6 ms duck
+// where the plan switches over).
+function applyOrder(draft) {
+  const playing = engine.playing,
+    t = engine.now(),
+    k = playing ? engine.songAt(t) : -1;
+  let order = [...draft];
+  if (k >= 0) {
+    const played = ORDER.slice(0, k + 1);
+    order = played.concat(draft.filter((n) => !played.includes(n)));
+  }
+  if (order.length === ORDER.length && order.every((n, i) => n === ORDER[i])) return ORDER;
+  setOrder(order);
+  store.set("order", ORDER);
+  engine.setTimeline(TL, k);
+  if (k >= 0) engine.ready(k).then(() => engine.playing && engine.jump(engine.now()));
+  else engine.seek(0);
+  rebuildViews();
+  toast(
+    k >= 0
+      ? `SET UPDATED · ${ORDER.length} SONGS · FROM THE NEXT SONG`
+      : `SET LOADED · ${ORDER.length} SONGS · ${fmt(TL.duration)}`,
+  );
+  return ORDER;
+}
+// everything drawn from the timeline is rebuilt for the new order
+function rebuildViews() {
+  wave = makeWave($("#waveCv"), TL);
+  drawRuler = makeRuler($("#ruler"), TL.songs);
+  chopCache.clear();
+  frame.k = undefined;
+  drawWave.read = null;
+  setBuilder?.render();
+  broadcast();
+}
+
+/* ---------- 03 · hot cues ---------- */
+let cueList = [];
+function paintCues(k) {
+  cueList = cuesFor(TL, k);
+  $("#cues").innerHTML =
+    `<span class="lv-lbl">CUES</span>` +
+    cueList
+      .map(
+        (c) =>
+          `<button class="lv-btn lv-cue-b${c.t == null ? " empty" : ""}" type="button" data-cue="${c.id}" data-ctl="CUE ${c.id}" style="--c:${CUE_COLOURS[c.id]}" title="Tap: jump on the next bar · hold: set to this bar · key ${5 + CUE_IDS.indexOf(c.id)} (shift = set)"><span><b>${c.id}</b> ${esc(c.label)}</span></button>`,
+      )
+      .join("");
+}
+function fireCue(id) {
+  if (S.locked) return;
+  const c = cueList.find((x) => x.id === id);
+  if (!c || c.t == null) return toast(`CUE ${id} IS EMPTY · HOLD IT TO SET IT TO THIS BAR`);
+  if (!engine.playing) return engine.seek(c.t);
+  // land on the next bar line so the repeat (or the skip) stays in time
+  const t = engine.now(),
+    nb = engine.nextGrid(t + 0.03, "bar");
+  engine.jump(c.t, 0, nb > t && nb - t < 4 ? engine.ctxAt(nb) : null);
+  toast(`CUE ${id} · ${c.label}`);
+}
+function storeCue(id) {
+  if (S.locked) return;
+  const t = heard(),
+    k = engine.songAt(t);
+  saveCue(TL, k, id, engine.barStart(t));
+  paintCues(k);
+  toast(`CUE ${id} SET TO THIS BAR · ${TL.songs[k].title}`);
+}
+function startCues() {
+  const host = $("#cues");
+  let hold = 0,
+    held = false;
+  host.addEventListener("pointerdown", (e) => {
+    const b = e.target.closest("[data-cue]");
+    if (!b || S.locked) return;
+    try {
+      b.setPointerCapture(e.pointerId);
+    } catch {
+      /* */
+    }
+    held = false;
+    hold = setTimeout(() => {
+      held = true;
+      storeCue(b.dataset.cue);
+    }, 600);
+  });
+  host.addEventListener("pointerup", (e) => {
+    clearTimeout(hold);
+    const b = e.target.closest("[data-cue]");
+    if (b && !held) fireCue(b.dataset.cue);
+  });
+  host.addEventListener("pointercancel", () => clearTimeout(hold));
+  for (const id of CUE_IDS) CTL[`CUE ${id}`] = { press: (down) => down !== false && fireCue(id) };
+  paintCues(0);
+}
+
+/* ---------- 02 · show clock + curfew ---------- */
+const hhmm = (d) => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+function clock() {
+  if (!engine) return;
+  const t = heard(),
+    left = Math.max(0, TL.duration - t) / (engine.rate || 1),
+    cf = store.get("curfew", ""),
+    now = new Date();
+  let html = `<span>SET LEFT <b>${fmt(left)}</b></span>`,
+    over = 0,
+    skip = null,
+    ends = engine.playing ? `ENDS ${hhmm(new Date(now.getTime() + left * 1000))}` : "";
+  if (cf) {
+    const [h, m] = cf.split(":").map(Number),
+      c = new Date(now);
+    c.setHours(h, m, 0, 0);
+    if (c - now < -6 * 3600e3) c.setDate(c.getDate() + 1); // a curfew after midnight
+    const toCurfew = (c - now) / 1000;
+    over = left - Math.max(0, toCurfew);
+    html += `<span>CURFEW <b>${toCurfew > 0 ? fmt(toCurfew) : "PASSED"}</b></span>`;
+    ends = `ENDS ${hhmm(new Date(now.getTime() + left * 1000))} · CURFEW ${cf}${over > 0 ? ` · ${fmt(over)} OVER` : ""}`;
+    if (over > 5) {
+      skip = skipSuggestion(TL, engine.songAt(t), over);
+      html += `<span class="lv-over">▲ ${fmt(over)} OVER</span>`;
+      if (skip)
+        html += `<button class="lv-btn lv-skip" type="button" data-skip="${skip.n}"><span>SKIP ${esc(skip.title)} (${fmt(skip.frames / TL.sr)})?</span></button>`;
+    }
+  }
+  setBuilder?.ends(ends);
+  if (clock.k === html) return;
+  clock.k = html;
+  $("#clockChip").innerHTML = html;
+  $("#clockChip").classList.toggle("over", over > 5);
+}
+function skipSong(n) {
+  if (S.locked) return;
+  const s = TL.songs.find((x) => x.n === n);
+  applyOrder(ORDER.filter((x) => x !== n));
+  setBuilder?.sync();
+  clock.k = null;
+  toast(`SKIPPING ${s?.title || n} · SET NOW ${fmt(TL.duration)}`);
+}
+
+/* ---------- 04 · show safety ---------- */
+function paintSafety(st) {
+  const rows = safetyRows(st),
+    bad = rows.filter((r) => r[0] === false).length,
+    chip = $("#safeChip");
+  if (!chip) return;
+  chip.classList.toggle("bad", bad > 0);
+  chip.querySelector("span").textContent = bad ? `! ${bad} TO CHECK` : "ALL GOOD";
+  $("#safePanel").innerHTML = rows
     .map(
-      (s, i) =>
-        `<li data-k="${i}"><em>${String(s.n).padStart(2, "0")}</em><span>${esc(s.title)}</span><em>${fmt(s.frames / TL.sr)}</em></li>`,
+      ([ok, label, note]) =>
+        `<li class="${ok === false ? "warn" : ok ? "ok" : "na"}"><i></i>${label}<em>${esc(note)}</em></li>`,
     )
     .join("");
-  $("#setl").onclick = (e) => {
-    const li = e.target.closest("li");
-    if (!li || S.locked) return;
-    engine.seek(TL.songs[+li.dataset.k].start);
-    engine.ready(+li.dataset.k).then(() => !engine.playing && engine.onstate());
-  };
 }
 
 /* ---------- console ---------- */
@@ -764,6 +974,8 @@ function wireControls() {
       $("#playBtn").click();
       return;
     }
+    const cue = /^Digit[5-8]$/.test(e.code) ? CUE_IDS[+e.code.slice(5) - 5] : null;
+    if (cue && !e.repeat) return e.shiftKey ? storeCue(cue) : fireCue(cue);
     const pad = PAD_DEFS.find((p) => p.key === e.key.toUpperCase());
     if (pad && !e.repeat) padDown(pad);
   });
@@ -772,6 +984,11 @@ function wireControls() {
     if (pad) padUp(pad);
   });
   setInterval(broadcast, 500);
+  $("#clockChip").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-skip]");
+    if (b) skipSong(+b.dataset.skip);
+  });
+  $("#safeChip").onclick = () => ($("#safePanel").hidden = !$("#safePanel").hidden);
 }
 function openStage() {
   window.open("/live/?stage", "e404-stage", "popup,width=1280,height=720");
@@ -850,7 +1067,9 @@ function startWave() {
 }
 function drawWave(t, k) {
   if (!wave) return;
-  const o = wave.draw(t - TL.songs[k].start, k);
+  const s0 = TL.songs[k].start,
+    marks = cueList.filter((c) => c.t != null).map((c) => ({ t: c.t - s0, id: c.id, c: CUE_COLOURS[c.id] }));
+  const o = wave.draw(t - s0, k, marks);
   if (!o) return;
   const read = `${esc(o.title)} · ${esc(o.read)}<b>${o.bars} BAR${o.bars === 1 ? "" : "S"}</b>`;
   if (drawWave.read !== read) $("#waveRead").innerHTML = drawWave.read = read;
@@ -1190,6 +1409,7 @@ function broadcast() {
     playing: engine.playing && !engine.loop,
     rate: engine.rate,
     crowd: S.crowd,
+    order: ORDER,
   });
 }
 function startStage() {
@@ -1199,7 +1419,15 @@ function startStage() {
   $("#stage").hidden = false;
   const sky = REDUCE ? null : rain($("#stageRain"), TITLE_WORDS);
   let st = { t: 0, wall: Date.now(), playing: false, rate: 1 };
-  if (bc) bc.onmessage = (e) => (st = e.data);
+  if (bc)
+    bc.onmessage = (e) => {
+      st = e.data;
+      // the show changed its running order: follow it
+      if (Array.isArray(st.order) && st.order.join() !== ORDER.join()) {
+        setOrder(st.order);
+        loop.k = undefined;
+      }
+    };
   const els = { sec: { textContent: "" }, prev: $("#stPrev"), cur: $("#stCur"), nxt: $("#stNxt") };
   const fakeEngine = { bpmAt: (t) => (TL.songs[songAtT(t)] || {}).bpm || 140, songAt: (t) => songAtT(t) };
   const loop = () => {

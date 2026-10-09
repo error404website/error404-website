@@ -3,6 +3,11 @@
 // The set is 20 song files that butt end to end. Each song plays two sample-locked versions (the
 // master and the instrumental, which is the master minus its vocal), so the VOX fader is a true
 // vocal level: mix = (1 - x) * master + x * instrumental = master - x * vocal.
+// In a re-ordered set (set.js) a song whose neighbours changed swaps the ends of its file for clean
+// patches: a head (its own lead-in + first 12 beats, without the old previous song's ring-over) and a
+// tail (its last 4 s + its own ring-out, without the old next song's lead-in). So each song plays as up
+// to three parts, head -> file -> tail, crossfaded over 5 ms where they meet (the audio is identical
+// there).
 // MP3s carry encoder priming at the start and padding at the end; we know each file's exact length,
 // so every decoded buffer is trimmed to its real samples and songs are scheduled back to back on the
 // AudioContext clock: gapless. Only the current and next songs are kept decoded (a full decode of
@@ -15,7 +20,7 @@ export class Engine {
     this.tl = timeline; // { songs: [{n, start, frames, ...}], duration, beats, ... }
     this.getBytes = getBytes; // (n, kind) -> Promise<ArrayBuffer>  kind: "m" | "i"
     this.ctx = null;
-    this.bufs = new Map(); // "n:m" -> AudioBuffer (trimmed)
+    this.bufs = new Map(); // "k:m" / "k:i" / "k:hm" … -> AudioBuffer (trimmed); k = index in the set
     this.decoding = new Map();
     this.voices = []; // scheduled songs: {n, m, i, when}
     this.playing = false;
@@ -111,7 +116,11 @@ export class Engine {
   // ---------- clock ----------
   now() {
     if (!this.ctx || !this.playing) return this.anchorSet;
-    const t = this.anchorSet + (this.ctx.currentTime - this.anchorCtx) * this.rate;
+    // a jump scheduled for later (hot cues on the bar): keep the old clock until it lands
+    const p = this.pending && this.ctx.currentTime < this.pending.at ? this.pending : null;
+    const t = p
+      ? p.set + (this.ctx.currentTime - p.ctx) * this.rate
+      : this.anchorSet + (this.ctx.currentTime - this.anchorCtx) * this.rate;
     if (this.loop && t >= this.loop.end) {
       const L = this.loop.end - this.loop.start;
       return this.loop.start + ((t - this.loop.start) % L);
@@ -125,21 +134,22 @@ export class Engine {
   }
 
   // ---------- decoding ----------
+  // kind: m / i (the song files), hm / hi (head patch), tm / ti (tail patch)
   async buffer(k, kind) {
     const key = `${k}:${kind}`;
     if (this.bufs.has(key)) return this.bufs.get(key);
     if (this.decoding.has(key)) return this.decoding.get(key);
     const p = (async () => {
-      const bytes = await this.getBytes(this.tl.songs[k].n, kind);
-      const raw = await this.ctx.decodeAudioData(bytes.slice(0));
       const song = this.tl.songs[k];
-      const buf = trim(
-        this.ctx,
-        raw,
-        song.frames,
-        song[kind === "m" ? "pad" : "ipad"],
-        song[kind === "m" ? "fp" : "ifp"],
-      );
+      const bytes = await this.getBytes(song.n, kind);
+      const raw = await this.ctx.decodeAudioData(bytes.slice(0));
+      const info =
+        kind.length === 2
+          ? song.patch[kind[0] === "h" ? "head" : "tail"][kind[1]]
+          : kind === "m"
+            ? { frames: song.frames, pad: song.pad, fp: song.fp }
+            : { frames: song.frames, pad: song.ipad, fp: song.ifp };
+      const buf = trim(this.ctx, raw, info.frames, info.pad, info.fp);
       this.bufs.set(key, buf);
       this.decoding.delete(key);
       return buf;
@@ -148,7 +158,18 @@ export class Engine {
     return p;
   }
   async ready(k) {
-    await Promise.all([this.buffer(k, "m"), this.buffer(k, "i")]);
+    const s = this.tl.songs[k];
+    const kinds = ["m", "i", ...(s.head ? ["hm", "hi"] : []), ...(s.tail ? ["tm", "ti"] : [])];
+    await Promise.all(kinds.map((kind) => this.buffer(k, kind)));
+  }
+  // a new running order (set.js): keep what's decoded for songs 0..keep (unchanged), drop the rest
+  setTimeline(tl, keep = -1) {
+    this.tl = tl;
+    for (const key of [...this.bufs.keys()]) {
+      const [k, kind] = key.split(":");
+      if (+k > keep || (+k === keep && kind.length === 2)) this.bufs.delete(key);
+    }
+    this.decoding.clear();
   }
   forget(keep) {
     for (const key of [...this.bufs.keys()]) if (!keep.has(+key.split(":")[0])) this.bufs.delete(key);
@@ -160,6 +181,7 @@ export class Engine {
     if (this.ctx.state !== "running") await this.ctx.resume();
     this.stopVoices();
     this.slip = null;
+    this.pending = null;
     const k = this.songAt(from);
     await this.ready(k);
     this.anchorCtx = this.ctx.currentTime + 0.06;
@@ -171,6 +193,7 @@ export class Engine {
   }
   pause() {
     if (!this.playing) return;
+    this.pending = null;
     this.anchorSet = this.slip ? this.slipTime() : this.now();
     this.slip = null;
     this.playing = false;
@@ -187,50 +210,101 @@ export class Engine {
       this.onstate();
     }
   }
-  stopVoices() {
+  stopVoices(at) {
     for (const v of this.voices) {
       try {
-        v.m.stop();
-        v.i.stop();
+        v.m.stop(at);
+        v.i.stop(at);
       } catch {
         /* already stopped */
       }
     }
     this.voices = [];
   }
-  // start song k so that set time `from` (inside it) plays at the anchor
-  startSong(k, from) {
-    const s = this.tl.songs[k];
-    const into = Math.max(0, from - s.start);
-    const when = this.anchorCtx + (s.start + into - this.anchorSet) / this.rate;
-    const m = this.bufs.get(`${k}:m`);
-    const i = this.bufs.get(`${k}:i`);
-    const v = { k, when, m: this.src(m, this.gM), i: this.src(i, this.gI) };
-    v.m.start(Math.max(when, this.ctx.currentTime), into);
-    v.i.start(Math.max(when, this.ctx.currentTime), into);
-    this.voices.push(v);
-    return v;
+  // the parts song k plays, in set time: [a, b) and the buffer offset at set time t
+  parts(k) {
+    const s = this.tl.songs[k],
+      P = s.patch,
+      X = 0.005,
+      end = s.start + s.frames / this.tl.sr,
+      fileA = s.start + (s.head ? P.body : 0),
+      fileB = end - (s.tail ? P.pre : 0),
+      out = [];
+    if (s.head) {
+      const a = Math.max(k === 0 ? s.start : s.start - P.lead, s.start - P.lead);
+      out.push({ kind: "h", a, b: fileA + X, off: (t) => t - s.start + P.lead, fadeOut: true });
+    }
+    out.push({
+      kind: "",
+      a: fileA - (s.head ? X : 0),
+      b: s.tail ? fileB + X : end,
+      off: (t) => t - s.start,
+      fadeIn: s.head,
+      fadeOut: s.tail,
+    });
+    if (s.tail) out.push({ kind: "t", a: fileB, b: end + P.ring, off: (t) => t - fileB, fadeIn: true });
+    return out;
   }
-  src(buf, out) {
+  // schedule song k's parts so that set time `from` plays at the anchor (parts already under way
+  // start where the set is now)
+  startSong(k, from, after = -Infinity) {
+    const c = this.ctx.currentTime,
+      nowSet = this.anchorSet + (c - this.anchorCtx) * this.rate,
+      X = 0.005 / this.rate;
+    let first = null;
+    for (const p of this.parts(k)) {
+      if (p.a < after) continue;
+      const s0 = Math.max(p.a, from, nowSet);
+      if (s0 >= p.b) continue;
+      const bm = this.bufs.get(`${k}:${p.kind}m`),
+        bi = this.bufs.get(`${k}:${p.kind}i`);
+      if (!bm || !bi) continue;
+      const when = Math.max(c, this.ctxAt(s0)),
+        stopAt = this.ctxAt(p.b),
+        off = Math.max(0, p.off(s0));
+      const v = { k, kind: p.kind, part: p, end: stopAt, m: this.src(bm, this.gM), i: this.src(bi, this.gI) };
+      for (const n of [v.m, v.i]) {
+        const g = n.fade.gain;
+        if (p.fadeIn && s0 <= p.a + 1e-4) {
+          g.setValueAtTime(0, when);
+          g.linearRampToValueAtTime(1, when + X);
+        }
+        if (p.fadeOut) {
+          g.setValueAtTime(1, Math.max(when, stopAt - X));
+          g.linearRampToValueAtTime(0, stopAt);
+        }
+        n.start(when, off);
+        if (p.b < Infinity && (p.kind || p.fadeOut)) n.stop(stopAt + 0.01);
+      }
+      this.voices.push(v);
+      first = first || v;
+    }
+    return first;
+  }
+  // a source through its own fade gain into its version's bus
+  src(buf, bus) {
     const s = new AudioBufferSourceNode(this.ctx, { buffer: buf, playbackRate: this.rate });
-    s.connect(out);
+    s.fade = new GainNode(this.ctx);
+    s.connect(s.fade).connect(bus);
     return s;
   }
-  // keeps the next song decoded and scheduled; drops songs that are done
+  // keeps the next song decoded and scheduled (from its head patch's lead-in, if it has one); drops
+  // parts that have finished
   tick() {
     clearTimeout(this._tick);
     if (!this.playing) return;
-    const t = this.now();
-    const k = this.songAt(t);
-    this.voices = this.voices.filter((v) => v.k >= k);
+    const t = this.now(),
+      c = this.ctx.currentTime,
+      k = this.songAt(t);
+    if (!this.loop) this.voices = this.voices.filter((v) => v.end > c);
     const next = k + 1;
     if (next < this.tl.songs.length && !this.loop) {
-      const s = this.tl.songs[next];
-      const scheduled = this.voices.some((v) => v.k === next);
-      if (!scheduled && s.start - t < 20) {
+      const s = this.tl.songs[next],
+        lead = s.head ? Math.max(0, s.patch.lead) : 0;
+      if (!this.voices.some((v) => v.k === next) && s.start - lead - t < 20) {
         this.ready(next).then(() => {
           if (this.playing && !this.loop && !this.voices.some((v) => v.k === next))
-            this.startSong(next, s.start);
+            this.startSong(next, -Infinity);
         });
       }
     }
@@ -241,44 +315,74 @@ export class Engine {
     }
     this._tick = setTimeout(() => this.tick(), 120);
   }
+  // every buffer song k needs is decoded
+  hasAll(k) {
+    const s = this.tl.songs[k];
+    if (!s) return false;
+    const kinds = ["m", "i", ...(s.head ? ["hm", "hi"] : []), ...(s.tail ? ["tm", "ti"] : [])];
+    return kinds.every((kind) => this.bufs.has(`${k}:${kind}`));
+  }
 
   // ---------- loops (beat loop, roll, rehearsal) ----------
   setLoop(start, end) {
     if (!this.playing) return;
-    const v = this.voices.find((x) => x.k === this.songAt(start));
+    const k = this.songAt(start);
+    const v = this.voices.find((x) => x.k === k && x.part.a <= start + 1e-6 && start < x.part.b);
     if (!v) return;
-    const s = this.tl.songs[v.k];
-    // drop anything scheduled after this song while looping
-    this.voices
-      .filter((x) => x !== v)
-      .forEach((x) => {
+    const c = this.ctx.currentTime;
+    // drop everything else (the parts and songs after this one) while looping
+    for (const x of this.voices)
+      if (x !== v)
         try {
           x.m.stop();
           x.i.stop();
         } catch {
           /* */
         }
-      });
     this.voices = [v];
     for (const n of [v.m, v.i]) {
-      n.loopStart = start - s.start;
-      n.loopEnd = end - s.start;
+      n.loopStart = v.part.off(start);
+      n.loopEnd = v.part.off(end);
       n.loop = true;
+      n.fade.gain.cancelScheduledValues(c);
+      n.fade.gain.setValueAtTime(1, c);
+      try {
+        n.stop(c + 1e6); // replaces the part's scheduled stop
+      } catch {
+        /* */
+      }
     }
     this.loop = { start, end };
     this.onstate();
   }
+  // the sources carry on from where the loop is now: re-anchor the clock there, give the looped part
+  // back its own ending, and schedule whatever comes after it
   clearLoop() {
     if (!this.loop) return;
-    const t = this.now();
-    for (const v of this.voices) {
-      v.m.loop = false;
-      v.i.loop = false;
-    }
-    // the sources carry on from where the loop is now: re-anchor the clock there
-    this.anchorCtx = this.ctx.currentTime;
+    const t = this.now(),
+      c = this.ctx.currentTime,
+      X = 0.005 / this.rate;
+    this.anchorCtx = c;
     this.anchorSet = t;
     this.loop = null;
+    for (const v of this.voices) {
+      const p = v.part;
+      v.end = this.ctxAt(p.b);
+      for (const n of [v.m, v.i]) {
+        n.loop = false;
+        if (p.fadeOut) {
+          n.fade.gain.setValueAtTime(1, Math.max(c, v.end - X));
+          n.fade.gain.linearRampToValueAtTime(0, v.end);
+        }
+        try {
+          n.stop(v.end + 0.01);
+        } catch {
+          /* */
+        }
+      }
+    }
+    const v = this.voices[0];
+    if (v) this.startSong(v.k, -Infinity, v.part.b - 0.006);
     this.tick();
     this.onstate();
   }
@@ -300,37 +404,32 @@ export class Engine {
     if (this.playing) this.play(t);
   }
 
-  // restart the set at time t right now (no 60 ms run-up), ducking the song bus over the cut so it
+  // restart the set at time t right now (no 60 ms run-up), or at ctx time `at` (a hot cue landing on
+  // the bar: the old audio and clock carry on until then), ducking the song bus over the cut so it
   // doesn't click; spinFrom < 1 starts the new voices slow and spins them up to speed
-  jump(t, spinFrom = 0) {
+  jump(t, spinFrom = 0, at = null) {
     const k = this.songAt(t);
-    if (!this.bufs.has(`${k}:m`) || !this.bufs.has(`${k}:i`)) return this.play(t);
+    if (!this.hasAll(k)) return this.play(t);
     const c = this.ctx.currentTime,
-      at = c + 0.006,
       g = this.song.gain;
+    at = Math.max(at ?? 0, c + 0.006);
+    this.pending = at > c + 0.007 ? { at, set: this.anchorSet, ctx: this.anchorCtx } : null;
     g.cancelScheduledValues(c);
-    g.setValueAtTime(g.value, c);
+    g.setValueAtTime(1, at - 0.006);
     g.linearRampToValueAtTime(0, at);
     g.linearRampToValueAtTime(1, at + 0.008);
-    for (const v of this.voices) {
-      try {
-        v.m.stop(at);
-        v.i.stop(at);
-      } catch {
-        /* already stopped */
-      }
-    }
-    this.voices = [];
+    this.stopVoices(at);
     this.loop = null;
     this.anchorCtx = at;
     this.anchorSet = t;
     this.playing = true;
-    const v = this.startSong(k, t);
+    this.startSong(k, t);
     if (spinFrom)
-      for (const n of [v.m, v.i]) {
-        n.playbackRate.setValueAtTime(spinFrom * this.rate, at);
-        n.playbackRate.exponentialRampToValueAtTime(this.rate, at + 0.14);
-      }
+      for (const v of this.voices)
+        for (const n of [v.m, v.i]) {
+          n.playbackRate.setValueAtTime(spinFrom * this.rate, at);
+          n.playbackRate.exponentialRampToValueAtTime(this.rate, at + 0.14);
+        }
     this.tick();
     this.onstate();
   }

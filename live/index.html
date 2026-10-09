@@ -212,7 +212,7 @@
                 ><span class="e4c-l">PADS</span><span class="e4c-s"><b>02</b>16 · QUANTISED</span></a
               >
               <a href="#setl" data-view="setlist" class="e4c-link"
-                ><span class="e4c-l">SETLIST</span><span class="e4c-s"><b>03</b>20 SONGS · 72:04</span></a
+                ><span class="e4c-l">SETS</span><span class="e4c-s"><b>03</b>ORDER · CURFEW · SAVE</span></a
               >
               <a href="/live/?stage" data-view="stage" class="e4c-link"
                 ><span class="e4c-l">STAGE SCREEN</span><span class="e4c-s"><b>04</b>OPEN ↗</span></a
@@ -273,19 +273,12 @@
         </div>
       </div>
 
-      <!-- the setlist: a drawer from the right (menu → SETLIST), click a song to jump -->
-      <aside class="lv-drawer" id="drawer" aria-label="Setlist" hidden>
-        <div class="lv-drawer-hd">
-          <span class="lv-lbl">SETLIST · 20 SONGS · 72:04</span
-          ><button class="lv-btn" id="drawerX" type="button" aria-label="Close the setlist">
-            <span>✕</span>
-          </button>
-        </div>
-        <ol class="lv-setl" id="setl"></ol>
-      </aside>
+      <!-- 01 · SETS: the running order, saved sets, curfew, export / import (built by setbuilder.js) -->
+      <aside class="lv-drawer lv-sets" id="drawer" aria-label="Sets" hidden></aside>
 
       <!-- the song as one slim waveform: played part in colour, section ticks, click to jump -->
       <div class="lv-wave" id="wave">
+        <div class="lv-cues" id="cues" aria-label="Hot cues"></div>
         <span class="lv-wave-read" id="waveRead"></span>
         <canvas id="waveCv" aria-label="Waveform and song sections: click to jump"></canvas>
       </div>
@@ -300,6 +293,13 @@
             <span class="lv-next-ttl" id="nxTitle">—</span>
             <span class="lv-lbl">IN <b id="nxIn">—</b></span>
             <span id="nxMeta" hidden></span>
+          </div>
+          <div class="lv-mid">
+            <div class="lv-clock" id="clockChip" aria-live="off"></div>
+            <button class="lv-safe" id="safeChip" type="button" title="Show safety">
+              <i></i><span>ALL GOOD</span>
+            </button>
+            <ul class="lv-safe-panel" id="safePanel" hidden></ul>
           </div>
           <div class="lv-grp lv-safety">
             <button class="lv-btn lv-panic" id="panicBtn" data-ctl="PANIC"><span>PANIC · FADE</span></button>

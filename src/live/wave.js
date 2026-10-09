@@ -73,7 +73,8 @@ export function makeWave(cv, TL) {
   };
   const secEnd = (d, i) => (d.secs[i + 1] ? d.secs[i + 1].t : d.dur);
 
-  function draw(T, k) {
+  // marks: hot cues [{ t (song time), id, c (colour) }], drawn as a flag on the line
+  function draw(T, k, marks = []) {
     if (!W || cv.clientWidth !== W) size();
     if (!W) return;
     const d = song(k),
@@ -111,6 +112,12 @@ export function makeWave(cv, TL) {
         c.fillText(short(q.name), x + 3, LINE + 9);
       }
     });
+    for (const m of marks) {
+      const x = Math.round(m.t / px) + 0.5;
+      c.fillStyle = m.c;
+      c.fillRect(x, 0, 1, LINE - 4);
+      c.fillText(m.id, x + 3, 8);
+    }
     c.fillStyle = "#f4f4f8";
     c.shadowColor = "#ff00e5";
     c.shadowBlur = 10;
