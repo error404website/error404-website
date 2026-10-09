@@ -13,6 +13,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- **Live show effects and vocal pads, more responsive:** effects and loops fire the moment a button goes down; ECHO / REVERB / CRUSH latch on a tap and throw (on only while held) on a hold; ROLL and TAPE STOP are held and slip, so the set comes back exactly in time (tape stop spins back up instead of stopping the show); echo is a ping-pong that darkens as it repeats, reverb has a pre-delay and no low-end mud, crush bites in the mids. The four vocal pads are cut on the word timings (the hook's opening phrase, its punchiest word, its last word, its longest held word), trimmed and level-matched, fire instantly, go through the effects, choke each other, repeat every 1/8 while held, and the next song's chops are cut before the changeover. MIDI note-off releases held controls.
 - Live show menu: PADS and SETLIST now toggle. Clicking one that's already open (lit) closes it, like the console's PADS button, and Esc now also closes the pads.
 - Live show: a set timecode ruler under the nav (R1), like the Source Vault's: ticks every 1.5 s, the time every minute, a magenta notch and number at each song's start, and a gradient playhead a third of the way in while the whole set scrolls past.
 - Live show menu: hovering (or tabbing to) a link now fills it with the whole magenta → cyan gradient, the same as the section you're on, instead of turning it solid white.

@@ -12,13 +12,13 @@ export const PAD_DEFS = [
   { key: "E", name: "RISER", q: "bar" },
   { key: "R", name: "SIREN", q: 1 },
   { key: "A", name: "GLITCH", q: 0.25 },
-  { key: "S", name: "STUTTER", q: 1, fx: "stutter" },
-  { key: "D", name: "TAPE STOP", q: 1, fx: "tapestop" },
+  { key: "S", name: "STUTTER", q: 0, fx: "stutter" },
+  { key: "D", name: "TAPE STOP", q: 0, fx: "tapestop" },
   { key: "F", name: "REWIND", q: 1 },
-  { key: "Z", name: "VOX 1", q: 1, vox: 0 },
-  { key: "X", name: "VOX 2", q: 1, vox: 1 },
-  { key: "C", name: "VOX 3", q: 1, vox: 2 },
-  { key: "V", name: "VOX 4", q: 1, vox: 3 },
+  { key: "Z", name: "VOX 1", q: 0, vox: 0 },
+  { key: "X", name: "VOX 2", q: 0, vox: 1 },
+  { key: "C", name: "VOX 3", q: 0, vox: 2 },
+  { key: "V", name: "VOX 4", q: 0, vox: 3 },
 ];
 
 const render = async (sec, fn, sr = 48000) => {
@@ -151,22 +151,43 @@ function soft(k) {
   return c;
 }
 
-// vocal chop: (master - instrumental) over [t0, t0+len] of a song's buffers, with short fades
-export function vocalChop(ctx, mBuf, iBuf, t0, len = 0.7) {
-  const sr = mBuf.sampleRate;
-  const a = Math.max(0, Math.floor(t0 * sr)),
-    n = Math.min(Math.floor(len * sr), mBuf.length - a);
-  if (n <= 0) return null;
-  const out = ctx.createBuffer(mBuf.numberOfChannels, n, sr);
-  const f = Math.min(480, n >> 2);
-  for (let c = 0; c < mBuf.numberOfChannels; c++) {
-    const m = mBuf.getChannelData(c).subarray(a, a + n),
-      i = iBuf.getChannelData(c).subarray(a, a + n),
+// vocal chop: (master - instrumental) over [t0, t1] of a song's buffers, cut on word timings: trimmed of
+// silence (below about -40 dB) at both ends, a 3 ms fade in and 15 ms out, and every chop peak-matched to
+// the same level so the four pads hit alike
+export function vocalChop(ctx, mBuf, iBuf, t0, t1) {
+  const sr = mBuf.sampleRate,
+    C = mBuf.numberOfChannels;
+  let a = Math.max(0, Math.floor(t0 * sr)),
+    e = Math.min(mBuf.length, Math.floor(t1 * sr));
+  if (e - a < sr * 0.04) return null;
+  const Ms = [...Array(C)].map((_, c) => mBuf.getChannelData(c)),
+    Is = [...Array(C)].map((_, c) => iBuf.getChannelData(c));
+  const loud = (k) => {
+    let x = 0;
+    for (let c = 0; c < C; c++) x += Math.abs(Ms[c][k] - Is[c][k]);
+    return x / C > 0.01;
+  };
+  let s0 = a,
+    s1 = e - 1;
+  while (s0 < s1 && !loud(s0)) s0++;
+  while (s1 > s0 && !loud(s1)) s1--;
+  a = Math.max(0, s0 - Math.floor(0.004 * sr));
+  e = Math.min(mBuf.length, s1 + Math.floor(0.03 * sr));
+  const n = e - a;
+  if (n < sr * 0.04) return null;
+  const out = ctx.createBuffer(C, n, sr),
+    fi = Math.floor(0.003 * sr),
+    fo = Math.floor(0.015 * sr);
+  let pk = 0;
+  for (let c = 0; c < C; c++) {
+    const m = Ms[c].subarray(a, e),
+      i = Is[c].subarray(a, e),
       d = out.getChannelData(c);
     for (let k = 0; k < n; k++) {
-      const g = k < f ? k / f : k > n - f ? (n - k) / f : 1;
-      d[k] = (m[k] - i[k]) * g * 1.4;
+      d[k] = (m[k] - i[k]) * (k < fi ? k / fi : k > n - fo ? (n - k) / fo : 1);
+      pk = Math.max(pk, Math.abs(d[k]));
     }
   }
+  if (pk > 0) for (let c = 0; c < C; c++) out.getChannelData(c).forEach((x, k, d) => (d[k] = (x * 0.7) / pk));
   return out;
 }
