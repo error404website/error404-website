@@ -1950,7 +1950,9 @@ body.phone .lv-safe-panel {
 /* PADS: moves, prompts and the 16 pads inside the sheet */
 body.phone .lv-strip > .lv-pads {
   position: static;
-  max-height: 46vh;
+  /* short phones (SE): keep the whole sheet on screen, the pads scroll inside it */
+  max-height: min(46vh, calc(100dvh - 400px - env(safe-area-inset-bottom)));
+  min-height: 140px;
   overflow: auto;
   padding: 0;
   background: none;
@@ -1990,6 +1992,81 @@ body.phone .lv-menu-grid {
   grid-template-columns: 1fr;
   gap: 18px;
   overflow: auto;
+}
+/* a phone on its side (short screen): transport and tabs share one row, the lyrics shrink, and an open
+   tab's panel scrolls inside what's left so the sheet never runs off the bottom */
+@media (max-height: 500px) {
+  body.phone .lv-strip {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    padding-top: 8px;
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+  }
+  /* open, it slides up over the lyrics (under the nav); the open tab again closes it */
+  body.phone .lv-strip.open {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 5;
+  }
+  body.phone .lv-grab {
+    display: none;
+  }
+  body.phone .lv-transport {
+    flex: 1 1 260px;
+    min-width: 0;
+  }
+  body.phone .lv-transport .lv-btn {
+    min-width: 46px;
+    min-height: 40px;
+  }
+  body.phone .lv-play {
+    width: 50px;
+    height: 50px;
+  }
+  body.phone .lv-tabs {
+    flex: 1 1 260px;
+  }
+  body.phone .lv-tier-info,
+  body.phone .lv-knobs,
+  body.phone .lv-fx,
+  body.phone .lv-strip > .lv-pads {
+    flex: 1 0 100%;
+    max-height: calc(100dvh - 150px - env(safe-area-inset-bottom));
+    min-height: 0;
+    overflow-y: auto;
+  }
+  body.phone .lv-knobs {
+    overflow: visible;
+  }
+  body.phone .lv-cue {
+    margin-top: 4px;
+    padding: 4px 10px;
+  }
+  body.phone .lv-center {
+    padding: 2px 18px;
+  }
+  body.phone .lv-sec,
+  body.phone .lv-prev {
+    display: none;
+  }
+  body.phone .lv-cur {
+    font-size: calc(var(--fit, 1) * clamp(22px, 8.5vh, 34px));
+  }
+  body.phone .lv-nxt {
+    font-size: 15px;
+    margin-top: 4px;
+  }
+  body.phone .lv-wave {
+    margin: 26px 18px 6px;
+  }
+  body.phone .lv-toast {
+    bottom: 96px;
+  }
 }
 /* the preload / pre-show check on a phone (or any short screen): scroll instead of being cut off */
 @media (max-width: 700px), (max-height: 760px) {
