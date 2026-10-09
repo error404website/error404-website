@@ -1000,7 +1000,7 @@ function setTab(tab, open = true) {
   strip.dataset.tab = tab;
   strip.classList.toggle("open", open && !same);
   store.set("sheetTab", tab);
-  $$("[data-tab]").forEach((b) =>
+  $$("#sheetTabs [data-tab]").forEach((b) =>
     b.classList.toggle("on", b.dataset.tab === tab && strip.classList.contains("open")),
   );
   $("#padsPanel").hidden = !(tab === "pads" && strip.classList.contains("open"));
