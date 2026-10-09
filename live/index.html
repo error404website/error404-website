@@ -300,6 +300,20 @@
       <!-- 12 · REHEARSE (rehearse.js) · 10 · KEYLAB SETUP (ctrl.js) · 11 · PHONE REMOTE (remote.js) -->
       <aside class="lv-drawer lv-sets" id="rehearseDrawer" aria-label="Rehearse" hidden></aside>
       <aside class="lv-drawer lv-sets" id="ctrlDrawer" aria-label="Controller setup" hidden></aside>
+      <!-- 16 · AFTER THE SHOW: the recorded files -->
+      <aside class="lv-drawer lv-sets" id="captureDrawer" aria-label="After the show" hidden>
+        <div class="lv-drawer-hd">
+          <span class="lv-lbl">AFTER THE SHOW</span
+          ><button class="lv-btn" id="captureX" type="button" aria-label="Close"><span>✕</span></button>
+        </div>
+        <div class="lv-rm">
+          <ol class="lv-setl lv-cap" id="capList"></ol>
+          <div class="lv-vo-row">
+            <button class="lv-btn" id="capAll" type="button"><span>↓ DOWNLOAD ALL</span></button>
+          </div>
+          <pre class="lv-cap-rep" id="capReport"></pre>
+        </div>
+      </aside>
       <aside class="lv-drawer lv-sets" id="remoteDrawer" aria-label="Phone remote" hidden>
         <div class="lv-drawer-hd">
           <span class="lv-lbl">PHONE REMOTE</span
@@ -425,6 +439,9 @@
       <!-- the live page's cinematic look (P2), for the audience: rain under a vignette, centred lyrics -->
       <canvas class="lv-bg-rain" id="stageRain" aria-hidden="true"></canvas>
       <div class="lv-vig" aria-hidden="true"></div>
+      <div class="lv-st-glow" aria-hidden="true"></div>
+      <div class="lv-st-prompt" id="stPrompt" aria-live="polite"></div>
+      <div class="lv-st-card" id="stCard" aria-live="polite"></div>
       <div class="lv-stage-in">
         <div class="lv-lyr lv-lyr-stage">
           <div class="lv-st-cue" id="stCue"></div>

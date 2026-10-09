@@ -50,8 +50,9 @@ export function rain(cv, words) {
   });
   ctx.fillStyle = "#030409";
   ctx.fillRect(0, 0, W, H);
+  let speed = 1; // the live stage screen drives it with the music (14)
   const frame = (now) => {
-    const dt = Math.min(0.05, (now - last) / 1000);
+    const dt = Math.min(0.05, (now - last) / 1000) * speed;
     last = now;
     ctx.fillStyle = `rgba(3,4,9,${drain ? 0.2 : 0.075})`;
     ctx.fillRect(0, 0, W, H);
@@ -100,6 +101,9 @@ export function rain(cv, words) {
     },
     words(w) {
       if (w && w.length) pool = w;
+    },
+    speed(m) {
+      speed = Math.max(0.2, Math.min(3, m));
     },
   };
 }

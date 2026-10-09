@@ -11,6 +11,7 @@ import "./live.css";
 import { audioSrc } from "../lib/audioSrc";
 import { keyField } from "../lib/keyField";
 import { rain, REDUCE } from "../lib/rain";
+import { download, makeCapture } from "./capture";
 import { CUE_COLOURS, CUE_IDS, cuesFor, setCue as saveCue } from "./cues";
 import { makeCtrlWizard } from "./ctrl";
 import { Engine } from "./engine";
@@ -373,6 +374,7 @@ let outputId = "";
 
 /* ---------- the show ---------- */
 const S = {
+  autoPrompt: store.get("autoPrompt", true),
   crowd: false,
   panic: false,
   locked: false,
@@ -450,10 +452,10 @@ function startShow() {
       });
     },
   });
-  for (const m of MOVES) CTL[m] = { press: (d) => d !== false && moves.fire(m) };
+  for (const m of MOVES) CTL[m] = { press: (d) => d !== false && fireMove(m) };
   $("#padsPanel").addEventListener("pointerdown", (e) => {
     const b = e.target.closest("[data-move-btn]");
-    if (b && !S.locked) moves.fire(b.dataset.moveBtn);
+    if (b && !S.locked) fireMove(b.dataset.moveBtn);
   });
   remote = makeRemote({
     proof: () => PROOF,
@@ -493,6 +495,28 @@ function startShow() {
     esc,
     fmt,
   });
+  capture = makeCapture({
+    engine: () => engine,
+    micNode: () => voice?.micNode(),
+    tl: () => TL,
+    toast,
+    fmt,
+    curfew: () => store.get("curfew", ""),
+  });
+  $("#capList").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-cap]");
+    if (b) download(capture.st.files[+b.dataset.cap]);
+  });
+  $("#capAll").onclick = () => capture.st.files.forEach((f, i) => setTimeout(() => download(f), i * 600));
+  // 13 · crowd prompts
+  $("#padsPanel").addEventListener("pointerdown", (e) => {
+    const b = e.target.closest("[data-prompt]");
+    if (!b || S.locked) return;
+    if (b.dataset.prompt === "AUTO") return setAutoPrompt(!S.autoPrompt);
+    firePrompt(b.dataset.prompt);
+  });
+  for (const p of PROMPTS) CTL[`PROMPT ${p}`] = { press: (d) => d !== false && firePrompt(p) };
+  paintPrompts();
   notesEd = makeNotesEditor($("#notesDrawer"), {
     tl: () => TL,
     songIndex: () => engine.songAt(heard()),
@@ -597,6 +621,7 @@ function frame() {
   drawWave(t, k);
   drawRuler?.(t, k);
   if (k !== frame.k) {
+    if (frame.k !== undefined) logEv(`SONG ${songTag(k)}`, "song");
     frame.k = k;
     setBuilder?.render();
     paintCues(k);
@@ -713,7 +738,8 @@ let setBuilder = null,
   moves = null,
   ctrlWiz = null,
   remote = null,
-  rehearse = null;
+  rehearse = null,
+  capture = null;
 function paintMic(st) {
   const chip = $("#micChip");
   if (!chip) return;
@@ -748,6 +774,7 @@ function applyOrder(draft) {
   if (k >= 0) engine.ready(k).then(() => engine.playing && engine.jump(engine.now()));
   else engine.seek(0);
   rebuildViews();
+  logEv(`SET · ${ORDER.length} SONGS`);
   toast(
     k >= 0
       ? `SET UPDATED · ${ORDER.length} SONGS · FROM THE NEXT SONG`
@@ -783,6 +810,7 @@ function fireCue(id) {
   if (S.locked) return;
   const c = cueList.find((x) => x.id === id);
   if (!c || c.t == null) return toast(`CUE ${id} IS EMPTY · HOLD IT TO SET IT TO THIS BAR`);
+  logEv(`CUE ${id} · ${c.label}`, "cues");
   if (!engine.playing) return engine.seek(c.t);
   // land on the next bar line so the repeat (or the skip) stays in time
   const t = engine.now(),
@@ -824,6 +852,33 @@ function startCues() {
   host.addEventListener("pointercancel", () => clearTimeout(hold));
   for (const id of CUE_IDS) CTL[`CUE ${id}`] = { press: (down) => down !== false && fireCue(id) };
   paintCues(0);
+}
+
+function fireMove(name) {
+  if (!moves || S.locked) return;
+  logEv(name, "moves");
+  moves.fire(name);
+}
+
+/* ---------- 13 · crowd prompts (the stage screen) ---------- */
+const PROMPTS = ["SING IT!", "HANDS UP", "JUMP", "ARCHIVE_404"];
+let prompt = null; // { text, wall }
+function firePrompt(text) {
+  prompt = prompt?.text === text ? null : { text, wall: Date.now() }; // a second press clears it
+  logEv(`PROMPT ${text}`);
+  paintPrompts();
+  broadcast();
+}
+function setAutoPrompt(on) {
+  S.autoPrompt = on;
+  store.set("autoPrompt", on);
+  paintPrompts();
+  broadcast();
+}
+function paintPrompts() {
+  $$("[data-prompt]").forEach((b) =>
+    b.classList.toggle("on", b.dataset.prompt === "AUTO" ? S.autoPrompt : prompt?.text === b.dataset.prompt),
+  );
 }
 
 /* ---------- 11 · phone remote ---------- */
@@ -1083,6 +1138,7 @@ function wireControls() {
     let downAt = 0,
       fromOff = false;
     const set = (on) => {
+      if (!!fxOn[fx] !== on) logEv(`${fx.toUpperCase()} ${on ? "ON" : "OFF"}`, "fx");
       fxOn[fx] = on;
       b.classList.toggle("on", on);
       if (fx === "echo") engine.setEcho(on);
@@ -1131,6 +1187,7 @@ function wireControls() {
       const end = Math.min(st + n * engine.barLen(t), song.start + song.frames / TL.sr);
       engine.setLoop(st, end);
       if (engine.loop) engine.loop.bars = n;
+      logEv(`LOOP ${n}`, "loops");
       engine.onstate();
     };
     CTL[b.dataset.ctl] = { press };
@@ -1170,6 +1227,7 @@ function wireControls() {
     S.panic = !S.panic;
     engine.panic(S.panic);
     if (S.panic) moves?.reset();
+    logEv(S.panic ? "PANIC · FADE" : "PANIC · RESTORE", S.panic ? "panics" : undefined);
     $("#panicBtn").classList.toggle("on", S.panic);
     $("#panicBtn span").textContent = S.panic ? "FADED · TAP TO RESTORE" : "PANIC · FADE";
   };
@@ -1199,8 +1257,7 @@ function wireControls() {
       $("#playBtn").click();
       return;
     }
-    if (e.shiftKey && /^Digit[1-4]$/.test(e.code) && !e.repeat)
-      return moves?.fire(MOVES[+e.code.slice(5) - 1]);
+    if (e.shiftKey && /^Digit[1-4]$/.test(e.code) && !e.repeat) return fireMove(MOVES[+e.code.slice(5) - 1]);
     const cue = /^Digit[5-8]$/.test(e.code) ? CUE_IDS[+e.code.slice(5) - 5] : null;
     if (cue && !e.repeat) return e.shiftKey ? storeCue(cue) : fireCue(cue);
     const pad = PAD_DEFS.find((p) => p.key === e.key.toUpperCase());
@@ -1251,6 +1308,7 @@ const DRAWERS = {
   rehearse: "#rehearseDrawer",
   remote: "#remoteDrawer",
   ctrl: "#ctrlDrawer",
+  capture: "#captureDrawer",
 };
 function openDrawer(name) {
   for (const [v, sel] of Object.entries(DRAWERS)) {
@@ -1264,6 +1322,7 @@ function openDrawer(name) {
   if (name === "remote" && remote && remote.st.status !== "connected" && remote.st.status !== "waiting")
     remote.pair();
   if (name === "ctrl") ctrlWiz?.render();
+  if (name === "capture") paintCapture();
 }
 const drawerOpen = () => Object.keys(DRAWERS).find((v) => !$(DRAWERS[v]).hidden) || null;
 function startMenu() {
@@ -1275,6 +1334,7 @@ function startMenu() {
   $("#rhX").onclick = () => openDrawer(null);
   $("#ctrlX").onclick = () => openDrawer(null);
   $("#remoteX").onclick = () => openDrawer(null);
+  $("#captureX").onclick = () => openDrawer(null);
   $("#rmNew").onclick = () => remote.pair();
   $("#rmOff").onclick = () => remote.close();
   $$("[data-open]").forEach(
@@ -1386,7 +1446,12 @@ function buildPads() {
   $("#padsPanel").innerHTML = `<div class="lv-moves">${MOVES.map(
     (m, i) =>
       `<button class="lv-move" type="button" data-move-btn="${m}" data-ctl="${m}"><b>${m}</b><small>SHIFT ${i + 1} · ${["8 BARS · DROPS ITSELF", "ON THE 1", "ON / OFF", "INTO THE NEXT SONG"][i]}</small></button>`,
-  ).join("")}</div><div class="lv-padgrid">${PAD_DEFS.map(
+  ).join("")}</div><div class="lv-prompts"><span class="lv-lbl">STAGE</span>${PROMPTS.map(
+    (p) =>
+      `<button class="lv-btn" type="button" data-prompt="${p}" data-ctl="PROMPT ${p}"><span>${p}</span></button>`,
+  ).join(
+    "",
+  )}<button class="lv-btn" type="button" data-prompt="AUTO"><span>AUTO SING IT! AT HOOKS</span></button></div><div class="lv-padgrid">${PAD_DEFS.map(
     (p) =>
       `<button class="lv-pad${p.vox !== undefined ? " vox" : ""}" data-pad="${p.key}" data-ctl="PAD ${p.key}"><span>${p.name}</span><small>${p.key} · ${padLabel(p)}</small></button>`,
   ).join("")}</div>`;
@@ -1565,35 +1630,51 @@ function padUp(pad) {
 
 /* ---------- record ---------- */
 let rec = null;
-function toggleRec() {
-  if (!engine?.recDest) return;
-  if (rec) {
-    rec.stop();
-    return;
-  }
-  const type =
-    ["audio/webm;codecs=opus", "audio/mp4", "audio/webm"].find((t) => MediaRecorder.isTypeSupported?.(t)) ||
-    "";
-  const chunks = [];
-  rec = new MediaRecorder(engine.recDest.stream, type ? { mimeType: type, audioBitsPerSecond: 320000 } : {});
-  rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
-  rec.onstop = () => {
-    const blob = new Blob(chunks, { type: rec.mimeType });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-");
-    a.download = `error_404_live_${stamp}.${rec.mimeType.includes("mp4") ? "m4a" : "webm"}`;
-    a.click();
+// 16 · REC: the show mix + the mic as WAVs, a cue sheet and a show report (capture.js)
+async function toggleRec() {
+  if (!engine || !capture) return;
+  if (capture.st.on) {
+    $("#recTxt").textContent = "SAVING…";
+    await capture.stop();
     rec = null;
     $("#recBtn").classList.remove("on");
     $("#recTxt").textContent = "● RECORD THE SHOW";
-    toast("RECORDING SAVED TO YOUR DOWNLOADS");
-  };
-  rec.start(1000);
-  rec.t0 = Date.now();
+    paintCapture();
+    setMenu(false);
+    openDrawer("capture");
+    return toast("SHOW SAVED · DOWNLOAD THE FILES");
+  }
+  try {
+    await capture.start();
+  } catch {
+    return toast("COULDN'T START RECORDING IN THIS BROWSER");
+  }
+  rec = { t0: capture.st.t0 };
   $("#recBtn").classList.add("on");
   $("#recTxt").textContent = "■ STOP RECORDING";
+  logEv(`SONG ${songTag(engine.songAt(heard()))}`, "song");
   setMenu(false);
+  toast(
+    voice?.st.mic
+      ? "RECORDING · SHOW MIX + YOUR MIC"
+      : "RECORDING · SHOW MIX (TURN THE MIC ON TO RECORD IT TOO)",
+  );
+}
+const songTag = (k) => `${String(TL.songs[k]?.n).padStart(2, "0")} ${TL.songs[k]?.title}`;
+function logEv(text, kind) {
+  capture?.log(text, kind);
+}
+function paintCapture() {
+  const f = capture.st.files;
+  $("#capList").innerHTML = f.length
+    ? f
+        .map(
+          (x, i) =>
+            `<li><span>${esc(x.name)}</span><em>${(x.blob.size / 1e6).toFixed(x.blob.size > 1e6 ? 0 : 2)} MB</em><button class="lv-sb-x" type="button" data-cap="${i}" aria-label="Download ${esc(x.name)}">↓</button></li>`,
+        )
+        .join("")
+    : `<li><span class="lv-lbl">NOTHING RECORDED YET · MENU → ● RECORD THE SHOW</span></li>`;
+  $("#capReport").textContent = capture.st.report || "";
 }
 
 /* ---------- MIDI: connect, then learn (click a control, move a knob / hit a pad) ---------- */
@@ -1686,6 +1767,8 @@ function broadcast() {
     crowd: S.crowd,
     order: ORDER,
     notes: notesVer,
+    prompt,
+    autoPrompt: S.autoPrompt,
   });
 }
 // the stage screen (audience) and, with ?prompter, the performer's prompter: the same synced lyrics,
@@ -1743,6 +1826,7 @@ function startStage() {
       sky?.words(songWords(TL.songs[k])); // the rain streams the words of the song that's on, like the show
     }
     if (sky) st.playing ? sky.resume() : sky.pause();
+    if (!PROMPTER) roomFrame(t, k, st, sky);
     document.body.classList.toggle("crowd", !!st.crowd);
     if (PROMPTER) {
       // the next section, counted in bars (the show's cue, for the performer)
@@ -1763,6 +1847,73 @@ function startStage() {
   };
   loop();
   document.addEventListener("dblclick", () => document.documentElement.requestFullscreen?.());
+}
+// 13–15 · the audience's stage screen: crowd prompts, title cards between songs, and visuals that move
+// with the music (the rain and a glow follow the bass from the song's waveform data, a soft pulse on
+// every downbeat, a tint per chapter). Pulses only: no strobe, never more than 3 flashes a second.
+const CHAPTER_HUE = { ORIGIN: 0, "THE FEED": 35, "THE WRECKAGE": -35, WHOLE: 150 };
+const roman = (n) => ["", "I", "II", "III", "IV", "V", "VI"][n] || String(n);
+const waves = new Map();
+function roomFrame(t, k, st, sky) {
+  const s = TL.songs[k];
+  if (!s) return;
+  const stage = $("#stage"),
+    rel = t - s.start,
+    bar = 240 / (s.bpm || 140);
+  if (!REDUCE) {
+    let raw = waves.get(s.n);
+    if (!raw && s.wv) {
+      raw = Uint8Array.from(atob(s.wv), (c) => c.charCodeAt(0));
+      waves.set(s.n, raw);
+      if (waves.size > 3) waves.delete(waves.keys().next().value);
+    }
+    const bin = raw ? Math.max(0, Math.min(raw.length / 4 - 1, Math.floor(rel * (s.wr || 25)))) : 0;
+    const lo = st.playing && raw ? raw[bin * 4 + 1] / 255 : 0.15;
+    roomFrame.lo = (roomFrame.lo ?? lo) * 0.85 + lo * 0.15;
+    stage.style.setProperty("--bass", roomFrame.lo.toFixed(3));
+    sky?.speed(0.7 + 1.4 * roomFrame.lo);
+    stage.style.setProperty("--hue", `${CHAPTER_HUE[s.chapter] ?? 0}deg`);
+    // the downbeat just passed
+    const B = TL.beats;
+    let lo2 = 0,
+      hi = B.length - 1;
+    while (lo2 < hi) {
+      const m = (lo2 + hi + 1) >> 1;
+      if (B[m][0] <= t) lo2 = m;
+      else hi = m - 1;
+    }
+    let d = lo2;
+    while (d > 0 && B[d][1] !== 1) d--;
+    if (st.playing && B[d] && B[d][0] !== roomFrame.down && t - B[d][0] < 0.1) {
+      roomFrame.down = B[d][0];
+      stage.classList.add("pulse");
+      setTimeout(() => stage.classList.remove("pulse"), 160);
+    }
+  }
+  // 13 · a prompt: pressed (4 bars), or SING IT! on the first 2 bars of every hook
+  let text = null;
+  if (st.prompt && Date.now() - st.prompt.wall < 4 * bar * 1000) text = st.prompt.text;
+  else if (
+    st.autoPrompt &&
+    st.playing &&
+    TL.secs.some((q) => q.n === s.n && /hook|chorus/i.test(q.name) && t >= q.t && t < q.t + 2 * bar)
+  )
+    text = "SING IT!";
+  const pr = $("#stPrompt");
+  if (pr.textContent !== (text || "")) pr.textContent = text || "";
+  pr.classList.toggle("on", !!text);
+  stage.style.setProperty("--beat", `${(bar / 4).toFixed(3)}s`);
+  // 15 · the title card, in the gap before the song's first line
+  const first = TL.lines.find((l) => l.n === s.n),
+    gap = first ? first.t - s.start : 4 * bar,
+    card = rel >= -0.05 && rel < Math.min(gap - 0.4, 4 * bar) && gap > 1.5 * bar;
+  if (card && roomFrame.card !== k) {
+    roomFrame.card = k;
+    const newChapter = k === 0 || TL.songs[k - 1]?.chapter !== s.chapter;
+    $("#stCard").innerHTML =
+      `${newChapter ? `<span class="lv-card-ch">CHAPTER ${roman(s.ch)} · ${esc(s.chapter)}</span>` : ""}<b>${esc(s.title)}</b><span class="lv-card-meta">${String(s.n).padStart(2, "0")} · ${fmt(s.frames / TL.sr)}</span>`;
+  }
+  stage.classList.toggle("carded", card);
 }
 function songAtT(t) {
   for (let k = TL.songs.length - 1; k >= 0; k--) if (t >= TL.songs[k].start - 1e-6) return k;
