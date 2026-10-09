@@ -13,6 +13,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Live show menu: PADS and SETLIST now toggle. Clicking one that's already open (lit) closes it, like the console's PADS button, and Esc now also closes the pads.
 - Live show: a set timecode ruler under the nav (R1), like the Source Vault's: ticks every 1.5 s, the time every minute, a magenta notch and number at each song's start, and a gradient playhead a third of the way in while the whole set scrolls past.
 - Live show menu: hovering (or tabbing to) a link now fills it with the whole magenta → cyan gradient, the same as the section you're on, instead of turning it solid white.
 - Live show: the nav logo now draws itself on when the show opens and replays on hover, like the Source Vault's (the site's logo-fx script).

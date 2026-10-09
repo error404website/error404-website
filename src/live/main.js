@@ -758,6 +758,7 @@ function startMenu() {
     if (e.key !== "Escape") return;
     if ($("#lvMenu").classList.contains("is-open")) setMenu(false);
     else if (!$("#drawer").hidden) setDrawer(false);
+    else if (!$("#padsPanel").hidden) $("#padsBtn").click();
   });
   $$("[data-view]").forEach((a) =>
     a.addEventListener("click", (e) => {
@@ -766,9 +767,10 @@ function startMenu() {
       const v = a.dataset.view,
         pads = $("#padsPanel");
       if (v === "stage") return openStage();
-      if (v === "pads") return pads.hidden && $("#padsBtn").click();
+      // PADS and SETLIST toggle: a second click closes what the first one opened
+      if (v === "pads") return $("#padsBtn").click();
       if (!pads.hidden) $("#padsBtn").click();
-      setDrawer(v === "setlist");
+      setDrawer(v === "setlist" && $("#drawer").hidden);
     }),
   );
   // the REC readout in the nav: Nº404 when idle, the recording's running time when recording
