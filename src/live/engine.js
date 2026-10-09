@@ -491,11 +491,37 @@ export class Engine {
   setVox(x, tau = 0.015) {
     // x = 1 full vocal; 0 = instrumental (CROWD). The auto-duck scales it while the singer sings.
     this.vox = x;
-    if (!this.ctx) return;
+    if (!this.ctx || this.vocalOnly) return;
     const c = this.ctx.currentTime,
       v = x * this.duck;
     this.gM.gain.setTargetAtTime(v, c, tau);
     this.gI.gain.setTargetAtTime(1 - v, c, tau);
+  }
+  // 09 · BREAKDOWN: the vocal on its own (master − instrumental), then back to the VOX setting
+  setVocalOnly(on) {
+    this.vocalOnly = on;
+    const c = this.ctx.currentTime;
+    if (on) {
+      this.gM.gain.setTargetAtTime(1, c, 0.04);
+      this.gI.gain.setTargetAtTime(-1, c, 0.04);
+    } else this.setVox(this.vox, 0.04);
+  }
+  // 09 · BUILD-UP: sweep the high-pass from where it is up to `hz` between ctx times a and b; DROP snaps it
+  // back (and the low-pass open) at ctx time `at`
+  sweepHP(hz, a, b) {
+    const f = this.hp.frequency;
+    f.cancelScheduledValues(a);
+    f.setValueAtTime(Math.max(10, f.value), a);
+    f.exponentialRampToValueAtTime(hz, b);
+  }
+  snapFilter(at, lp = 22000, hp = 10) {
+    for (const [f, v] of [
+      [this.hp.frequency, hp],
+      [this.lp.frequency, lp],
+    ]) {
+      f.cancelScheduledValues(at);
+      f.setValueAtTime(v, at);
+    }
   }
   // 05 · d = 1 the guide vocal as set; 0.25 = 12 dB under the singer (fast down, slow back up)
   setDuck(d) {

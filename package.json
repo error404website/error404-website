@@ -2,7 +2,7 @@
   "name": "error404-website",
   "private": true,
   "version": "1.2.0",
-  "description": "ERROR_404 \u2014 ARCHIVE_404 website",
+  "description": "ERROR_404 — ARCHIVE_404 website",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,7 +16,9 @@
     "live:encrypt": "node scripts/live-encrypt.mjs"
   },
   "dependencies": {
+    "@netlify/blobs": "^11.1.4",
     "framer-motion": "^11.18.2",
+    "qrcode-generator": "^2.0.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

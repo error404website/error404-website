@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="theme-color" content="#000000" />
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, noai, noimageai" />
+    <meta name="referrer" content="no-referrer" />
+    <title>Remote · ARCHIVE_404 Live</title>
+    <link rel="icon" type="image/svg+xml" href="/live/favicon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/live/apple-touch-icon.png" />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <main class="rm">
+      <header class="rm-hd">
+        <span class="rm-brand">ERROR_404 <b class="grad">REMOTE</b></span>
+        <span class="rm-st" id="st"><i></i><span id="stTxt">PAIRING…</span></span>
+      </header>
+      <form class="rm-code" id="codeForm" hidden>
+        <label for="code">CODE FROM THE SHOW LAPTOP</label>
+        <input id="code" maxlength="6" autocapitalize="characters" autocomplete="off" spellcheck="false" />
+        <button type="submit">PAIR</button>
+      </form>
+      <section class="rm-now">
+        <span class="rm-lbl">NOW</span>
+        <h1 id="song">—</h1>
+        <span class="rm-lbl" id="next"></span>
+      </section>
+      <section class="rm-tp">
+        <button data-c="PREV" aria-label="Previous song">≪</button>
+        <button data-c="PLAY" class="rm-play" id="play" aria-label="Play or pause">▶</button>
+        <button data-c="NEXT" aria-label="Next song">≫</button>
+      </section>
+      <label class="rm-vox"
+        ><span class="rm-lbl">VOX</span><input type="range" id="vox" min="0" max="1" step="0.01" value="1"
+      /></label>
+      <section class="rm-grid">
+        <button data-c="ECHO">ECHO</button><button data-c="REVERB">REVERB</button
+        ><button data-c="CRUSH">CRUSH</button> <button data-c="ROLL">ROLL · HOLD</button
+        ><button data-c="TAPE STOP">TAPE · HOLD</button><button data-c="CROWD">CROWD</button>
+      </section>
+      <section class="rm-grid rm-4">
+        <button data-c="CUE A">CUE A</button><button data-c="CUE B">CUE B</button
+        ><button data-c="CUE C">CUE C</button><button data-c="CUE D">CUE D</button>
+      </section>
+      <section class="rm-grid rm-4">
+        <button data-c="BUILD-UP">BUILD</button><button data-c="DROP">DROP</button
+        ><button data-c="BREAKDOWN">BREAK</button><button data-c="ECHO OUT">ECHO OUT</button>
+      </section>
+      <section class="rm-grid rm-2">
+        <button data-c="LOOP 4">LOOP 4</button><button data-c="PANIC" class="rm-panic">PANIC · FADE</button>
+      </section>
+      <p class="rm-foot">PAIRED TO ONE SHOW · THE LAPTOP KEEPS PLAYING IF THIS PHONE DROPS</p>
+    </main>
+    <script type="module" src="/src/live/phone.js"></script>
+  </body>
+</html>

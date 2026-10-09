@@ -227,6 +227,9 @@
                 ><span class="e4c-l">PROMPTER</span
                 ><span class="e4c-s"><b>07</b>OPEN ↗ · YOUR NOTES, HUGE</span></a
               >
+              <a href="#rehearseDrawer" data-view="rehearse" class="e4c-link"
+                ><span class="e4c-l">REHEARSE</span><span class="e4c-s"><b>08</b>LOOP · SLOW · TAKES</span></a
+              >
             </nav>
             <div class="vm-ft lv-menu-ft">
               <span class="e-split e-split-menu lv-sync"
@@ -238,6 +241,11 @@
                 ><button class="e-split-dl" type="button" data-sync="10" aria-label="Lyrics 10 ms later">
                   + 10
                 </button></span
+              >
+              <span class="e-split e-split-menu"
+                ><span class="e-split-bk">CONTROL</span
+                ><button class="e-split-dl" type="button" data-open="ctrl">KEYLAB SETUP</button
+                ><button class="e-split-dl" type="button" data-open="remote">PHONE REMOTE</button></span
               >
               <span class="e-split e-split-menu"
                 ><span class="e-split-bk" id="offTxt">OFFLINE 20/20</span
@@ -289,6 +297,28 @@
       <!-- 05–07 · VOICE: mic, auto-duck, in-ear mix (voiceui.js) · 08 · NOTES: breaths and notes (notes.js) -->
       <aside class="lv-drawer lv-sets" id="voiceDrawer" aria-label="Voice" hidden></aside>
       <aside class="lv-drawer lv-sets" id="notesDrawer" aria-label="Notes" hidden></aside>
+      <!-- 12 · REHEARSE (rehearse.js) · 10 · KEYLAB SETUP (ctrl.js) · 11 · PHONE REMOTE (remote.js) -->
+      <aside class="lv-drawer lv-sets" id="rehearseDrawer" aria-label="Rehearse" hidden></aside>
+      <aside class="lv-drawer lv-sets" id="ctrlDrawer" aria-label="Controller setup" hidden></aside>
+      <aside class="lv-drawer lv-sets" id="remoteDrawer" aria-label="Phone remote" hidden>
+        <div class="lv-drawer-hd">
+          <span class="lv-lbl">PHONE REMOTE</span
+          ><button class="lv-btn" id="remoteX" type="button" aria-label="Close"><span>✕</span></button>
+        </div>
+        <div class="lv-rm">
+          <p class="lv-lbl lv-rm-st" id="rmStatus">NOT PAIRED</p>
+          <div class="lv-rm-box" id="rmBox"></div>
+          <div class="lv-vo-row">
+            <button class="lv-btn" id="rmNew" type="button"><span>NEW CODE</span></button>
+            <button class="lv-btn" id="rmOff" type="button"><span>DISCONNECT</span></button>
+          </div>
+          <p class="lv-vo-help">
+            Scan the code with the phone (or open the address and type the code). Pairing goes through the
+            site once; after that the phone talks to this laptop directly, best on the same Wi-Fi. The show
+            never waits for the phone.
+          </p>
+        </div>
+      </aside>
 
       <!-- the song as one slim waveform: played part in colour, section ticks, click to jump -->
       <div class="lv-wave" id="wave">
