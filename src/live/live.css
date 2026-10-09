@@ -2068,15 +2068,38 @@ body.phone .lv-menu-grid {
     bottom: 96px;
   }
 }
-/* the preload / pre-show check on a phone (or any short screen): scroll instead of being cut off */
+/* the preload / pre-show check on a phone (or any short screen): centred like the gate while it fits,
+   scrolling from the top (never cut off) once the check list makes it taller than the screen */
 @media (max-width: 700px), (max-height: 760px) {
   .lv-pre {
-    place-items: start center;
+    display: flex;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     padding: calc(28px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));
+  }
+  .lv-pre-card {
+    margin: auto;
   }
   .lv-pre .gate-rain,
   .lv-pre .e-glow {
     position: fixed;
+  }
+}
+/* the pre-show check on a phone: each row's result goes under its name instead of squeezing beside it */
+@media (max-width: 520px) {
+  .lv-check {
+    gap: 9px;
+  }
+  .lv-check li {
+    display: grid;
+    grid-template-columns: 6px 1fr;
+    gap: 3px 10px;
+    align-items: center;
+  }
+  .lv-check em {
+    grid-column: 2;
+    margin-left: 0;
+    text-align: left;
+    line-height: 1.5;
   }
 }

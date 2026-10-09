@@ -545,7 +545,8 @@ function startShow() {
   drawRuler = makeRuler($("#ruler"), TL.songs);
   setInterval(clock, 250);
   requestAnimationFrame(frame);
-  toast("SPACE = PLAY / PAUSE · PADS ON 1–4 Q–R A–F Z–V");
+  // the keyboard hint only where there's a keyboard (the phone sheet has its own buttons)
+  if (!document.body.classList.contains("phone")) toast("SPACE = PLAY / PAUSE · PADS ON 1–4 Q–R A–F Z–V");
 }
 
 /* ---------- S1 · what you hear vs what you see ----------
