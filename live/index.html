@@ -214,8 +214,18 @@
               <a href="#setl" data-view="setlist" class="e4c-link"
                 ><span class="e4c-l">SETS</span><span class="e4c-s"><b>03</b>ORDER · CURFEW · SAVE</span></a
               >
+              <a href="#voiceDrawer" data-view="voice" class="e4c-link"
+                ><span class="e4c-l">VOICE</span><span class="e4c-s"><b>04</b>MIC · DUCK · IN-EARS</span></a
+              >
+              <a href="#notesDrawer" data-view="notes" class="e4c-link"
+                ><span class="e4c-l">NOTES</span><span class="e4c-s"><b>05</b>BREATHS · AD-LIBS</span></a
+              >
               <a href="/live/?stage" data-view="stage" class="e4c-link"
-                ><span class="e4c-l">STAGE SCREEN</span><span class="e4c-s"><b>04</b>OPEN ↗</span></a
+                ><span class="e4c-l">STAGE SCREEN</span><span class="e4c-s"><b>06</b>OPEN ↗</span></a
+              >
+              <a href="/live/?prompter" data-view="prompter" class="e4c-link"
+                ><span class="e4c-l">PROMPTER</span
+                ><span class="e4c-s"><b>07</b>OPEN ↗ · YOUR NOTES, HUGE</span></a
               >
             </nav>
             <div class="vm-ft lv-menu-ft">
@@ -269,12 +279,16 @@
           <div class="lv-sec" id="lySec"></div>
           <div class="lv-prev" id="lyPrev"></div>
           <div class="lv-cur" id="lyCur"></div>
+          <div class="lv-note" id="lyNote"></div>
           <div class="lv-nxt" id="lyNxt"></div>
         </div>
       </div>
 
       <!-- 01 · SETS: the running order, saved sets, curfew, export / import (built by setbuilder.js) -->
       <aside class="lv-drawer lv-sets" id="drawer" aria-label="Sets" hidden></aside>
+      <!-- 05–07 · VOICE: mic, auto-duck, in-ear mix (voiceui.js) · 08 · NOTES: breaths and notes (notes.js) -->
+      <aside class="lv-drawer lv-sets" id="voiceDrawer" aria-label="Voice" hidden></aside>
+      <aside class="lv-drawer lv-sets" id="notesDrawer" aria-label="Notes" hidden></aside>
 
       <!-- the song as one slim waveform: played part in colour, section ticks, click to jump -->
       <div class="lv-wave" id="wave">
@@ -296,6 +310,9 @@
           </div>
           <div class="lv-mid">
             <div class="lv-clock" id="clockChip" aria-live="off"></div>
+            <button class="lv-safe lv-mic" id="micChip" type="button" title="Mic, auto-duck and in-ears">
+              <i></i><span>MIC OFF</span>
+            </button>
             <button class="lv-safe" id="safeChip" type="button" title="Show safety">
               <i></i><span>ALL GOOD</span>
             </button>
@@ -374,14 +391,17 @@
 
     <!-- ================= STAGE SCREEN (opened by STAGE SCREEN ↗, for a projector) ================= -->
     <section class="lv-stage" id="stage" hidden>
+      <p class="lv-st-help" id="stHelp" hidden>PROMPTER · M MIRROR · + / − SIZE · DOUBLE-CLICK FULL SCREEN</p>
       <!-- the live page's cinematic look (P2), for the audience: rain under a vignette, centred lyrics -->
       <canvas class="lv-bg-rain" id="stageRain" aria-hidden="true"></canvas>
       <div class="lv-vig" aria-hidden="true"></div>
       <div class="lv-stage-in">
         <div class="lv-lyr lv-lyr-stage">
+          <div class="lv-st-cue" id="stCue"></div>
           <div class="lv-sec" id="stSong"></div>
           <div class="lv-prev" id="stPrev"></div>
           <div class="lv-cur" id="stCur"></div>
+          <div class="lv-note" id="stNote"></div>
           <div class="lv-nxt" id="stNxt"></div>
         </div>
       </div>
