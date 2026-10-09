@@ -1,0 +1,193 @@
+/* 11 · the phone remote: thumb-sized, the live show's colours */
+:root {
+  --void: #030409;
+  --ghost: #f4f4f8;
+  --mag: #ff00e5;
+  --cyan: #00efff;
+  --red: #ff3b5c;
+  --led: #4ade80;
+  --t3: rgba(244, 244, 248, 0.45);
+  --hair: rgba(244, 244, 248, 0.12);
+  --grad: linear-gradient(90deg, var(--mag), var(--cyan));
+  --mono: "Space Mono", monospace;
+  --head: "Bebas Neue", sans-serif;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  background: var(--void);
+  color: var(--ghost);
+  font-family: var(--mono);
+  min-height: 100svh;
+}
+.grad {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.rm {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: calc(14px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rm-hd {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.rm-brand {
+  font-family: var(--head);
+  font-size: 24px;
+  letter-spacing: 0.04em;
+}
+.rm-brand b {
+  font-weight: 400;
+}
+.rm-st {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--t3);
+  text-align: right;
+}
+.rm-st i {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  background: var(--t3);
+}
+.rm-st.ok i {
+  background: var(--led);
+  box-shadow: 0 0 8px var(--led);
+}
+.rm-st.bad {
+  color: var(--red);
+}
+.rm-st.bad i {
+  background: var(--red);
+}
+.rm-code {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: 8px;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--t3);
+}
+.rm-code label {
+  grid-column: 1 / -1;
+}
+.rm-code[hidden] {
+  display: none;
+}
+.rm-code input {
+  min-width: 0;
+  width: 100%;
+  font: 700 26px var(--mono);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ghost);
+  background: #07080f;
+  border: 1px solid var(--hair);
+  padding: 10px;
+}
+.rm-lbl {
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: var(--t3);
+}
+.rm-now h1 {
+  font-family: var(--head);
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.rm button {
+  font: 700 12px var(--mono);
+  letter-spacing: 0.16em;
+  color: var(--ghost);
+  background: #07080f;
+  border: 1px solid var(--hair);
+  min-height: 58px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.rm button.on {
+  color: #000;
+  background: var(--grad);
+  border-color: transparent;
+}
+.rm button.down {
+  box-shadow: inset 0 0 0 2px var(--mag);
+}
+.rm-tp {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr 1fr;
+  gap: 8px;
+}
+.rm-tp button {
+  min-height: 72px;
+  font-size: 22px;
+}
+.rm-tp .rm-play {
+  border-color: transparent;
+  background:
+    linear-gradient(#07080f, #07080f) padding-box,
+    var(--grad) border-box;
+  border: 1px solid transparent;
+}
+.rm-vox {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+}
+.rm-vox input {
+  accent-color: var(--mag);
+  height: 36px;
+}
+.rm-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.rm-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+.rm-4 button {
+  font-size: 10px;
+}
+.rm-2 {
+  grid-template-columns: 1fr 1.6fr;
+}
+.rm .rm-panic {
+  color: var(--red);
+  border-color: rgba(255, 59, 92, 0.5);
+}
+.rm .rm-panic.on {
+  background: var(--red);
+  color: #000;
+}
+.rm-foot {
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: var(--t3);
+  text-align: center;
+  line-height: 1.8;
+}

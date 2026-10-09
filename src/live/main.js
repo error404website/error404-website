@@ -12,9 +12,13 @@ import { audioSrc } from "../lib/audioSrc";
 import { keyField } from "../lib/keyField";
 import { rain, REDUCE } from "../lib/rain";
 import { CUE_COLOURS, CUE_IDS, cuesFor, setCue as saveCue } from "./cues";
+import { makeCtrlWizard } from "./ctrl";
 import { Engine } from "./engine";
 import { PAD_DEFS, synthKit, vocalChop } from "./pads";
+import { MOVES, makeMoves } from "./moves";
 import { makeNotesEditor, noteFor, reload as reloadNotes, tagLines } from "./notes";
+import { makeRehearse } from "./rehearse";
+import { makeRemote } from "./remote";
 import { makeRuler } from "./ruler";
 import { startSafety, safetyRows } from "./safety";
 import { ALBUM, deriveTimeline, isAlbum, skipSuggestion } from "./set";
@@ -51,6 +55,7 @@ const b64 = {
 };
 let sealed = null,
   KEY = null,
+  PROOF = "", // the vault's proof of the key (11: only the unlocked show can pair a phone)
   BASE = null, // the decrypted timeline, album order
   TL = null; // the running order in use (set.js); the album unless a set was loaded
 async function getSealed() {
@@ -91,18 +96,28 @@ async function unlockWith(key) {
   const s = await getSealed();
   const raw = await derive(key, s.salt, s.iterations);
   const ok = await open(raw);
-  if (ok)
+  if (ok) {
     try {
-      sessionStorage.setItem(SESSION, JSON.stringify({ k: b64.to(raw), salt: s.salt }));
+      const v = await (await fetch("/vault/data.enc.json", { cache: "no-cache" })).json();
+      PROOF = b64.to(await derive(key, v.proofSalt, v.iterations));
+    } catch {
+      PROOF = ""; // offline: the phone remote can pair once the page is reloaded online
+    }
+    try {
+      sessionStorage.setItem(SESSION, JSON.stringify({ k: b64.to(raw), p: PROOF, salt: s.salt }));
     } catch {
       /* private browsing: asks again next time */
     }
+  }
   return ok;
 }
 async function resume() {
   try {
     const saved = JSON.parse(sessionStorage.getItem(SESSION) || "null");
-    if (saved && (await getSealed()).salt === saved.salt) return open(b64.from(saved.k));
+    if (saved && (await getSealed()).salt === saved.salt) {
+      PROOF = saved.p || "";
+      return open(b64.from(saved.k));
+    }
   } catch {
     /* fall through to the gate */
   }
@@ -415,6 +430,69 @@ function startShow() {
     },
   });
   voiceUI = makeVoiceUI($("#voiceDrawer"), voice, { esc, toast });
+  moves = makeMoves({
+    engine: () => engine,
+    tl: () => TL,
+    S,
+    kit: () => kit,
+    toast,
+    fxUI,
+    fxOn: (n) => !!FXON[n],
+    onChange: (st) => {
+      $$("[data-move-btn]").forEach((b) => {
+        const m = b.dataset.moveBtn;
+        b.classList.toggle(
+          "on",
+          (m === "BUILD-UP" && !!st.build) ||
+            (m === "BREAKDOWN" && st.breakdown) ||
+            (m === "ECHO OUT" && st.echoOut),
+        );
+      });
+    },
+  });
+  for (const m of MOVES) CTL[m] = { press: (d) => d !== false && moves.fire(m) };
+  $("#padsPanel").addEventListener("pointerdown", (e) => {
+    const b = e.target.closest("[data-move-btn]");
+    if (b && !S.locked) moves.fire(b.dataset.moveBtn);
+  });
+  remote = makeRemote({
+    proof: () => PROOF,
+    control,
+    state: remoteState,
+    toast,
+    onChange: paintRemote,
+  });
+  ctrlWiz = makeCtrlWizard($("#ctrlDrawer"), {
+    map: midiMap,
+    saveMap: () => {
+      try {
+        localStorage.setItem(MAPKEY, JSON.stringify(midiMap));
+      } catch {
+        /* not saved */
+      }
+    },
+    connect: async () => {
+      if (!midi.access) await midi();
+      return !!midi.access;
+    },
+    toast,
+    esc,
+    lights: (on) => {
+      lights.on = on;
+      store.set("padLights", on);
+      lights.sent.clear();
+    },
+    lightsOn: () => lights.on,
+  });
+  setInterval(syncLights, 250);
+  rehearse = makeRehearse($("#rehearseDrawer"), {
+    engine: () => engine,
+    tl: () => TL,
+    voice,
+    toast,
+    esc,
+    fmt,
+  });
   notesEd = makeNotesEditor($("#notesDrawer"), {
     tl: () => TL,
     songIndex: () => engine.songAt(heard()),
@@ -631,7 +709,11 @@ let setBuilder = null,
   voice = null,
   voiceUI = null,
   notesEd = null,
-  notesVer = 0;
+  notesVer = 0,
+  moves = null,
+  ctrlWiz = null,
+  remote = null,
+  rehearse = null;
 function paintMic(st) {
   const chip = $("#micChip");
   if (!chip) return;
@@ -744,6 +826,83 @@ function startCues() {
   paintCues(0);
 }
 
+/* ---------- 11 · phone remote ---------- */
+function remoteState() {
+  const t = heard(),
+    k = engine.songAt(t),
+    nx = TL.songs[k + 1];
+  return {
+    song: TL.songs[k]?.title,
+    next: nx?.title || "",
+    nextIn: nx ? fmt(nx.start - t) : "",
+    playing: engine.playing,
+    vox: S.vox,
+    cues: cueList.map((c) => c.label),
+    on: {
+      ECHO: !!FXON.echo,
+      REVERB: !!FXON.reverb,
+      CRUSH: !!FXON.crush,
+      CROWD: S.crowd,
+      PANIC: S.panic,
+      "LOOP 4": engine.loop?.bars === 4,
+      "BUILD-UP": !!moves?.st.build,
+      BREAKDOWN: !!moves?.st.breakdown,
+    },
+  };
+}
+function paintRemote(st) {
+  const box = $("#rmBox");
+  if (!box) return;
+  const words = {
+    off: "NOT PAIRED",
+    pairing: "MAKING A CODE…",
+    waiting: "SCAN WITH THE PHONE · WAITING",
+    connected: "● PHONE CONNECTED",
+    failed: "COULDN'T PAIR · NEEDS THE INTERNET (TO PAIR ONLY)",
+  };
+  $("#rmStatus").textContent = words[st.status] || st.status;
+  $("#rmStatus").classList.toggle("ok", st.status === "connected");
+  box.innerHTML =
+    st.status === "waiting"
+      ? `${remote.qr(st.url)}<b class="lv-rm-code">${st.code}</b><span class="lv-lbl">OR OPEN ${esc(location.host)}/live/remote/ AND TYPE THE CODE · 10 MIN</span>`
+      : st.status === "connected"
+        ? `<span class="lv-lbl">THE PHONE CONTROLS THE SHOW · IF IT DROPS, NOTHING STOPS</span>`
+        : "";
+}
+
+/* ---------- 10 · pad lights (KeyLab and others that light a pad on note-on) ---------- */
+const lights = { on: store.get("padLights", false), sent: new Map() };
+function lightOn(name) {
+  if (/^(ECHO|REVERB|CRUSH)$/.test(name)) return !!FXON[name.toLowerCase()];
+  if (name === "CROWD") return S.crowd;
+  if (name === "PANIC") return S.panic;
+  if (name.startsWith("LOOP ")) return engine.loop?.bars === +name.slice(5);
+  if (name.startsWith("CUE ")) return cueList.some((c) => c.id === name.slice(4) && c.t != null);
+  if (name.startsWith("PAD ")) return /^PAD [ZXCV]$/.test(name) && !!voxChops["ZXCV".indexOf(name[4])];
+  if (name === "BUILD-UP") return !!moves?.st.build;
+  if (name === "BREAKDOWN") return !!moves?.st.breakdown;
+  if (name === "PLAY") return engine.playing;
+  return false;
+}
+function syncLights() {
+  if (!lights.on || !midi.access) return;
+  const outs = [...midi.access.outputs.values()];
+  if (!outs.length) return;
+  for (const [id, name] of Object.entries(midiMap)) {
+    if (!id.startsWith("note:")) continue;
+    const on = lightOn(name);
+    if (lights.sent.get(id) === on) continue;
+    lights.sent.set(id, on);
+    const [, ch, note] = id.split(":").map(Number);
+    for (const o of outs)
+      try {
+        o.send([0x90 | ch, note, on ? 127 : 0]);
+      } catch {
+        /* */
+      }
+  }
+}
+
 /* ---------- 02 · show clock + curfew ---------- */
 const hhmm = (d) => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 function clock() {
@@ -816,6 +975,20 @@ const FADERS = [
   ],
 ];
 const CTL = {}; // name -> {set(v 0..1), press(on)}
+const FXON = {}; // echo / reverb / crush on?
+// the moves (09) switch effects too: keep the buttons and the state in step
+function fxUI(fx, on) {
+  FXON[fx] = on;
+  $(`[data-fx="${fx}"]`)?.classList.toggle("on", on);
+}
+// one way in for the phone remote (11) and anything else: a press (down / up) or a level (0..1)
+function control(name, v) {
+  const ctl = CTL[name];
+  if (!ctl) return;
+  if (typeof v === "number") return ctl.set?.(v);
+  if (!ctl.press || (v === false && !ctl.hold)) return;
+  ctl.press(v);
+}
 function setVox(v) {
   S.vox = v;
   engine.setVox(v);
@@ -884,7 +1057,11 @@ function setFilter(v) {
   engine.setFilter(Math.abs(S.filter) < 0.04 ? 0 : S.filter);
 }
 function wireControls() {
-  $("#playBtn").onclick = () => !S.locked && (engine.playing ? engine.pause() : engine.play());
+  $("#playBtn").onclick = () =>
+    !S.locked && (engine.playing ? (engine.pause(), moves?.reset()) : engine.play());
+  CTL.PLAY = { press: (d) => d !== false && $("#playBtn").click() };
+  CTL.PREV = { press: (d) => d !== false && $("#prevBtn").click() };
+  CTL.NEXT = { press: (d) => d !== false && $("#nextBtn").click() };
   $("#prevBtn").onclick = () => {
     if (S.locked) return;
     const t = engine.now(),
@@ -899,7 +1076,7 @@ function wireControls() {
   // FX: they fire the moment the button goes down (not on release). ECHO / REVERB / CRUSH: a tap turns
   // them on or off; holding more than 1/4 s from off is a throw (on only while held). ROLL and TAPE STOP
   // are held, and slip: on release the set carries on where it would have been, in time.
-  const fxOn = {};
+  const fxOn = FXON;
   const HOLD_MS = 250;
   $$("[data-fx]").forEach((b) => {
     const fx = b.dataset.fx;
@@ -992,6 +1169,7 @@ function wireControls() {
   $("#panicBtn").onclick = () => {
     S.panic = !S.panic;
     engine.panic(S.panic);
+    if (S.panic) moves?.reset();
     $("#panicBtn").classList.toggle("on", S.panic);
     $("#panicBtn span").textContent = S.panic ? "FADED · TAP TO RESTORE" : "PANIC · FADE";
   };
@@ -1021,6 +1199,8 @@ function wireControls() {
       $("#playBtn").click();
       return;
     }
+    if (e.shiftKey && /^Digit[1-4]$/.test(e.code) && !e.repeat)
+      return moves?.fire(MOVES[+e.code.slice(5) - 1]);
     const cue = /^Digit[5-8]$/.test(e.code) ? CUE_IDS[+e.code.slice(5) - 5] : null;
     if (cue && !e.repeat) return e.shiftKey ? storeCue(cue) : fireCue(cue);
     const pad = PAD_DEFS.find((p) => p.key === e.key.toUpperCase());
@@ -1064,7 +1244,14 @@ function setMenu(o) {
   burger.classList.toggle("is-open", o);
   burger.setAttribute("aria-label", o ? "Close menu" : "Open menu");
 }
-const DRAWERS = { setlist: "#drawer", voice: "#voiceDrawer", notes: "#notesDrawer" };
+const DRAWERS = {
+  setlist: "#drawer",
+  voice: "#voiceDrawer",
+  notes: "#notesDrawer",
+  rehearse: "#rehearseDrawer",
+  remote: "#remoteDrawer",
+  ctrl: "#ctrlDrawer",
+};
 function openDrawer(name) {
   for (const [v, sel] of Object.entries(DRAWERS)) {
     $(sel).hidden = v !== name;
@@ -1073,6 +1260,10 @@ function openDrawer(name) {
   if (name === "setlist") ($("#setl li.now") || $("#setl li"))?.scrollIntoView({ block: "center" });
   if (name === "notes") notesEd?.open();
   if (name === "voice") voiceUI?.fillDevices();
+  if (name === "rehearse") rehearse?.render();
+  if (name === "remote" && remote && remote.st.status !== "connected" && remote.st.status !== "waiting")
+    remote.pair();
+  if (name === "ctrl") ctrlWiz?.render();
 }
 const drawerOpen = () => Object.keys(DRAWERS).find((v) => !$(DRAWERS[v]).hidden) || null;
 function startMenu() {
@@ -1081,6 +1272,18 @@ function startMenu() {
   $("#drawerX").onclick = () => openDrawer(null);
   $("#voiceX").onclick = () => openDrawer(null);
   $("#notesX").onclick = () => openDrawer(null);
+  $("#rhX").onclick = () => openDrawer(null);
+  $("#ctrlX").onclick = () => openDrawer(null);
+  $("#remoteX").onclick = () => openDrawer(null);
+  $("#rmNew").onclick = () => remote.pair();
+  $("#rmOff").onclick = () => remote.close();
+  $$("[data-open]").forEach(
+    (b) =>
+      (b.onclick = () => {
+        setMenu(false);
+        openDrawer(b.dataset.open);
+      }),
+  );
   $("#micChip").onclick = () => openDrawer(drawerOpen() === "voice" ? null : "voice");
   $("#burger").onclick = () => setMenu(!$("#lvMenu").classList.contains("is-open"));
   addEventListener("keydown", (e) => {
@@ -1180,7 +1383,10 @@ const held = new Map(); // pad key -> repeat timer
 const padLabel = (p) =>
   p.fx ? "HOLD" : p.q === 0 ? "NOW" : p.q === "bar" ? "BAR" : p.q === 1 ? "BEAT" : "1/16";
 function buildPads() {
-  $("#padsPanel").innerHTML = `<div class="lv-padgrid">${PAD_DEFS.map(
+  $("#padsPanel").innerHTML = `<div class="lv-moves">${MOVES.map(
+    (m, i) =>
+      `<button class="lv-move" type="button" data-move-btn="${m}" data-ctl="${m}"><b>${m}</b><small>SHIFT ${i + 1} · ${["8 BARS · DROPS ITSELF", "ON THE 1", "ON / OFF", "INTO THE NEXT SONG"][i]}</small></button>`,
+  ).join("")}</div><div class="lv-padgrid">${PAD_DEFS.map(
     (p) =>
       `<button class="lv-pad${p.vox !== undefined ? " vox" : ""}" data-pad="${p.key}" data-ctl="PAD ${p.key}"><span>${p.name}</span><small>${p.key} · ${padLabel(p)}</small></button>`,
   ).join("")}</div>`;
@@ -1440,6 +1646,7 @@ function onMidi(e) {
   const [st, d1, d2] = e.data;
   const type = st & 0xf0;
   const id = `${type === 0xb0 ? "cc" : "note"}:${st & 0x0f}:${d1}`;
+  if (ctrlWiz?.active() && (type === 0xb0 || (type === 0x90 && d2 > 0)) && ctrlWiz.learn(id)) return;
   if (learnFor && learnFor !== "pick" && (type === 0xb0 || (type === 0x90 && d2 > 0))) {
     midiMap[id] = learnFor;
     try {
@@ -1456,7 +1663,14 @@ function onMidi(e) {
   const ctl = CTL[midiMap[id]];
   if (!ctl) return;
   if (type === 0xb0 && ctl.set) ctl.set(d2 / 127);
-  else if (type === 0x90 && d2 > 0 && ctl.press) ctl.press(true);
+  else if (type === 0xb0 && ctl.press) {
+    // an encoder or a CC button on a press control: up past half = press, back = release
+    const now = performance.now();
+    if (d2 >= 64 && !(ctl.ccAt && now - ctl.ccAt < 300)) {
+      ctl.ccAt = now;
+      ctl.press(true);
+    } else if (d2 < 64 && ctl.hold) ctl.press(false);
+  } else if (type === 0x90 && d2 > 0 && ctl.press) ctl.press(true);
   else if ((type === 0x80 || (type === 0x90 && d2 === 0)) && ctl.press && ctl.hold) ctl.press(false);
 }
 
@@ -1564,4 +1778,17 @@ function songAtT(t) {
 })().catch(() => startGate());
 
 // dev only: lets the local tests reach the engine and timeline (stripped from production builds)
-if (import.meta.env.DEV) window.__live = () => ({ engine, TL, refreshVoxPads, chops: () => voxChops });
+if (import.meta.env.DEV)
+  window.__live = () => ({
+    engine,
+    TL,
+    refreshVoxPads,
+    chops: () => voxChops,
+    moves,
+    remote,
+    ctrlWiz,
+    rehearse,
+    FXON,
+    control,
+    midiMap,
+  });

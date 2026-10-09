@@ -45,7 +45,12 @@ export default defineConfig({
     assetsDir: "_app",
     // three pages: the site, the password-gated Source Vault at /vault/, and the live show at /live/
     rollupOptions: {
-      input: { main: "index.html", vault: "vault/index.html", live: "live/index.html" },
+      input: {
+        main: "index.html",
+        vault: "vault/index.html",
+        live: "live/index.html",
+        remote: "live/remote/index.html",
+      },
     },
   },
 });

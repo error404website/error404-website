@@ -387,10 +387,38 @@ export function makeVoice(app) {
     s.start(when, off, dur);
     sched.word = s;
   }
+  // set time -> ctx time for the next stretch of playback, loops included
+  const ctxOf = (e, t, bt) => {
+    if (e.loop && bt < t) return e.ctx.currentTime + (e.loop.end - t + (bt - e.loop.start)) / e.rate;
+    return e.ctx.currentTime + (bt - t) / e.rate;
+  };
+  let clickedTo = 0; // ctx time up to which clicks are scheduled
   setInterval(() => {
     const e = eng(),
       tl = app.tl();
-    if (!e.playing || e.loop || st.iemMode === "off") return;
+    if (!e.playing) return;
+    // the click (in-ears, or the main output while rehearsing), loops included
+    if ((st.iemMode !== "off" && st.click) || st.clickMain) {
+      const t = e.now(),
+        span = 0.15 * e.rate,
+        c = e.ctx.currentTime;
+      const ranges = [[t, t + span]];
+      if (e.loop && t + span > e.loop.end)
+        ranges.push([e.loop.start, e.loop.start + (t + span - e.loop.end)]);
+      for (const [a, b] of ranges)
+        for (const [bt, pos] of tl.beats) {
+          if (bt < a) continue;
+          if (bt >= b) break;
+          const when = ctxOf(e, t, bt);
+          if (when <= clickedTo + 0.01 || when < c) continue;
+          const s = new AudioBufferSourceNode(ctx, { buffer: clickBuf, playbackRate: pos === 1 ? 1 : 0.75 });
+          const g = new GainNode(ctx, { gain: pos === 1 ? 1 : 0.6 });
+          s.connect(g).connect(E.click);
+          s.start(when);
+          clickedTo = when;
+        }
+    }
+    if (e.loop || st.iemMode === "off") return;
     if (sched.tl !== tl) sched = { ...sched, tl, events: eventsFor(tl), next: 0 };
     const t = e.now(),
       ahead = t + 0.15 * e.rate;
@@ -401,23 +429,25 @@ export function makeVoice(app) {
       const ev = sched.events[sched.next++];
       if (st.cues) say(ev.key, Math.max(ctx.currentTime, e.ctxAt(ev.t)));
     }
-    if (st.click) {
-      if (sched.beat > t + 0.5) sched.beat = -1;
-      for (const [bt, pos] of tl.beats) {
-        if (bt <= sched.beat || bt < t) continue;
-        if (bt >= ahead) break;
-        const s = new AudioBufferSourceNode(ctx, { buffer: clickBuf, playbackRate: pos === 1 ? 1 : 0.75 });
-        const g = new GainNode(ctx, { gain: pos === 1 ? 1 : 0.6 });
-        s.connect(g).connect(E.click);
-        s.start(Math.max(ctx.currentTime, e.ctxAt(bt)));
-        sched.beat = bt;
-      }
-    }
   }, 25);
 
+  let clickMainOn = false;
   return {
     st,
     FX,
+    stream: () => N.stream || null,
+    // 12 · rehearsal: the click on the main output too
+    clickToMain(on) {
+      st.clickMain = on;
+      if (on && !clickMainOn) E.click.connect(eng().master);
+      if (!on && clickMainOn)
+        try {
+          E.click.disconnect(eng().master);
+        } catch {
+          /* */
+        }
+      clickMainOn = on;
+    },
     enableMic,
     disableMic,
     learnRoom,
