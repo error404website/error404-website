@@ -45,30 +45,47 @@ export class Engine {
     this.hi = new BiquadFilterNode(ctx, { type: "highshelf", frequency: 4200 });
     this.lp = new BiquadFilterNode(ctx, { type: "lowpass", frequency: 22000, Q: 0.9 });
     this.hp = new BiquadFilterNode(ctx, { type: "highpass", frequency: 10, Q: 0.9 });
-    this.crushIn = ctx.createGain();
-    this.crush = new WaveShaperNode(ctx, { curve: crushCurve(6), oversample: "none" });
+    // crush bites in the mids: high-passed, driven into 5 bits, a lift at 1.8 kHz
+    this.crush = new WaveShaperNode(ctx, { curve: crushCurve(5, 1.8), oversample: "2x" });
     this.crushWet = ctx.createGain();
     this.crushWet.gain.value = 0;
     this.dry = ctx.createGain();
     this.song.connect(this.lo).connect(this.mid).connect(this.hi).connect(this.lp).connect(this.hp);
     this.hp.connect(this.dry);
-    this.hp.connect(this.crush).connect(this.crushWet);
-    // sends: tempo-synced echo and a reverb
+    this.hp
+      .connect(new BiquadFilterNode(ctx, { type: "highpass", frequency: 220 }))
+      .connect(this.crush)
+      .connect(new BiquadFilterNode(ctx, { type: "peaking", frequency: 1800, Q: 0.8, gain: 4 }))
+      .connect(this.crushWet);
+    // sends: a tempo-synced ping-pong echo (left -> right, darker each repeat) and a reverb
     this.post = ctx.createGain();
     this.dry.connect(this.post);
     this.crushWet.connect(this.post);
     this.echoSend = ctx.createGain();
     this.echoSend.gain.value = 0;
-    this.delay = new DelayNode(ctx, { maxDelayTime: 4, delayTime: 0.3 });
-    this.fb = ctx.createGain();
-    this.fb.gain.value = 0.45;
-    const echoHp = new BiquadFilterNode(ctx, { type: "highpass", frequency: 300 });
-    this.post.connect(this.echoSend).connect(this.delay).connect(echoHp).connect(this.fb).connect(this.delay);
-    echoHp.connect(this.post);
+    this.delayL = new DelayNode(ctx, { maxDelayTime: 4, delayTime: 0.3 });
+    this.delayR = new DelayNode(ctx, { maxDelayTime: 4, delayTime: 0.3 });
+    const fb = new GainNode(ctx, { gain: 0.5 }),
+      dark = new BiquadFilterNode(ctx, { type: "lowpass", frequency: 3200 }),
+      pan = new ChannelMergerNode(ctx, { numberOfInputs: 2 });
+    this.post
+      .connect(this.echoSend)
+      .connect(new BiquadFilterNode(ctx, { type: "highpass", frequency: 350 }))
+      .connect(new GainNode(ctx, { gain: 0.8 }))
+      .connect(this.delayL);
+    this.delayL.connect(dark).connect(this.delayR).connect(fb).connect(this.delayL);
+    this.delayL.connect(pan, 0, 0);
+    this.delayR.connect(pan, 0, 1);
+    pan.connect(this.post);
+    // reverb: a short pre-delay, nothing below 450 Hz, a tail that darkens as it decays
     this.revSend = ctx.createGain();
     this.revSend.gain.value = 0;
-    this.verb = new ConvolverNode(ctx, { buffer: reverbIR(ctx, 2.6) });
-    this.post.connect(this.revSend).connect(this.verb).connect(this.post);
+    this.verb = new ConvolverNode(ctx, { buffer: reverbIR(ctx, 2.2) });
+    this.post
+      .connect(this.revSend)
+      .connect(new BiquadFilterNode(ctx, { type: "highpass", frequency: 450 }))
+      .connect(this.verb)
+      .connect(this.post);
     // pads join after the effects, before the master
     this.pads = ctx.createGain();
     this.pads.gain.value = 0.9;
@@ -142,6 +159,7 @@ export class Engine {
     await this.init();
     if (this.ctx.state !== "running") await this.ctx.resume();
     this.stopVoices();
+    this.slip = null;
     const k = this.songAt(from);
     await this.ready(k);
     this.anchorCtx = this.ctx.currentTime + 0.06;
@@ -153,7 +171,8 @@ export class Engine {
   }
   pause() {
     if (!this.playing) return;
-    this.anchorSet = this.now();
+    this.anchorSet = this.slip ? this.slipTime() : this.now();
+    this.slip = null;
     this.playing = false;
     this.loop = null;
     this.stopVoices();
@@ -281,24 +300,78 @@ export class Engine {
     if (this.playing) this.play(t);
   }
 
-  // tape stop: the record slows to a halt over `sec`, then the set pauses there
-  tapeStop(sec = 0.9) {
-    if (!this.playing) return;
-    const c = this.ctx.currentTime;
+  // restart the set at time t right now (no 60 ms run-up), ducking the song bus over the cut so it
+  // doesn't click; spinFrom < 1 starts the new voices slow and spins them up to speed
+  jump(t, spinFrom = 0) {
+    const k = this.songAt(t);
+    if (!this.bufs.has(`${k}:m`) || !this.bufs.has(`${k}:i`)) return this.play(t);
+    const c = this.ctx.currentTime,
+      at = c + 0.006,
+      g = this.song.gain;
+    g.cancelScheduledValues(c);
+    g.setValueAtTime(g.value, c);
+    g.linearRampToValueAtTime(0, at);
+    g.linearRampToValueAtTime(1, at + 0.008);
     for (const v of this.voices) {
+      try {
+        v.m.stop(at);
+        v.i.stop(at);
+      } catch {
+        /* already stopped */
+      }
+    }
+    this.voices = [];
+    this.loop = null;
+    this.anchorCtx = at;
+    this.anchorSet = t;
+    this.playing = true;
+    const v = this.startSong(k, t);
+    if (spinFrom)
+      for (const n of [v.m, v.i]) {
+        n.playbackRate.setValueAtTime(spinFrom * this.rate, at);
+        n.playbackRate.exponentialRampToValueAtTime(this.rate, at + 0.14);
+      }
+    this.tick();
+    this.onstate();
+  }
+  // where the set would be now if nothing had held it (for slip)
+  slipTime() {
+    return this.slip ? this.slip.t + (this.ctx.currentTime - this.slip.c) * this.rate : this.now();
+  }
+  // roll (slip): loop the 1/16 (or `div` of a beat) we're on right now; on release the set carries on
+  // exactly where it would have been, still in time
+  rollOn(div = 0.25) {
+    if (!this.playing || this.slip) return;
+    const t = this.now(),
+      L = (60 / this.bpmAt(t)) * div,
+      a = Math.max(this.tl.songs[this.songAt(t)].start, this.prevGrid(t, div));
+    this.slip = { t, c: this.ctx.currentTime };
+    this.setLoop(a, a + L);
+  }
+  rollOff() {
+    if (!this.slip || this.slip.tape) return;
+    const t = this.slipTime();
+    this.slip = null;
+    this.jump(t);
+  }
+  // tape stop (hold): the record brakes to a crawl while held; on release it spins back up and carries
+  // on where it would have been
+  tapeOn(sec = 0.9) {
+    if (!this.playing || this.slip) return;
+    const c = this.ctx.currentTime;
+    this.slip = { t: this.now(), c, tape: true };
+    for (const v of this.voices)
       for (const n of [v.m, v.i]) {
         n.playbackRate.cancelScheduledValues(c);
         n.playbackRate.setValueAtTime(this.rate, c);
         n.playbackRate.exponentialRampToValueAtTime(0.02, c + sec);
       }
-    }
-    const t = this.now() + (sec * this.rate) / 4; // roughly where it ends up
-    setTimeout(() => {
-      this.stopVoices();
-      this.playing = false;
-      this.anchorSet = t;
-      this.onstate();
-    }, sec * 1000);
+  }
+  tapeOff() {
+    if (!this.slip?.tape) return;
+    const t = this.slipTime();
+    this.slip = null;
+    this.jump(t, 0.4);
   }
 
   // ---------- mixer ----------
@@ -330,16 +403,18 @@ export class Engine {
   }
   setEcho(on, beats = 0.75) {
     const beat = 60 / this.bpmAt(this.now());
-    this.delay.delayTime.setTargetAtTime(Math.min(3.9, beat * beats), this.ctx.currentTime, 0.01);
-    this.echoSend.gain.setTargetAtTime(on ? 0.55 : 0, this.ctx.currentTime, 0.02);
+    const c = this.ctx.currentTime;
+    for (const d of [this.delayL, this.delayR])
+      d.delayTime.setTargetAtTime(Math.min(3.9, beat * beats), c, 0.01);
+    this.echoSend.gain.setTargetAtTime(on ? 0.6 : 0, c, 0.008);
   }
   setReverb(on) {
-    this.revSend.gain.setTargetAtTime(on ? 0.35 : 0, this.ctx.currentTime, 0.05);
+    this.revSend.gain.setTargetAtTime(on ? 0.45 : 0, this.ctx.currentTime, 0.01);
   }
   setCrush(on) {
     const c = this.ctx.currentTime;
-    this.crushWet.gain.setTargetAtTime(on ? 0.85 : 0, c, 0.01);
-    this.dry.gain.setTargetAtTime(on ? 0.25 : 1, c, 0.01);
+    this.crushWet.gain.setTargetAtTime(on ? 0.8 : 0, c, 0.008);
+    this.dry.gain.setTargetAtTime(on ? 0.35 : 1, c, 0.008);
   }
   panic(on, sec = 1.6) {
     const c = this.ctx.currentTime;
@@ -373,6 +448,17 @@ export class Engine {
     const step = (b1 - b0) * div;
     const k = Math.ceil((t - b0) / step - 1e-6);
     return b0 + k * step;
+  }
+  // the grid line (1/16, beat …) at or before t
+  prevGrid(t, div = 1) {
+    const B = this.tl.beats;
+    let k = 0;
+    while (k + 1 < B.length && B[k + 1][0] <= t + 1e-6) k++;
+    const b0 = B[k] ? B[k][0] : t,
+      b1 = B[k + 1] ? B[k + 1][0] : b0 + 60 / this.bpmAt(t);
+    if (div >= 1) return b0;
+    const step = (b1 - b0) * div;
+    return b0 + Math.floor((t - b0) / step + 1e-6) * step;
   }
   // set time -> ctx time (for scheduling pads on the grid)
   ctxAt(setT) {
@@ -425,23 +511,29 @@ function trim(ctx, raw, frames, pad, fp) {
   return out;
 }
 
-function crushCurve(bits) {
+function crushCurve(bits, drive = 1) {
   const n = 4096,
     steps = Math.pow(2, bits),
     c = new Float32Array(n);
   for (let i = 0; i < n; i++) {
-    const x = (i / (n - 1)) * 2 - 1;
+    const x = Math.tanh(((i / (n - 1)) * 2 - 1) * drive) / Math.tanh(drive);
     c[i] = Math.round(x * steps) / steps;
   }
   return c;
 }
 
-function reverbIR(ctx, sec) {
+// noise tail with a 30 ms pre-delay, low-passed harder as it decays (a darker, cleaner plate)
+function reverbIR(ctx, sec, pre = 0.03) {
   const n = Math.floor(ctx.sampleRate * sec),
-    b = ctx.createBuffer(2, n, ctx.sampleRate);
+    pd = Math.floor(ctx.sampleRate * pre),
+    b = ctx.createBuffer(2, n + pd, ctx.sampleRate);
   for (let c = 0; c < 2; c++) {
     const d = b.getChannelData(c);
-    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3.2);
+    let lp = 0;
+    for (let i = 0; i < n; i++) {
+      lp += ((Math.random() * 2 - 1) * Math.pow(1 - i / n, 2.4) - lp) * (0.35 - 0.25 * (i / n));
+      d[i + pd] = lp;
+    }
   }
   return b;
 }

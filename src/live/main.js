@@ -639,41 +639,51 @@ function wireControls() {
     const k = engine.songAt(engine.now());
     if (TL.songs[k + 1]) engine.seek(TL.songs[k + 1].start);
   };
-  // FX
+  // FX: they fire the moment the button goes down (not on release). ECHO / REVERB / CRUSH: a tap turns
+  // them on or off; holding more than 1/4 s from off is a throw (on only while held). ROLL and TAPE STOP
+  // are held, and slip: on release the set carries on where it would have been, in time.
   const fxOn = {};
+  const HOLD_MS = 250;
   $$("[data-fx]").forEach((b) => {
     const fx = b.dataset.fx;
-    const press = (on) => {
+    let downAt = 0,
+      fromOff = false;
+    const set = (on) => {
+      fxOn[fx] = on;
+      b.classList.toggle("on", on);
+      if (fx === "echo") engine.setEcho(on);
+      if (fx === "reverb") engine.setReverb(on);
+      if (fx === "crush") engine.setCrush(on);
+    };
+    const press = (down) => {
       if (S.locked) return;
       if (fx === "roll") {
-        if (on) {
-          const t = engine.now(),
-            s = engine.nextGrid(t, 0.25),
-            beat = 60 / engine.bpmAt(t);
-          engine.setLoop(Math.max(TL.songs[engine.songAt(t)].start, s - beat / 4), s);
-          b.classList.add("on");
-        } else {
-          engine.clearLoop();
-          b.classList.remove("on");
-        }
-        return;
+        if (down) engine.rollOn(0.25);
+        else engine.rollOff();
+        return b.classList.toggle("on", down && !!engine.slip);
       }
       if (fx === "tapestop") {
-        if (on) engine.tapeStop();
-        return;
+        if (down) engine.tapeOn();
+        else engine.tapeOff();
+        return b.classList.toggle("on", down && !!engine.slip);
       }
-      fxOn[fx] = !fxOn[fx];
-      b.classList.toggle("on", fxOn[fx]);
-      if (fx === "echo") engine.setEcho(fxOn[fx]);
-      if (fx === "reverb") engine.setReverb(fxOn[fx]);
-      if (fx === "crush") engine.setCrush(fxOn[fx]);
+      if (down) {
+        downAt = performance.now();
+        fromOff = !fxOn[fx];
+        set(!fxOn[fx]);
+      } else if (fromOff && fxOn[fx] && performance.now() - downAt > HOLD_MS) set(false);
     };
-    CTL[b.dataset.ctl] = { press };
-    if (fx === "roll") {
-      b.addEventListener("pointerdown", () => press(true));
-      b.addEventListener("pointerup", () => press(false));
-      b.addEventListener("pointerleave", () => b.classList.contains("on") && press(false));
-    } else b.addEventListener("click", () => press(true));
+    CTL[b.dataset.ctl] = { press, hold: true };
+    b.addEventListener("pointerdown", (e) => {
+      try {
+        b.setPointerCapture(e.pointerId); // the release lands here even if the finger slides off
+      } catch {
+        /* */
+      }
+      press(true);
+    });
+    b.addEventListener("pointerup", () => press(false));
+    b.addEventListener("pointercancel", () => press(false));
   });
   // beat loops (bars, from the current bar's downbeat)
   $$("[data-loop]").forEach((b) => {
@@ -690,7 +700,7 @@ function wireControls() {
       engine.onstate();
     };
     CTL[b.dataset.ctl] = { press };
-    b.addEventListener("click", press);
+    b.addEventListener("pointerdown", press);
   });
   // rehearse: loop the current section at 85 %
   $("#rehBtn").onclick = () => {
@@ -755,7 +765,11 @@ function wireControls() {
       return;
     }
     const pad = PAD_DEFS.find((p) => p.key === e.key.toUpperCase());
-    if (pad && !e.repeat) hitPad(pad);
+    if (pad && !e.repeat) padDown(pad);
+  });
+  addEventListener("keyup", (e) => {
+    const pad = PAD_DEFS.find((p) => p.key === e.key.toUpperCase());
+    if (pad) padUp(pad);
   });
   setInterval(broadcast, 500);
 }
@@ -874,76 +888,193 @@ function startLyricRain() {
 }
 
 /* ---------- pads ---------- */
-let voxChops = [];
+// Vocal pads (Z X C V): four chops of the playing song's hook, cut from its own vocal (master minus
+// instrumental) on the word timings: 1 the opening phrase · 2 the punchiest word · 3 the last word ·
+// 4 the longest held word. They fire the instant they're hit, go through the effects like the song, a new
+// hit chokes the one still ringing, and holding one repeats it every 1/8. The next song's chops are cut
+// while the current one plays, so they're ready at the changeover.
+let voxChops = [],
+  lastVox = null;
+const chopCache = new Map(); // song index -> chops
+const held = new Map(); // pad key -> repeat timer
+const padLabel = (p) =>
+  p.fx ? "HOLD" : p.q === 0 ? "NOW" : p.q === "bar" ? "BAR" : p.q === 1 ? "BEAT" : "1/16";
 function buildPads() {
   $("#padsPanel").innerHTML = `<div class="lv-padgrid">${PAD_DEFS.map(
     (p) =>
-      `<button class="lv-pad${p.vox !== undefined ? " vox" : ""}" data-pad="${p.key}" data-ctl="PAD ${p.key}"><span>${p.name}</span><small>${p.key} · ${p.q === "bar" ? "BAR" : p.q === 1 ? "BEAT" : "1/16"}</small></button>`,
+      `<button class="lv-pad${p.vox !== undefined ? " vox" : ""}" data-pad="${p.key}" data-ctl="PAD ${p.key}"><span>${p.name}</span><small>${p.key} · ${padLabel(p)}</small></button>`,
   ).join("")}</div>`;
   $$(".lv-pad").forEach((b) => {
     const pad = PAD_DEFS.find((p) => p.key === b.dataset.pad);
-    CTL[b.dataset.ctl] = { press: () => hitPad(pad) };
-    b.addEventListener("pointerdown", () => hitPad(pad));
+    CTL[b.dataset.ctl] = { press: (down) => (down ? padDown(pad) : padUp(pad)), hold: true };
+    b.addEventListener("pointerdown", (e) => {
+      try {
+        b.setPointerCapture(e.pointerId);
+      } catch {
+        /* */
+      }
+      padDown(pad);
+    });
+    b.addEventListener("pointerup", () => padUp(pad));
+    b.addEventListener("pointercancel", () => padUp(pad));
   });
 }
-async function refreshVoxPads(k) {
-  // the opening words of this song's hook / chorus lines, vocal only
-  voxChops = [];
-  const song = TL.songs[k];
+function chopPicks(song) {
+  const lines = TL.lines.filter((l) => l.n === song.n && l.w.length);
   const hooks = TL.secs.filter((s) => s.n === song.n && /hook|chorus/i.test(s.name));
-  const starts = [];
-  for (const s of hooks) for (const li of s.lines) if (TL.lines[li]) starts.push(TL.lines[li]);
-  const picks = (starts.length ? starts : TL.lines.filter((l) => l.n === song.n))
-    .filter((l, i, a) => a.findIndex((x) => x.text === l.text) === i)
-    .slice(0, 4);
+  const first = hooks[0];
+  const H = first ? first.lines.map((i) => TL.lines[i]).filter((l) => l && l.w.length) : [];
+  const src = H.length ? H : lines;
+  if (!src.length) return [];
+  const wEnd = (l, j) => l.w[j].e ?? l.w[j + 1]?.t ?? l.w[j].t + 0.35;
+  const words = src.flatMap((l) => l.w.map((w, j) => ({ w: w.w, t: w.t, e: wEnd(l, j) })));
+  const open = src[0],
+    j3 = Math.min(2, open.w.length - 1);
+  const lastL = src[src.length - 1],
+    lastJ = lastL.w.length - 1;
+  // each pad is a different moment: later picks skip words an earlier pad already uses
+  return [
+    {
+      w: open.w
+        .slice(0, j3 + 1)
+        .map((w) => w.w)
+        .join(" "),
+      t: open.w[0].t,
+      e: wEnd(open, j3),
+    },
+    { from: words.filter((w) => w.e - w.t > 0.12 && w.e - w.t < 0.45), by: "energy" }, // punchy
+    { w: lastL.w[lastJ].w, t: lastL.w[lastJ].t, e: wEnd(lastL, lastJ) },
+    { from: words, by: "length" }, // the longest held word
+  ];
+}
+async function cutChops(k) {
+  if (chopCache.has(k)) return chopCache.get(k);
+  const song = TL.songs[k];
+  if (!song) return [];
   try {
     await engine.ready(k);
   } catch {
-    return;
+    return [];
   }
   const m = engine.bufs.get(`${k}:m`),
     i = engine.bufs.get(`${k}:i`);
-  voxChops = picks.map((l) => ({
-    buf: vocalChop(engine.ctx, m, i, l.t - song.start, Math.min(0.9, (l.w[1]?.t ?? l.t + 0.6) - l.t + 0.15)),
-    word: l.w[0]?.w || l.text.split(" ")[0],
-  }));
+  if (!m || !i) return [];
+  const at = (t) => t - song.start;
+  const energy = (w) => {
+    const sr = m.sampleRate,
+      a = Math.floor(at(w.t) * sr),
+      b = Math.floor(at(w.e) * sr),
+      M = m.getChannelData(0),
+      I = i.getChannelData(0);
+    let s = 0;
+    for (let x = a; x < b; x++) s += (M[x] - I[x]) ** 2;
+    return s / Math.max(1, b - a);
+  };
+  const used = [];
+  const free = (w) => !used.some((u) => w.t < u.e - 0.02 && w.e > u.t + 0.02);
+  const chops = chopPicks(song).map((p) => {
+    if (p.from) {
+      const score = p.by === "energy" ? energy : (w) => w.e - w.t;
+      p = p.from.filter(free).sort((x, y) => score(y) - score(x))[0];
+      if (!p) return null;
+      p = { ...p, e: Math.min(p.e, p.t + 1.2) };
+    } else if (!free(p) && used.length) return null;
+    used.push(p);
+    const buf = vocalChop(engine.ctx, m, i, at(p.t) - 0.015, at(p.e) + 0.02);
+    return buf ? { buf, word: p.w } : null;
+  });
+  chopCache.set(k, chops);
+  for (const key of [...chopCache.keys()]) if (key !== k && key !== k + 1) chopCache.delete(key);
+  return chops;
+}
+async function refreshVoxPads(k) {
+  const chops = await cutChops(k);
+  if (frame.k !== undefined && frame.k !== k) return; // moved on while cutting: a later call owns the pads
+  voxChops = chops;
   $$(".lv-pad.vox").forEach((b, j) => {
     const c = voxChops[j];
-    $("span", b).textContent = c ? `“${c.word.replace(/[^\w']/g, "").toUpperCase()}”` : `VOX ${j + 1}`;
+    $("span", b).textContent = c ? `“${c.word.replace(/[^\w' ]/g, "").toUpperCase()}”` : `VOX ${j + 1}`;
   });
+  if (TL.songs[k + 1]) cutChops(k + 1); // ready before the changeover
 }
-function hitPad(pad) {
+function flash(pad, when = engine.ctx.currentTime) {
+  const b = $(`.lv-pad[data-pad="${pad.key}"]`);
+  if (!b) return;
+  setTimeout(
+    () => {
+      b.classList.remove("hit");
+      void b.offsetWidth;
+      b.classList.add("hit");
+      setTimeout(() => b.classList.remove("hit"), 120);
+    },
+    Math.max(0, (when - engine.ctx.currentTime) * 1000),
+  );
+}
+function fireVox(pad, when) {
+  const c = voxChops[pad.vox];
+  if (!c) return;
+  if (lastVox) {
+    // choke: one vocal voice at a time
+    const g = lastVox.g.gain;
+    g.cancelScheduledValues(when);
+    g.setValueAtTime(g.value, when);
+    g.linearRampToValueAtTime(0, when + 0.005);
+    try {
+      lastVox.s.stop(when + 0.01);
+    } catch {
+      /* */
+    }
+  }
+  const s = new AudioBufferSourceNode(engine.ctx, { buffer: c.buf }),
+    g = new GainNode(engine.ctx);
+  s.connect(g).connect(engine.song); // through the EQ, filter and effects, like the song
+  s.start(when);
+  lastVox = { s, g };
+  flash(pad, when);
+}
+function padDown(pad) {
   if (S.locked || !engine?.ctx) return;
   const ctx = engine.ctx;
-  const b = $(`.lv-pad[data-pad="${pad.key}"]`);
-  if (b) {
-    b.classList.remove("hit");
-    void b.offsetWidth;
-    b.classList.add("hit");
-    setTimeout(() => b.classList.remove("hit"), 140);
-  }
-  if (pad.fx === "tapestop") return engine.tapeStop();
-  if (pad.fx === "stutter") {
-    const t = engine.now(),
-      beat = 60 / engine.bpmAt(t),
-      s = engine.nextGrid(t, 0.25);
-    engine.setLoop(Math.max(TL.songs[engine.songAt(t)].start, s - beat / 8), s);
-    setTimeout(() => engine.clearLoop(), beat * 1000);
+  if (pad.fx === "tapestop") return (flash(pad), engine.tapeOn());
+  if (pad.fx === "stutter") return (flash(pad), engine.rollOn(0.125));
+  if (pad.vox !== undefined) {
+    const now = ctx.currentTime;
+    fireVox(pad, now);
+    // hold to repeat every 1/8 on the song's grid
+    if (engine.playing) {
+      const step = 30 / engine.bpmAt(engine.now());
+      let next = engine.ctxAt(engine.nextGrid(engine.now() + step * 0.5, 0.5));
+      clearInterval(held.get(pad.key));
+      held.set(
+        pad.key,
+        setInterval(() => {
+          while (next < ctx.currentTime + 0.1) {
+            if (next > now + step * 0.5) fireVox(pad, next);
+            next += step / engine.rate;
+          }
+        }, 25),
+      );
+    }
     return;
   }
-  const buf = pad.vox !== undefined ? voxChops[pad.vox]?.buf : kit?.[pad.name];
+  const buf = kit?.[pad.name];
   if (!buf) return;
-  // quantised to the song's own beat grid while playing
+  // drums quantised to the song's own grid while playing
   let when = ctx.currentTime;
-  if (engine.playing) {
-    const t = engine.now();
-    const g = engine.nextGrid(t, pad.q);
-    const w = engine.ctxAt(g);
+  if (engine.playing && pad.q) {
+    const w = engine.ctxAt(engine.nextGrid(engine.now(), pad.q));
     if (w - ctx.currentTime < (pad.q === "bar" ? 8 : 1.2)) when = Math.max(ctx.currentTime, w);
   }
   const s = new AudioBufferSourceNode(ctx, { buffer: buf });
   s.connect(engine.pads);
   s.start(when);
+  flash(pad, when);
+}
+function padUp(pad) {
+  if (pad.fx === "tapestop") return engine.tapeOff();
+  if (pad.fx === "stutter") return engine.rollOff();
+  clearInterval(held.get(pad.key));
+  held.delete(pad.key);
 }
 
 /* ---------- record ---------- */
@@ -1046,8 +1177,7 @@ function onMidi(e) {
   if (!ctl) return;
   if (type === 0xb0 && ctl.set) ctl.set(d2 / 127);
   else if (type === 0x90 && d2 > 0 && ctl.press) ctl.press(true);
-  else if ((type === 0x80 || (type === 0x90 && d2 === 0)) && ctl.press && midiMap[id] === "ROLL")
-    ctl.press(false);
+  else if ((type === 0x80 || (type === 0x90 && d2 === 0)) && ctl.press && ctl.hold) ctl.press(false);
 }
 
 /* ---------- stage screen (a second window for a projector) ---------- */
@@ -1105,4 +1235,4 @@ function songAtT(t) {
 })().catch(() => startGate());
 
 // dev only: lets the local tests reach the engine and timeline (stripped from production builds)
-if (import.meta.env.DEV) window.__live = () => ({ engine, TL });
+if (import.meta.env.DEV) window.__live = () => ({ engine, TL, refreshVoxPads, chops: () => voxChops });
