@@ -436,6 +436,7 @@ export function makeVoice(app) {
     st,
     FX,
     stream: () => N.stream || null,
+    micNode: () => (st.mic ? N.hp : null), // 16 · the mic, dry (high-passed only), for the show capture
     // 12 · rehearsal: the click on the main output too
     clickToMain(on) {
       st.clickMain = on;
