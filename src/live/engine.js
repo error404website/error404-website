@@ -56,8 +56,11 @@ export class Engine {
     this.crushWet.gain.value = 0;
     this.dry = ctx.createGain();
     this.song.connect(this.lo).connect(this.mid).connect(this.hi).connect(this.lp).connect(this.hp);
-    this.hp.connect(this.dry);
-    this.hp
+    // the effects' input: the song after its EQ / filter, plus the live mic when it goes to the PA (05/06)
+    this.fxIn = ctx.createGain();
+    this.hp.connect(this.fxIn);
+    this.fxIn.connect(this.dry);
+    this.fxIn
       .connect(new BiquadFilterNode(ctx, { type: "highpass", frequency: 220 }))
       .connect(this.crush)
       .connect(new BiquadFilterNode(ctx, { type: "peaking", frequency: 1800, Q: 0.8, gain: 4 }))
@@ -105,7 +108,16 @@ export class Engine {
       attack: 0.002,
       release: 0.1,
     });
-    this.master.connect(this.safety).connect(ctx.destination);
+    this.master.connect(this.safety);
+    this.out = this.safety; // what reaches the PA (07 may route it to outputs 1–2 of a 4-output device)
+    this.safety.connect(ctx.destination);
+    // 07 · taps for the in-ear mix: the guide vocal alone (master minus instrumental, before VOX)
+    this.guide = ctx.createGain();
+    this.guideM = new GainNode(ctx, { gain: 1 });
+    this.guideI = new GainNode(ctx, { gain: -1 });
+    this.guideM.connect(this.guide);
+    this.guideI.connect(this.guide);
+    this.duck = 1; // 05 · auto-duck: how much of the guide vocal is left while you sing
     this.recDest = ctx.createMediaStreamDestination();
     this.safety.connect(this.recDest);
     this.analyser = new AnalyserNode(ctx, { fftSize: 1024 });
@@ -263,6 +275,8 @@ export class Engine {
         stopAt = this.ctxAt(p.b),
         off = Math.max(0, p.off(s0));
       const v = { k, kind: p.kind, part: p, end: stopAt, m: this.src(bm, this.gM), i: this.src(bi, this.gI) };
+      v.m.fade.connect(this.guideM);
+      v.i.fade.connect(this.guideI);
       for (const n of [v.m, v.i]) {
         const g = n.fade.gain;
         if (p.fadeIn && s0 <= p.a + 1e-4) {
@@ -474,13 +488,55 @@ export class Engine {
   }
 
   // ---------- mixer ----------
-  setVox(x) {
-    // x = 1 full vocal; 0 = instrumental (CROWD)
+  setVox(x, tau = 0.015) {
+    // x = 1 full vocal; 0 = instrumental (CROWD). The auto-duck scales it while the singer sings.
     this.vox = x;
     if (!this.ctx) return;
-    const c = this.ctx.currentTime;
-    this.gM.gain.setTargetAtTime(x, c, 0.015);
-    this.gI.gain.setTargetAtTime(1 - x, c, 0.015);
+    const c = this.ctx.currentTime,
+      v = x * this.duck;
+    this.gM.gain.setTargetAtTime(v, c, tau);
+    this.gI.gain.setTargetAtTime(1 - v, c, tau);
+  }
+  // 05 · d = 1 the guide vocal as set; 0.25 = 12 dB under the singer (fast down, slow back up)
+  setDuck(d) {
+    if (Math.abs(d - this.duck) < 1e-3) return;
+    const down = d < this.duck;
+    this.duck = d;
+    this.setVox(this.vox, down ? 0.012 : 0.12);
+  }
+  // 07 · route the PA to outputs 1–2 and `iem` to 3–4 of one 4-output device (an aggregate device), or
+  // back to plain stereo when iem is null
+  routeOutputs(iem) {
+    const ctx = this.ctx,
+      d = ctx.destination;
+    try {
+      this.safety.disconnect(d);
+    } catch {
+      /* */
+    }
+    this.merge?.disconnect();
+    this.merge = null;
+    if (iem && d.maxChannelCount >= 4) {
+      d.channelCount = 4;
+      d.channelCountMode = "explicit";
+      d.channelInterpretation = "discrete";
+      const m = new ChannelMergerNode(ctx, { numberOfInputs: 4 }),
+        pa = new ChannelSplitterNode(ctx, { numberOfOutputs: 2 }),
+        ears = new ChannelSplitterNode(ctx, { numberOfOutputs: 2 });
+      this.safety.connect(pa);
+      pa.connect(m, 0, 0);
+      pa.connect(m, 1, 1);
+      iem.connect(ears);
+      ears.connect(m, 0, 2);
+      ears.connect(m, 1, 3);
+      m.connect(d);
+      this.merge = m;
+      return true;
+    }
+    d.channelCount = 2;
+    d.channelInterpretation = "speakers";
+    this.safety.connect(d);
+    return !iem;
   }
   setEq(band, v) {
     // v in 0..1, cut-only like a DJ mixer: 1 = flat (the song as mastered), turning down cuts the band

@@ -14,11 +14,14 @@ import { rain, REDUCE } from "../lib/rain";
 import { CUE_COLOURS, CUE_IDS, cuesFor, setCue as saveCue } from "./cues";
 import { Engine } from "./engine";
 import { PAD_DEFS, synthKit, vocalChop } from "./pads";
+import { makeNotesEditor, noteFor, reload as reloadNotes, tagLines } from "./notes";
 import { makeRuler } from "./ruler";
 import { startSafety, safetyRows } from "./safety";
 import { ALBUM, deriveTimeline, isAlbum, skipSuggestion } from "./set";
 import { makeSetBuilder } from "./setbuilder";
 import * as store from "./store";
+import { makeVoice } from "./voice";
+import { makeVoiceUI } from "./voiceui";
 import { makeWave, WAVE_H } from "./wave";
 
 const $ = (s, el = document) => el.querySelector(s),
@@ -28,6 +31,7 @@ const esc = (s) =>
   s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const camColour = (c) => `hsl(${((parseInt(c) - 1) * 30 + 300) % 360} 100% ${c.endsWith("B") ? 70 : 60}%)`;
 const STAGE = new URLSearchParams(location.search).has("stage");
+const PROMPTER = new URLSearchParams(location.search).has("prompter"); // 08 · the performer's prompter window
 const SESSION = "e404-live";
 const CACHE = "e404-live-v1";
 const bc = "BroadcastChannel" in window ? new BroadcastChannel("e404-live") : null;
@@ -73,6 +77,7 @@ async function open(raw) {
     const k = await crypto.subtle.importKey("raw", raw, "AES-GCM", false, ["decrypt"]);
     const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64.from(s.iv) }, k, b64.from(s.data));
     BASE = JSON.parse(new TextDecoder().decode(plain));
+    tagLines(BASE);
     TL = BASE;
     setOrder(store.get("order", ALBUM));
     KEY = k;
@@ -195,7 +200,7 @@ $("#gateForm").addEventListener("submit", async (e) => {
       $("#gate").classList.add("out");
       gateRain?.stop();
       setTimeout(() => ($("#gate").hidden = true), 450);
-      STAGE ? startStage() : startPreload();
+      STAGE || PROMPTER ? startStage() : startPreload();
       return;
     }
     const box = $(".gate-box");
@@ -271,6 +276,7 @@ async function preload() {
     console.error(err);
     return;
   }
+  await fetchCached("/live/voice.mp3").catch(() => null); // the in-ears' spoken cues
   btn.hidden = true;
   stat.textContent = `ALL ${jobs.length} FILES LOADED · STORED FOR OFFLINE`;
   await preflight();
@@ -398,6 +404,23 @@ function startShow() {
     outputId: () => outputId,
     onChange: paintSafety,
   });
+  voice = makeVoice({
+    engine: () => engine,
+    tl: () => TL,
+    toast,
+    fetchBytes: fetchCached,
+    onChange: (st) => {
+      voiceUI?.paint();
+      paintMic(st);
+    },
+  });
+  voiceUI = makeVoiceUI($("#voiceDrawer"), voice, { esc, toast });
+  notesEd = makeNotesEditor($("#notesDrawer"), {
+    tl: () => TL,
+    songIndex: () => engine.songAt(heard()),
+    esc,
+    onChange: () => (notesVer++, broadcast()),
+  });
   engine.onstate = () => {
     $("#playBtn").innerHTML = engine.playing ? '<span class="e-pp"></span>' : '<span class="e-pi"></span>';
     $("#playBtn").setAttribute("aria-label", engine.playing ? "Pause" : "Play");
@@ -488,6 +511,7 @@ function frame() {
     sec: $("#lySec"),
     prev: $("#lyPrev"),
     cur: $("#lyCur"),
+    note: $("#lyNote"),
     nxt: $("#lyNxt"),
   });
   renderCue(t, k);
@@ -517,29 +541,31 @@ function lineIndex(t) {
   }
   return ans; // last line that has started
 }
-function renderLyrics(t, el) {
+function renderLyrics(t, el, notes = true) {
   const L = TL.lines;
   const i = lineIndex(t);
   const cur = i >= 0 && t < L[i].e + 0.6 && (!L[i + 1] || t < L[i + 1].t) ? L[i] : null;
   const nx = L[cur ? i + 1 : i + 1] || null;
   const beat = 60 / engine.bpmAt(t);
   const prev = cur ? L[i - 1] : L[i];
-  const key = cur
-    ? `${i}:${cur.w.filter((w) => w.t <= t).length}`
-    : nx
-      ? `c${Math.ceil((nx.t - t) / beat)}:${i}`
-      : "end";
+  const key =
+    (cur
+      ? `${i}:${cur.w.filter((w) => w.t <= t).length}`
+      : nx
+        ? `c${Math.ceil((nx.t - t) / beat)}:${i}`
+        : "end") + `:${notesVer}`;
   if (key === el.key) return;
   el.key = key;
   el.sec.textContent = sectionName(cur || nx, t);
   el.prev.textContent = prev && (!cur || prev !== cur) ? prev.text : "";
   if (cur) {
+    const nb = notes ? noteFor(cur.id)?.b || [] : [];
     el.cur.innerHTML = cur.w.length
       ? cur.w
           .map((w, j) => {
             const sung = w.t <= t,
               now = sung && (!cur.w[j + 1] || cur.w[j + 1].t > t);
-            return `<span class="lv-w${now ? " lv-now" : sung ? " lv-sung" : ""}">${esc(w.w)}</span>`;
+            return `<span class="lv-w${now ? " lv-now" : sung ? " lv-sung" : ""}">${esc(w.w)}</span>${nb.includes(j) ? '<i class="lv-br">⌄</i>' : ""}`;
           })
           .join(" ")
       : `<span class="lv-w lv-now">${esc(cur.text)}</span>`;
@@ -551,6 +577,8 @@ function renderLyrics(t, el) {
   const n1 = cur ? L[i + 1] : nx,
     n2 = cur ? L[i + 2] : L[i + 2];
   el.nxt.textContent = n1 ? n1.text : "";
+  // 08 · the performer's note for this line (or, in a count-in, for the line that's coming)
+  if (el.note) el.note.textContent = notes ? noteFor((cur || nx)?.id)?.note || "" : "";
   if (el.nxt2) el.nxt2.textContent = n2 ? n2.text : "";
 }
 function sectionName(line, t) {
@@ -599,7 +627,26 @@ function renderNext(t, k) {
   $("#nxIn").textContent = `${fmt(nx.start - t)} · ${Math.ceil((nx.start - t) / engine.barLen(t))} BARS`;
 }
 /* ---------- 01 · sets: applying a running order ---------- */
-let setBuilder = null;
+let setBuilder = null,
+  voice = null,
+  voiceUI = null,
+  notesEd = null,
+  notesVer = 0;
+function paintMic(st) {
+  const chip = $("#micChip");
+  if (!chip) return;
+  chip.classList.toggle("on", st.mic);
+  chip.classList.toggle("sing", st.mic && st.singing);
+  chip.querySelector("span").textContent = !st.mic
+    ? "MIC OFF"
+    : st.singing
+      ? st.duckOn
+        ? "SINGING · GUIDE DUCKED"
+        : "SINGING"
+      : st.toPA
+        ? "MIC → PA"
+        : "MIC LISTENING";
+}
 // Stopped: the whole set loads and the playhead goes to its start. Playing: the songs up to the one
 // that's on stay as they are, the rest follow the new order, and the music carries on (a 6 ms duck
 // where the plan switches over).
@@ -990,6 +1037,10 @@ function wireControls() {
   });
   $("#safeChip").onclick = () => ($("#safePanel").hidden = !$("#safePanel").hidden);
 }
+function openPrompter() {
+  window.open("/live/?prompter", "e404-prompter", "popup,width=1280,height=720");
+  setTimeout(broadcast, 800);
+}
 function openStage() {
   window.open("/live/?stage", "e404-stage", "popup,width=1280,height=720");
   setTimeout(broadcast, 800);
@@ -1013,20 +1064,29 @@ function setMenu(o) {
   burger.classList.toggle("is-open", o);
   burger.setAttribute("aria-label", o ? "Close menu" : "Open menu");
 }
-function setDrawer(o) {
-  $("#drawer").hidden = !o;
-  $('[data-view="setlist"]').classList.toggle("on", o);
-  if (o) ($("#setl li.now") || $("#setl li"))?.scrollIntoView({ block: "center" });
+const DRAWERS = { setlist: "#drawer", voice: "#voiceDrawer", notes: "#notesDrawer" };
+function openDrawer(name) {
+  for (const [v, sel] of Object.entries(DRAWERS)) {
+    $(sel).hidden = v !== name;
+    $(`[data-view="${v}"]`)?.classList.toggle("on", v === name);
+  }
+  if (name === "setlist") ($("#setl li.now") || $("#setl li"))?.scrollIntoView({ block: "center" });
+  if (name === "notes") notesEd?.open();
+  if (name === "voice") voiceUI?.fillDevices();
 }
+const drawerOpen = () => Object.keys(DRAWERS).find((v) => !$(DRAWERS[v]).hidden) || null;
 function startMenu() {
   $$("[data-sync]").forEach((b) => (b.onclick = () => setNudge(+b.dataset.sync)));
   showSync();
-  $("#drawerX").onclick = () => setDrawer(false);
+  $("#drawerX").onclick = () => openDrawer(null);
+  $("#voiceX").onclick = () => openDrawer(null);
+  $("#notesX").onclick = () => openDrawer(null);
+  $("#micChip").onclick = () => openDrawer(drawerOpen() === "voice" ? null : "voice");
   $("#burger").onclick = () => setMenu(!$("#lvMenu").classList.contains("is-open"));
   addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
     if ($("#lvMenu").classList.contains("is-open")) setMenu(false);
-    else if (!$("#drawer").hidden) setDrawer(false);
+    else if (drawerOpen()) openDrawer(null);
     else if (!$("#padsPanel").hidden) $("#padsBtn").click();
   });
   $$("[data-view]").forEach((a) =>
@@ -1036,10 +1096,11 @@ function startMenu() {
       const v = a.dataset.view,
         pads = $("#padsPanel");
       if (v === "stage") return openStage();
+      if (v === "prompter") return openPrompter();
       // PADS and SETLIST toggle: a second click closes what the first one opened
       if (v === "pads") return $("#padsBtn").click();
       if (!pads.hidden) $("#padsBtn").click();
-      setDrawer(v === "setlist" && $("#drawer").hidden);
+      openDrawer(DRAWERS[v] && drawerOpen() !== v ? v : null);
     }),
   );
   // the REC readout in the nav: Nº404 when idle, the recording's running time when recording
@@ -1410,17 +1471,40 @@ function broadcast() {
     rate: engine.rate,
     crowd: S.crowd,
     order: ORDER,
+    notes: notesVer,
   });
 }
+// the stage screen (audience) and, with ?prompter, the performer's prompter: the same synced lyrics,
+// plus breath marks, notes and the next cue, huge, with a mirror for teleprompter glass (M) and the
+// size on + / −
 function startStage() {
   document.body.classList.remove("locked");
   document.body.classList.add("stage-mode");
-  document.title = "Stage Screen · ARCHIVE_404 Live";
+  document.body.classList.toggle("prompter", PROMPTER);
+  document.title = PROMPTER ? "Prompter · ARCHIVE_404 Live" : "Stage Screen · ARCHIVE_404 Live";
   $("#stage").hidden = false;
-  const sky = REDUCE ? null : rain($("#stageRain"), TITLE_WORDS);
+  const sky = REDUCE || PROMPTER ? null : rain($("#stageRain"), TITLE_WORDS);
   let st = { t: 0, wall: Date.now(), playing: false, rate: 1 };
+  if (PROMPTER) {
+    const ps = store.get("prompter", { mirror: false, size: 1 });
+    const apply = () => {
+      document.body.classList.toggle("mirror", ps.mirror);
+      document.body.style.setProperty("--ps", ps.size);
+      store.set("prompter", ps);
+    };
+    apply();
+    $("#stHelp").hidden = false;
+    addEventListener("keydown", (e) => {
+      if (e.key === "m" || e.key === "M") ps.mirror = !ps.mirror;
+      else if (e.key === "+" || e.key === "=") ps.size = Math.min(1.6, +(ps.size + 0.1).toFixed(1));
+      else if (e.key === "-") ps.size = Math.max(0.6, +(ps.size - 0.1).toFixed(1));
+      else return;
+      apply();
+    });
+  }
   if (bc)
     bc.onmessage = (e) => {
+      if (PROMPTER && e.data.notes !== st.notes) reloadNotes(); // edited in the show window
       st = e.data;
       // the show changed its running order: follow it
       if (Array.isArray(st.order) && st.order.join() !== ORDER.join()) {
@@ -1428,7 +1512,13 @@ function startStage() {
         loop.k = undefined;
       }
     };
-  const els = { sec: { textContent: "" }, prev: $("#stPrev"), cur: $("#stCur"), nxt: $("#stNxt") };
+  const els = {
+    sec: { textContent: "" },
+    prev: $("#stPrev"),
+    cur: $("#stCur"),
+    nxt: $("#stNxt"),
+    note: PROMPTER ? $("#stNote") : null,
+  };
   const fakeEngine = { bpmAt: (t) => (TL.songs[songAtT(t)] || {}).bpm || 140, songAt: (t) => songAtT(t) };
   const loop = () => {
     const t = st.playing ? st.t + ((Date.now() - st.wall) / 1000) * st.rate : st.t;
@@ -1440,9 +1530,20 @@ function startStage() {
     }
     if (sky) st.playing ? sky.resume() : sky.pause();
     document.body.classList.toggle("crowd", !!st.crowd);
+    if (PROMPTER) {
+      // the next section, counted in bars (the show's cue, for the performer)
+      const q = TL.secs.find((x) => x.t > t + 0.05 && x.n === TL.songs[k].n);
+      const bar = (4 * 60) / ((TL.songs[k] || {}).bpm || 140);
+      const txt = q
+        ? `${q.name.toUpperCase()} IN ${Math.max(1, Math.ceil((q.t - t) / bar))}`
+        : TL.songs[k + 1]
+          ? `${TL.songs[k + 1].title} IN ${Math.max(1, Math.ceil((TL.songs[k + 1].start - t) / bar))}`
+          : "";
+      if ($("#stCue").textContent !== txt) $("#stCue").textContent = txt;
+    }
     const save = engine;
     engine = fakeEngine;
-    renderLyrics(t, els);
+    renderLyrics(t, els, PROMPTER);
     engine = save;
     requestAnimationFrame(loop);
   };
@@ -1458,7 +1559,7 @@ function songAtT(t) {
 (async () => {
   if (await resume()) {
     $("#gate").hidden = true;
-    STAGE ? startStage() : startPreload();
+    STAGE || PROMPTER ? startStage() : startPreload();
   } else startGate();
 })().catch(() => startGate());
 
