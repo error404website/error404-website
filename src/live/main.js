@@ -278,7 +278,7 @@ async function preflight() {
   row(
     engine.ctx.state === "running",
     "AUDIO OUTPUT",
-    `${engine.ctx.sampleRate} HZ · ${Math.round((engine.ctx.baseLatency || 0) * 1000)} MS`,
+    `${engine.ctx.sampleRate} HZ · ${Math.round(outLag() * 1000)} MS DELAY · LYRICS FOLLOW IT`,
   );
   kit = await synthKit();
   row(true, "PADS", "16 READY (12 SYNTH · 4 VOCAL CHOPS PER SONG)");
@@ -348,10 +348,46 @@ function startShow() {
   toast("SPACE = PLAY / PAUSE · PADS ON 1–4 Q–R A–F Z–V");
 }
 
+/* ---------- S1 · what you hear vs what you see ----------
+   The engine's clock is when audio leaves the browser; it reaches the speakers outputLatency (+ the
+   browser's own baseLatency) later: ~10–40 ms on built-in or wired outputs, 150–300 ms over Bluetooth.
+   Everything drawn (lyrics, cues, counters, waveform, ruler, the stage screen) follows that delay, plus a
+   per-device nudge for rigs that report it wrong (menu: SYNC − / +, kept in this browser). */
+const SYNCKEY = "e404-live-sync";
+let nudge = 0;
+try {
+  nudge = Math.max(-500, Math.min(500, +localStorage.getItem(SYNCKEY) || 0));
+} catch {
+  /* storage blocked: no saved nudge */
+}
+const outLag = () => {
+  const c = engine?.ctx;
+  return c ? (c.outputLatency || 0) + (c.baseLatency || 0) : 0;
+};
+// set time as heard: while playing, the engine's time minus the output delay and the nudge
+const heard = () => (engine.playing ? Math.max(0, engine.now() - outLag() - nudge / 1000) : engine.now());
+function showSync() {
+  const ms = Math.round(outLag() * 1000);
+  $("#syncTxt").textContent = `SYNC ${nudge >= 0 ? "+" : "−"}${Math.abs(nudge)} MS`;
+  $("#syncBk").title = `Output delay ${ms} ms (reported by the browser), plus your nudge`;
+}
+function setNudge(d) {
+  nudge = d === 0 ? 0 : Math.max(-500, Math.min(500, nudge + d));
+  try {
+    localStorage.setItem(SYNCKEY, String(nudge));
+  } catch {
+    /* storage blocked: the nudge lasts for this visit */
+  }
+  showSync();
+  toast(
+    `LYRICS ${nudge === 0 ? "ON THE REPORTED DELAY" : `${Math.abs(nudge)} MS ${nudge > 0 ? "LATER" : "EARLIER"}`}`,
+  );
+}
+
 /* lyrics, cues, counters: every frame */
 let drawRuler = null;
 function frame() {
-  const t = engine.now();
+  const t = heard();
   const k = engine.songAt(t);
   const song = TL.songs[k];
   // bar.beat from the analysed beats
@@ -752,6 +788,8 @@ function setDrawer(o) {
   if (o) ($("#setl li.now") || $("#setl li"))?.scrollIntoView({ block: "center" });
 }
 function startMenu() {
+  $$("[data-sync]").forEach((b) => (b.onclick = () => setNudge(+b.dataset.sync)));
+  showSync();
   $("#drawerX").onclick = () => setDrawer(false);
   $("#burger").onclick = () => setMenu(!$("#lvMenu").classList.contains("is-open"));
   addEventListener("keydown", (e) => {
@@ -1017,7 +1055,7 @@ function onMidi(e) {
 function broadcast() {
   if (!bc || !engine) return;
   bc.postMessage({
-    t: engine.now(),
+    t: heard(),
     wall: Date.now(),
     playing: engine.playing && !engine.loop,
     rate: engine.rate,
