@@ -1709,3 +1709,297 @@ body.crowd .lv-lyr-stage .lv-cur {
 .lv-menu .e4c-l {
   display: inline-block;
 }
+
+/* landscape tablets and small laptops (up to 1180 px): the info row drops its smaller labels so the
+   next song, the set clock, the chips and PANIC each keep their own room */
+@media (max-width: 1180px) {
+  body:not(.phone) .lv-next > .lv-lbl:first-child {
+    display: none;
+  }
+  body:not(.phone) .lv-next {
+    gap: 10px;
+  }
+  body:not(.phone) .lv-next-ttl {
+    font-size: 22px;
+  }
+  body:not(.phone) .lv-mid {
+    gap: 8px;
+  }
+}
+
+/* ================= PH1 · the phone layout ================= */
+/* same parts as the desktop (the vault nav, cue pill, karaoke, waveform, ring knobs, chromatic buttons,
+   drawers); the console becomes a sheet: handle · transport + PANIC · tabs, and the open tab's panel */
+.lv-grab,
+.lv-tabs {
+  display: none;
+}
+body.phone .lv-nav .lv-tele:has(#cam),
+body.phone .lv-nav .lv-tele:has(#setClock),
+body.phone .lv-nav .lv-split,
+body.phone .lv-ruler,
+body.phone .lv-wave-read,
+body.phone .lv-cue-note {
+  display: none;
+}
+body.phone .lv-nav .snav-in {
+  gap: 10px;
+}
+body.phone .lv-nav .e4-lock-tag,
+body.phone .lv-nav .e4-lock-div,
+body.phone .lv-nav .lv-beats {
+  display: none;
+}
+body.phone .lv-nav .lv-tele {
+  gap: 6px;
+}
+body.phone .lv-nav .lv-stat {
+  font-size: 20px;
+}
+body.phone .lv-logo {
+  height: 22px;
+}
+body.phone .lv-cue {
+  margin-top: 8px;
+  padding: 6px 12px;
+  font-size: 8.5px;
+  letter-spacing: 0.22em;
+  gap: 8px;
+}
+body.phone .lv-cue-bars {
+  font-size: 16px;
+}
+body.phone .lv-center {
+  padding: 8px 18px;
+}
+body.phone .lv-sec {
+  margin-bottom: 12px;
+  font-size: 8px;
+}
+body.phone .lv-prev {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+body.phone .lv-cur {
+  font-size: calc(var(--fit, 1) * clamp(34px, 11.5vw, 54px));
+}
+body.phone .lv-nxt {
+  font-size: 20px;
+  margin-top: 10px;
+}
+body.phone .lv-note {
+  font-size: 9px;
+}
+body.phone .lv-wave {
+  margin: 34px 18px 10px;
+}
+body.phone .lv-cues {
+  bottom: calc(100% + 4px);
+  gap: 0;
+}
+body.phone .lv-cue-b {
+  padding: 0 5px;
+  font-size: 7.5px;
+  letter-spacing: 0.1em;
+}
+/* the sheet */
+body.phone .lv-strip {
+  padding: 0 14px calc(10px + env(safe-area-inset-bottom));
+  background: rgba(5, 6, 11, 0.97);
+  border-top: 1px solid var(--hair);
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -24px 60px rgba(0, 0, 0, 0.7);
+  gap: 10px;
+}
+body.phone .lv-grab {
+  display: block;
+  align-self: center;
+  width: 64px;
+  height: 22px;
+  margin-top: 2px;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  position: relative;
+}
+body.phone .lv-grab::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 9px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--t4);
+}
+body.phone .lv-tier-play {
+  display: contents;
+}
+body.phone .lv-grp {
+  opacity: 1;
+}
+body.phone .lv-transport {
+  order: 1;
+  justify-content: space-between;
+  gap: 10px;
+}
+body.phone .lv-transport .lv-btn {
+  min-width: 56px;
+  min-height: 46px;
+  border: 1px solid var(--hair);
+}
+body.phone .lv-play {
+  width: 66px;
+  height: 66px;
+}
+body.phone .lv-transport .lv-panic {
+  margin-left: auto;
+  padding: 0 12px;
+  font-size: 9px;
+  border-color: rgba(255, 59, 92, 0.45);
+}
+body.phone .lv-tabs {
+  order: 2;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+body.phone .lv-tabs .lv-btn {
+  min-height: 36px;
+  border: 1px solid var(--hair);
+  letter-spacing: 0.24em;
+}
+body.phone .lv-tier-info,
+body.phone .lv-knobs,
+body.phone .lv-fx,
+body.phone .lv-strip > .lv-pads {
+  display: none;
+  order: 3;
+}
+body.phone .lv-strip.open[data-tab="fx"] .lv-fx,
+body.phone .lv-strip.open[data-tab="mix"] .lv-knobs,
+body.phone .lv-strip.open[data-tab="set"] .lv-tier-info {
+  display: flex;
+}
+body.phone .lv-strip.open[data-tab="pads"] > .lv-pads:not([hidden]) {
+  display: block;
+}
+/* FX: every effect and loop as a thumb-sized grid */
+body.phone .lv-fx {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  margin: 0;
+}
+body.phone .lv-fx .lv-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+body.phone .lv-fx-div {
+  display: none;
+}
+body.phone .lv-fx .lv-btn,
+body.phone .lv-tier-info .lv-btn {
+  min-height: 44px;
+  padding: 0 6px;
+  border: 1px solid var(--hair);
+  letter-spacing: 0.16em;
+}
+/* MIX: the ring knobs, bigger */
+body.phone .lv-knobs {
+  justify-content: space-between;
+  padding: 6px 0 4px;
+}
+body.phone .lv-kn svg {
+  width: 44px;
+  height: 44px;
+}
+/* SET: next song, clock + chips, the other safety buttons */
+body.phone .lv-tier-info {
+  flex-direction: column;
+  align-items: stretch;
+  height: auto;
+  gap: 10px;
+  border: 0;
+  padding: 2px 0 4px;
+}
+body.phone .lv-tier-info .lv-next {
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+body.phone .lv-mid {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+body.phone .lv-clock {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+body.phone .lv-safety {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+body.phone .lv-safe-panel {
+  min-width: 0;
+  left: 0;
+  right: 0;
+}
+/* PADS: moves, prompts and the 16 pads inside the sheet */
+body.phone .lv-strip > .lv-pads {
+  position: static;
+  max-height: 46vh;
+  overflow: auto;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+body.phone .lv-moves {
+  grid-template-columns: repeat(2, 1fr);
+}
+body.phone .lv-move b {
+  font-size: 18px;
+}
+body.phone .lv-padgrid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+body.phone .lv-pad {
+  height: 62px;
+}
+/* drawers fill the screen under the nav; the toast sits above the sheet */
+body.phone .lv-drawer,
+body.phone .lv-sets {
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  border-left: 0;
+}
+body.phone .lv-toast {
+  bottom: 230px;
+  max-width: calc(100vw - 32px);
+  text-align: center;
+}
+body.phone .lv-menu .e4-inner {
+  padding: calc(64px + 20px) 18px 24px;
+}
+body.phone .lv-menu-grid {
+  grid-template-columns: 1fr;
+  gap: 18px;
+  overflow: auto;
+}
+/* the preload / pre-show check on a phone (or any short screen): scroll instead of being cut off */
+@media (max-width: 700px), (max-height: 760px) {
+  .lv-pre {
+    place-items: start center;
+    overflow-y: auto;
+    padding: calc(28px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));
+  }
+  .lv-pre .gate-rain,
+  .lv-pre .e-glow {
+    position: fixed;
+  }
+}
