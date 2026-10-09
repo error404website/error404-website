@@ -13,6 +13,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Changed
 
+- Live show lyrics sync: the words now follow what you hear, not what the browser has sent. Lyrics, cues, counters, the waveform, the ruler and the stage screen are delayed by the output delay the browser reports (about 10–40 ms on wired outputs, 150–300 ms on Bluetooth). The menu has a SYNC − 10 / 0 / + 10 nudge, remembered per browser, for rigs that report it wrong. The word timings are re-aligned too: a second aligner (wav2vec2) checks every word, word starts snap to the sung onsets, line starts lock to the 16th-note grid where the voice agrees, and runs of words that used to light up together are spread over the vocal (379 squashed words across the set down to 65).
 - Live show menu: PADS and SETLIST now toggle. Clicking one that's already open (lit) closes it, like the console's PADS button, and Esc now also closes the pads.
 - Live show: a set timecode ruler under the nav (R1), like the Source Vault's: ticks every 1.5 s, the time every minute, a magenta notch and number at each song's start, and a gradient playhead a third of the way in while the whole set scrolls past.
 - Live show menu: hovering (or tabbing to) a link now fills it with the whole magenta → cyan gradient, the same as the section you're on, instead of turning it solid white.
