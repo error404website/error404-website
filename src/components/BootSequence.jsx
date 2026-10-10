@@ -35,32 +35,46 @@ function TracklistRain({ drainRef }) {
     const ctx = cv && cv.getContext("2d");
     if (!ctx) return;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const W = window.innerWidth;
-    const H = window.innerHeight;
-    cv.width = W * dpr;
-    cv.height = H * dpr;
-    ctx.scale(dpr, dpr);
-    ctx.textBaseline = "top";
-    const phone = W < 768;
-    // each column streams one track name, top to bottom, with a gap before it repeats
-    const streams = [];
-    LAYERS.forEach((L, li) => {
-      const fs = phone ? L.pfs : L.fs;
-      const n = Math.ceil(W / fs);
-      for (let c = 0; c < n; c++) {
-        if ((c + li) % L.every) continue;
-        streams.push({
-          L,
-          fs,
-          x: c * fs,
-          word: TITLES[(c * 7 + li * 3) % TITLES.length] + "   ",
-          row: (-Math.random() * H * 0.6) / fs,
-          rows: Math.ceil(H / fs),
-          speed: (L.speed[0] + Math.random() * (L.speed[1] - L.speed[0])) / fs, // rows per second
-          colour: columnColour(c / n),
-        });
-      }
-    });
+    let W = 0;
+    let H = 0;
+    let streams = [];
+    // Size the canvas to the overlay. On phones the overlay is the large viewport (100lvh), so the
+    // toolbars sliding in and out never resize it; only a real width change (rotation) rebuilds.
+    const build = () => {
+      W = window.innerWidth;
+      const phone = W < 768;
+      H = phone ? Math.max(window.innerHeight, cv.clientHeight) : window.innerHeight;
+      cv.width = W * dpr;
+      cv.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.textBaseline = "top";
+      ctx.fillStyle = "#030409";
+      ctx.fillRect(0, 0, W, H);
+      // each column streams one track name, top to bottom, with a gap before it repeats
+      streams = [];
+      LAYERS.forEach((L, li) => {
+        const fs = phone ? L.pfs : L.fs;
+        const n = Math.ceil(W / fs);
+        for (let c = 0; c < n; c++) {
+          if ((c + li) % L.every) continue;
+          streams.push({
+            L,
+            fs,
+            x: c * fs,
+            word: TITLES[(c * 7 + li * 3) % TITLES.length] + "   ",
+            row: (-Math.random() * H * 0.6) / fs,
+            rows: Math.ceil(H / fs),
+            speed: (L.speed[0] + Math.random() * (L.speed[1] - L.speed[0])) / fs, // rows per second
+            colour: columnColour(c / n),
+          });
+        }
+      });
+    };
+    build();
+    const onResize = () => {
+      if (window.innerWidth !== W) build();
+    };
+    window.addEventListener("resize", onResize);
     const charAt = (s, r) => s.word[((r % s.word.length) + s.word.length) % s.word.length];
     let raf;
     let last = performance.now();
@@ -93,7 +107,10 @@ function TracklistRain({ drainRef }) {
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+    };
   }, [drainRef]);
   return (
     <canvas
@@ -133,13 +150,39 @@ export function BootSequence({ onComplete }) {
       });
       at(TOTAL_MS, finish);
     }
+    // A tap or any key skips. A swipe does not: on phones the first touch of a scroll used to end
+    // the intro mid-gesture, so only a press that lifts close to where it started counts.
+    let down = null;
     const skip = () => finish();
+    const onDown = (e) => {
+      down = { x: e.clientX, y: e.clientY };
+    };
+    const onUp = (e) => {
+      if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 12) finish();
+      down = null;
+    };
+    const onCancel = () => {
+      down = null;
+    };
+    // nothing scrolls during the intro: holding the page still keeps the phone toolbars put
+    const noScroll = (e) => e.preventDefault();
+    const root = document.documentElement;
+    root.classList.add("e-boot-lock");
     window.addEventListener("keydown", skip);
-    window.addEventListener("pointerdown", skip);
+    window.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointerup", onUp);
+    window.addEventListener("pointercancel", onCancel);
+    window.addEventListener("touchmove", noScroll, { passive: false });
+    window.addEventListener("wheel", noScroll, { passive: false });
     return () => {
       timers.forEach(clearTimeout);
+      root.classList.remove("e-boot-lock");
       window.removeEventListener("keydown", skip);
-      window.removeEventListener("pointerdown", skip);
+      window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      window.removeEventListener("pointercancel", onCancel);
+      window.removeEventListener("touchmove", noScroll);
+      window.removeEventListener("wheel", noScroll);
     };
   }, [finish]);
   const pad = (n) => String(n).padStart(2, "0");

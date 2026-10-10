@@ -15,6 +15,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ### Fixed
 
+- **Intro · phones:** the intro no longer flickers or breaks when you scroll during it. A swipe used to skip it mid-gesture and let the page scroll and the toolbars slide, which stretched the code rain. Now the page holds still while it plays, the rain fills the full screen at a fixed size, and only a tap (or any key) skips it.
 - **Ableton set and Source Vault:** on opening, the menu no longer lights CREDITS (the scroll-spy measured the footer while it was still hidden); nothing is lit while the header is in view.
 - **Ableton set:** the big chapter numbers (01–09) are no longer clipped at the top and bottom; the PDF buttons sit side by side.
 
