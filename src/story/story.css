@@ -171,6 +171,9 @@ a {
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--hair2);
 }
+.top .e-fx-nav {
+  height: 24px;
+}
 .top-logo img {
   display: block;
   height: 24px;
@@ -497,10 +500,21 @@ a {
   background: radial-gradient(closest-side, rgba(3, 4, 9, 0.92), rgba(3, 4, 9, 0.6) 60%, transparent);
   z-index: -1;
 }
-.ov-boot img {
-  width: min(560px, 80vw);
+.ov-logo {
+  position: relative;
+  display: block;
+  width: min(620px, 82vw);
+  aspect-ratio: 1414 / 348;
+  filter: drop-shadow(0 0 2px rgba(255, 0, 229, 0.7)) drop-shadow(0 0 12px rgba(161, 0, 255, 0.3));
+}
+.ov-logo > img {
+  width: 100%;
   height: auto;
-  filter: drop-shadow(0 0 30px rgba(255, 0, 229, 0.35));
+}
+.ov-logo .e-fx-layer {
+  left: 0;
+  top: 0;
+  width: 100%;
 }
 .ov-boot .by {
   font-family: var(--mono);

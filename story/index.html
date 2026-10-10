@@ -39,7 +39,13 @@
     <!-- ================= TOP BAR ================= -->
     <header class="top" id="top">
       <a href="/" class="top-logo" aria-label="ERROR_404 home"
-        ><img src="/assets/error404logo.svg" alt="ERROR404" width="1414" height="348" draggable="false"
+        ><img
+          class="e4-lock-logo"
+          src="/assets/error404logo.svg"
+          alt="ERROR404"
+          width="1414"
+          height="348"
+          draggable="false"
       /></a>
       <span class="top-tag">THE BUILD</span>
       <span class="top-ch" id="topCh" aria-live="polite">00 · THE OVERLOAD</span>
@@ -72,7 +78,9 @@
         </div>
         <div class="ov-flash" id="ovFlash" aria-hidden="true"></div>
         <div class="ov-boot" id="ovBoot">
-          <img src="/assets/error404logo.svg" alt="" width="1414" height="348" draggable="false" />
+          <span class="e-logo-slam ov-logo" role="img" aria-label="ERROR404"
+            ><img src="/assets/error404logo.svg" alt="" width="1414" height="348" draggable="false"
+          /></span>
           <span class="by">NULLSAINT × CACHEGHOST · THE BUILD</span>
           <p class="t">SOME PROJECTS FIT THE MACHINE. <span class="grad">THIS ONE MELTED IT.</span></p>
         </div>
@@ -539,5 +547,7 @@
     </section>
 
     <script type="module" src="/src/story/main.js"></script>
+    <!-- the site's logo behaviours: top-bar draw-on + the reboot screen's torch-lit glitch wordmark -->
+    <script src="/assets/logo-fx.js" defer></script>
   </body>
 </html>

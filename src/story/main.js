@@ -1,6 +1,7 @@
 // The Build (/story/): a scrolling storybook for engineers about how ARCHIVE_404 was made,
 // credited to NULLSAINT × CACHEGHOST. Opens on a thermal camera view of the Mac mini overheating,
 // then one pinned visual per chapter, the AI crew, and credits that roll while the machine cools.
+import "./logo-fx.css";
 import "./story.css";
 import { rain, REDUCE } from "../lib/rain.js";
 import { CHAPTERS } from "../data/chapters.js";
@@ -193,9 +194,9 @@ const ov = (() => {
     ],
     ["CRITICAL.", "THERMAL LIMIT REACHED"],
   ];
-  const WARM = 0.262;
+  const WARM = 0.3195;
   return function update() {
-    // the camera opens already warm (two jobs running, ~58°); scrolling heats it from there
+    // the camera opens already warm (three jobs running, ~65°); scrolling heats it from there
     const raw = through(sec),
       p = WARM + raw * (1 - WARM);
     P = p;
