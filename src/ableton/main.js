@@ -7,6 +7,7 @@
 // transfer) follow src/vault/main.js.
 import "../styles/index.css";
 import "../styles/overrides.css";
+import "../styles/dock.css";
 import "../vault/vault.css";
 import "./ableton.css";
 import { keyField } from "../lib/keyField";

@@ -1,0 +1,42 @@
+/* The few Tailwind utilities and preflight rules the site's PlayerDock markup relies on. /story/ doesn't
+   load Tailwind, so they're defined here, scoped to the dock and kept at single-class weight (:where)
+   so ../styles/dock.css still wins exactly as it does on the site. */
+:where(.e-dock) {
+  line-height: 1.5;
+}
+:where(.e-dock) svg {
+  display: block;
+}
+:where(.e-dock) .flex {
+  display: flex;
+}
+:where(.e-dock) .items-center {
+  align-items: center;
+}
+:where(.e-dock) .justify-center {
+  justify-content: center;
+}
+:where(.e-dock) .shrink-0 {
+  flex-shrink: 0;
+}
+:where(.e-dock) .flex-1 {
+  flex: 1 1 0%;
+}
+:where(.e-dock) .w-full {
+  width: 100%;
+}
+:where(.e-dock) .gap-3 {
+  gap: 0.75rem;
+}
+:where(.e-dock) .text-left {
+  text-align: left;
+}
+:where(.e-dock) .truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+:where(.e-dock) .focus\:outline-none:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
