@@ -43,24 +43,164 @@
     />
   </head>
   <body>
-    <!-- ================= TOP BAR ================= -->
-    <header class="top" id="top">
-      <a href="/" class="top-logo" aria-label="ERROR_404 home"
-        ><img
-          class="e4-lock-logo"
-          src="/assets/error404logo.svg"
-          alt="ERROR404"
-          width="1414"
-          height="348"
-          draggable="false"
-      /></a>
-      <span class="top-tag">THE BUILD</span>
-      <span class="top-ch" id="topCh" aria-live="polite">00 · THE OVERLOAD</span>
-      <button class="top-60" id="open60" type="button" aria-haspopup="dialog" aria-controls="tldr">
-        60 SEC
-      </button>
-      <span class="top-bar" aria-hidden="true"><i id="topBar"></i></span>
-    </header>
+    <!-- ================= the site's menu bar (vault markup) + L1 chapter ruler ================= -->
+    <nav class="snav site-nav" id="snav" aria-label="Story navigation">
+      <div class="nav-glass"></div>
+      <div class="snav-in">
+        <a href="#ov" class="brand-link" data-nav="ov" aria-label="ERROR404 The Build, back to the top"
+          ><span class="e4-lock"
+            ><img
+              src="/assets/error404logo.svg"
+              alt="ERROR404"
+              width="1414"
+              height="348"
+              draggable="false"
+              class="e4-lock-logo"
+              style="
+                height: clamp(26px, 3vw, 32px);
+                width: auto;
+                filter: drop-shadow(0 0 1.5px rgba(255, 0, 229, 0.7))
+                  drop-shadow(0 0 10px rgba(161, 0, 255, 0.3));
+              "
+            /><span aria-hidden="true" class="e4-lock-div"></span
+            ><span class="e4-lock-tag">THE<br />BUILD</span></span
+          ></a
+        >
+        <div class="links">
+          <a href="#ch-sound" class="e8-link" data-nav="ch-sound"><span class="e8-txt">SOUND</span></a
+          ><a href="#ch-seams" class="e8-link" data-nav="ch-seams"><span class="e8-txt">SEAMS</span></a
+          ><a href="#ch-vault" class="e8-link" data-nav="ch-vault"><span class="e8-txt">VAULT</span></a
+          ><a href="#ch-live" class="e8-link" data-nav="ch-live"><span class="e8-txt">LIVE</span></a
+          ><a href="#ch-ableton" class="e8-link" data-nav="ch-ableton"><span class="e8-txt">RIG</span></a
+          ><a href="#ch-crew" class="e8-link" data-nav="ch-crew"><span class="e8-txt">CREW</span></a>
+        </div>
+        <div class="nright">
+          <span class="e-split e-split-nav"
+            ><button class="e-split-bk" id="open60" type="button" aria-haspopup="dialog" aria-controls="tldr">
+              60 SEC</button
+            ><button class="e-split-dl" data-snd type="button">♪ SOUND</button></span
+          ><button
+            class="e4-burger"
+            id="burger"
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="vmenu"
+          >
+            <span class="e4-ic" aria-hidden="true"
+              ><svg class="e4-p" viewBox="0 0 24 24" fill="none">
+                <defs>
+                  <linearGradient id="vn-cg" gradientUnits="userSpaceOnUse" x1="12" y1="0" x2="21.5" y2="0">
+                    <stop offset="0" stop-color="#FF00E5" />
+                    <stop offset="1" stop-color="#00EFFF" />
+                  </linearGradient>
+                  <filter id="vn-tf" x="-25%" y="-25%" width="150%" height="150%">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.62" numOctaves="3" seed="4" />
+                    <feDisplacementMap
+                      in="SourceGraphic"
+                      scale="1.9"
+                      xChannelSelector="R"
+                      yChannelSelector="G"
+                    />
+                  </filter>
+                </defs>
+                <g filter="url(#vn-tf)">
+                  <path d="M3 5.5l7.2 6.5L3 18.5" stroke="#F4F4F8" stroke-width="3" stroke-linecap="square" />
+                  <rect class="e4-cur" x="12" y="15.9" width="9.5" height="3" fill="url(#vn-cg)" />
+                  <path
+                    d="M5.1 7.6l1.2-.4M8.6 10.9l.9.9M5.4 16.2l1.3.2M15.2 17.6v-.9M18.8 17.7v-.8"
+                    stroke="#000"
+                    stroke-width=".8"
+                  />
+                </g></svg
+              ><svg class="e4-x" viewBox="0 0 24 24" fill="none">
+                <g filter="url(#vn-tf)">
+                  <path
+                    d="M4.5 4.5l15 15M19.5 4.5l-15 15"
+                    stroke="#F4F4F8"
+                    stroke-width="3"
+                    stroke-linecap="square"
+                  />
+                </g></svg
+            ></span>
+          </button>
+        </div>
+      </div>
+    </nav>
+    <div class="ruler story-ruler" id="ruler" aria-hidden="true">
+      <span class="mk" data-for="ov"><b>00</b>THE OVERLOAD</span
+      ><span class="mk" data-for="ch-brief"><b>01</b>THE BRIEF</span
+      ><span class="mk" data-for="ch-sound"><b>02</b>THE SOUND</span
+      ><span class="mk" data-for="ch-seams"><b>03</b>THE SEAMS</span
+      ><span class="mk" data-for="ch-site"><b>04</b>THE SITE</span
+      ><span class="mk" data-for="ch-vault"><b>05</b>THE VAULT</span
+      ><span class="mk" data-for="ch-live"><b>06</b>THE LIVE SHOW</span
+      ><span class="mk" data-for="ch-ableton"><b>07</b>THE RIG</span
+      ><span class="mk" data-for="ch-crew"><b>08</b>THE CREW</span
+      ><span class="mk" data-for="end"><b>09</b>CREDITS</span><i class="fill" id="rulerFill"></i
+      ><i class="head" id="rulerHead"></i>
+    </div>
+    <!-- the site's open menu: slat wipe, SYS::OPEN chip, outlined poster links (M1: every chapter), split buttons -->
+    <div
+      class="vmenu e4-menu"
+      id="vmenu"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Story navigation"
+      aria-hidden="true"
+      inert
+    >
+      <div class="e4-sl" style="--i: 0"></div>
+      <div class="e4-sl" style="--i: 1"></div>
+      <div class="e4-sl" style="--i: 2"></div>
+      <div class="e4-sl" style="--i: 3"></div>
+      <div class="e4-sl" style="--i: 4"></div>
+      <div class="e4-sl" style="--i: 5"></div>
+      <div class="e4-inner">
+        <div class="e4-sys">
+          <span class="e8c" style="--c: #ff00e5"><i></i><span>SYS::OPEN</span></span>
+        </div>
+        <nav class="e4-nav m-two" aria-label="Chapters">
+          <a href="#ov" data-nav="ov" class="e4c-link"
+            ><span class="e4c-l">THE OVERLOAD</span><span class="e4c-s"><b>00</b>108.4° · REBOOT</span></a
+          >
+          <a href="#ch-brief" data-nav="ch-brief" class="e4c-link"
+            ><span class="e4c-l">THE BRIEF</span><span class="e4c-s"><b>01</b>20 SONGS · 1 MAC</span></a
+          >
+          <a href="#ch-sound" data-nav="ch-sound" class="e4c-link"
+            ><span class="e4c-l">THE SOUND</span><span class="e4c-s"><b>02</b>PROMPT SPEC</span></a
+          >
+          <a href="#ch-seams" data-nav="ch-seams" class="e4c-link"
+            ><span class="e4c-l">THE SEAMS</span><span class="e4c-s"><b>03</b>19 SEAMS · A/B</span></a
+          >
+          <a href="#ch-site" data-nav="ch-site" class="e4c-link"
+            ><span class="e4c-l">THE SITE</span><span class="e4c-s"><b>04</b>77 PRS</span></a
+          >
+          <a href="#ch-vault" data-nav="ch-vault" class="e4c-link"
+            ><span class="e4c-l">THE VAULT</span><span class="e4c-s"><b>05</b>PBKDF2 · AES-GCM</span></a
+          >
+          <a href="#ch-live" data-nav="ch-live" class="e4c-link"
+            ><span class="e4c-l">THE LIVE SHOW</span><span class="e4c-s"><b>06</b>8,711 WORDS</span></a
+          >
+          <a href="#ch-ableton" data-nav="ch-ableton" class="e4c-link"
+            ><span class="e4c-l">THE RIG</span><span class="e4c-s"><b>07</b>MIDI FEED</span></a
+          >
+          <a href="#ch-crew" data-nav="ch-crew" class="e4c-link"
+            ><span class="e4c-l">THE CREW</span><span class="e4c-s"><b>08</b>NOBODY ALONE</span></a
+          >
+          <a href="#end" data-nav="end" class="e4c-link"
+            ><span class="e4c-l">CREDITS</span><span class="e4c-s"><b>09</b>41° · IDLE</span></a
+          >
+        </nav>
+        <div class="vm-ft">
+          <span class="e-split e-split-menu"
+            ><button class="e-split-bk" data-open60 type="button">60 SEC</button
+            ><button class="e-split-dl" data-print type="button">CASE FILE ↓</button></span
+          ><span class="e-split e-split-menu"
+            ><button class="e-split-dl" data-snd type="button">♪ SOUND ON</button></span
+          >
+        </div>
+      </div>
+    </div>
 
     <!-- ================= 00 · THE OVERLOAD (thermal camera) ================= -->
     <section class="ov" id="ov" data-ch="00 · THE OVERLOAD" data-track="impacted" aria-label="The overload">
@@ -672,57 +812,58 @@
         </div>
       </section>
 
-      <!-- 08 COMICS + ANIME (press shots for now) -->
+      <!-- 08 THE CREW (C3: who checks whom) -->
       <section
         class="chap"
-        id="ch-comics"
-        data-chap="comic"
-        data-ch="08 · COMICS + ANIME"
-        data-track="open_sky"
+        id="ch-crew"
+        data-chap="crew"
+        data-ch="08 · THE CREW"
+        data-track="all_of_me"
         data-temp="75"
         data-jobs="2"
-        aria-labelledby="t-comics"
+        aria-labelledby="t-crew"
       >
         <header class="tc">
           <p class="tc-meta">
-            <span>CHAPTER <b>08</b> / 08</span><span>SCORED BY <b>OPEN_SKY</b></span
-            ><span><b>B♭ MAJOR</b> · 6B</span>
+            <span>CHAPTER <b>08</b> / 08</span><span>SCORED BY <b>ALL_OF_ME</b></span
+            ><span><b>E♭ MAJOR</b> · 5B</span>
           </p>
-          <h2 class="tc-t" id="t-comics" data-t="THE BOOKS">
-            <span class="o">THE BOOKS</span><span class="l" aria-hidden="true">THE BOOKS</span>
+          <h2 class="tc-t" id="t-crew" data-t="THE CREW">
+            <span class="o">THE CREW</span><span class="l" aria-hidden="true">THE CREW</span>
           </h2>
-          <p class="tc-sub">FOUR COMICS IN PRODUCTION · FOUR ANIME SHORTS NEXT</p>
+          <p class="tc-sub">ELEVEN TOOLS · EVERY ONE CHECKED BY ANOTHER · NOBODY TRUSTED ALONE</p>
         </header>
         <div class="chap-body">
           <article class="step">
-            <span class="num">08 · COMICS + ANIME</span>
+            <span class="num">08 · THE CREW</span>
             <div class="talk">
-              <p class="n">
-                <b>NULLSAINT</b>Four books, one per chapter. The press shots set the look: the spiked masks,
-                the violet stage, no faces.
+              <p class="n"><b>NULLSAINT</b>Which model do you trust?</p>
+              <p class="c">
+                <b>CACHEGHOST</b>None of them on their own. Every one has a job, something that checks it, and
+                a failure on record.
               </p>
               <p class="c">
-                <b>CACHEGHOST</b>So the books have to hold that look for hundreds of pages. SDXL in ComfyUI on
-                the same Mac, a face lock for the Subject, and a ControlNet guide traced from each storyboard.
-                Art is text-free; the lettering is live.
+                <b>CACHEGHOST</b>stable-ts times the words and wav2vec2 votes. madmom finds the bars and your
+                vocal stem decides where a seam may fall. Claude Code writes the pull request; nothing merges
+                until we review it.
               </p>
-              <p class="c">
-                <b>CACHEGHOST</b>At 3 minutes a panel, about 1,700 panels is a speed problem, so batches are
-                resumable and every page gets a contact sheet. Four anime shorts, one per chapter, come after
-                the books.
-              </p>
+              <p class="n"><b>NULLSAINT</b>And when they disagree?</p>
+              <p class="c"><b>CACHEGHOST</b>Then it's a human call. That's the job.</p>
             </div>
             <details class="how">
               <summary>HOW IT WORKS</summary>
               <ul>
-                <li>4 books × 88 scripted pages, five movements each, named after the album's tracks.</li>
                 <li>
-                  A face lock at full strength turned every scene into a close-up; it now starts at 20% of the
-                  steps at 0.7, with an explicit shot size.
+                  The cyan links on the map are real cross-checks: stable-ts ↔ wav2vec2, madmom ↔ the vocal
+                  stem, Rubber Band ↔ madmom's pins, Suno ↔ essentia.js, SDXL ↔ the ControlNet guide.
                 </li>
                 <li>
-                  Artist names in the style prompt leaked onto posters as text, so they came out; charts and
-                  data panels are built as live HTML/SVG, never generated.
+                  Red rings mark the tools with a failure on record; tap one to read what went wrong and the
+                  fix.
+                </li>
+                <li>
+                  VIEW SOURCE shows the vote itself: wav2vec2 only moves a word when it agrees with stable-ts
+                  within 150 ms.
                 </li>
               </ul>
             </details>
@@ -730,38 +871,11 @@
           <div class="stage">
             <div class="stage-in">
               <span class="ghost" aria-hidden="true">08<span>08</span></span>
-              <div class="vis" data-vis="comic">
+              <div class="vis" data-vis="crew">
                 <div class="tilt">
                   <div class="flip">
-                    <div class="face front">
-                      <div class="press">
-                        <figure>
-                          <img
-                            src="/assets/brand/press-03.webp"
-                            alt="NULLSAINT and CACHEGHOST in spiked helmets behind the decks under a neon skull"
-                            loading="lazy"
-                          />
-                          <figcaption>PRESS · THE DECKS</figcaption>
-                        </figure>
-                        <figure>
-                          <img
-                            src="/assets/brand/press-01.webp"
-                            alt="NULLSAINT and CACHEGHOST on a festival stage with ARCHIVE_404 on the screen"
-                            loading="lazy"
-                          />
-                          <figcaption>PRESS · THE STAGE</figcaption>
-                        </figure>
-                        <figure>
-                          <img
-                            src="/assets/brand/press-02.webp"
-                            alt="NULLSAINT and CACHEGHOST with mic and guitar under a neon skull"
-                            loading="lazy"
-                          />
-                          <figcaption>PRESS · THE BAND</figcaption>
-                        </figure>
-                      </div>
-                    </div>
-                    <div class="face back" data-src="comic"></div>
+                    <div class="face front"><div class="map" id="crewMap"></div></div>
+                    <div class="face back" data-src="crew"></div>
                   </div>
                 </div>
               </div>
@@ -772,49 +886,94 @@
       </section>
     </div>
 
-    <!-- ================= THE CREW (A4) ================= -->
-    <section
-      class="crew"
-      id="crew"
-      data-ch="09 · THE CREW"
-      data-track="all_of_me"
-      data-temp="72"
-      data-jobs="1"
-      aria-labelledby="crew-h"
-    >
-      <div class="wrap">
-        <span class="kick">THE AI CREW · WHAT EACH ONE DID · WHERE IT FAILED</span>
-        <h2 class="h1" id="crew-h">NOBODY WAS <span class="grad">TRUSTED ALONE.</span></h2>
-      </div>
-      <div class="crew-track" id="crewTrack" tabindex="0" aria-label="The AI crew, scroll sideways"></div>
-    </section>
-
-    <!-- ================= CLOSING: credits roll while the machine cools (C2 + C1) ================= -->
-    <section class="end" id="end" data-ch="10 · COOL DOWN" data-track="better_days" aria-label="Credits">
+    <!-- ================= F2 · the machine cools, then the site's cinematic credits ================= -->
+    <section class="end" id="end" data-ch="09 · CREDITS" data-track="better_days" aria-label="Cool-down">
       <div class="end-stage">
         <canvas class="end-rain" id="endRain" aria-hidden="true"></canvas>
-        <div class="end-temp" aria-hidden="true">
-          <span class="lab" id="endJobs">ALL JOBS COMPLETE</span><b class="grad" id="endTemp">108°</b>
-        </div>
-        <div class="credits" id="credits">
-          <div class="cr"><span class="lab">VOICE · DIRECTION</span><b>NULLSAINT</b></div>
-          <div class="cr"><span class="lab">OPERATOR · SYSTEMS</span><b>CACHEGHOST</b></div>
-          <div class="cr gap"><span class="lab">TAKES</span><b>SUNO</b></div>
-          <div class="cr"><span class="lab">STEMS</span><b>DEMUCS</b></div>
-          <div class="cr"><span class="lab">LYRIC SYNC</span><b>STABLE-TS · WAV2VEC2</b></div>
-          <div class="cr"><span class="lab">BEATS · TIME</span><b>MADMOM · RUBBER BAND</b></div>
-          <div class="cr"><span class="lab">ANALYSIS</span><b>ESSENTIA.JS</b></div>
-          <div class="cr"><span class="lab">PANELS</span><b>SDXL · IP-ADAPTER · CONTROLNET</b></div>
-          <div class="cr"><span class="lab">ENGINEERING PARTNER</span><b>CLAUDE CODE</b></div>
-          <div class="cr gap"><span class="lab">HARDWARE</span><b>ONE MAC MINI · M4 · 16 GB</b></div>
-          <div class="cr"><span class="lab">RECOVERED FROM</span><b class="grad">ARCHIVE_404</b></div>
-        </div>
-        <div class="end-final" id="endFinal">
-          <p class="t">THE MACHINE <span class="grad">SURVIVED.</span></p>
-          <a class="holo" href="/">OPEN THE ARCHIVE →</a>
+        <div class="end-cool">
+          <span class="lab" id="endJobs">ALL JOBS COMPLETE · FANS SPINNING DOWN</span>
+          <b class="grad" id="endTemp">75°</b>
+          <div class="end-bars">
+            <span class="lab">FAN<b id="endFan">2,490</b></span
+            ><span class="lab">JOBS<b id="endJ">2</b></span>
+          </div>
         </div>
       </div>
     </section>
+    <footer class="vfoot" id="vfoot" aria-label="Site footer">
+      <div class="vf-top" aria-hidden="true"></div>
+      <div class="vf-bot" aria-hidden="true"></div>
+      <div class="e-credits vf-credits">
+        <div class="e-cr">
+          <span class="e-cr-r">An</span
+          ><span class="e-cr-v font-heading"><span class="e-grad">ERROR_404</span> PROJECT</span>
+        </div>
+        <div class="e-cr">
+          <span class="e-cr-r">Written &amp; built by</span
+          ><span class="e-cr-v font-heading"
+            ><span class="e-grad">NULLSAINT</span> · <span class="e-grad">CACHEGHOST</span></span
+          >
+        </div>
+        <div class="e-cr">
+          <span class="e-cr-r">With the crew</span
+          ><span class="e-cr-crew"
+            >SUNO <i>·</i> DEMUCS <i>·</i> STABLE-TS <i>·</i> WAV2VEC2 <i>·</i> MADMOM <i>·</i> RUBBER BAND
+            <i>·</i> ESSENTIA.JS <i>·</i> SDXL <i>·</i> IP-ADAPTER <i>·</i> CONTROLNET <i>·</i> CLAUDE
+            CODE</span
+          >
+        </div>
+        <div class="e-cr">
+          <span class="e-cr-r">On one machine</span
+          ><span class="e-cr-s">MAC MINI · M4 · 16 GB · 108.4° PEAK</span>
+        </div>
+        <div class="e-cr">
+          <span class="e-cr-r">In four chapters</span
+          ><span class="e-cr-s">ORIGIN · THE FEED · THE WRECKAGE · WHOLE</span>
+        </div>
+        <div class="e-cr vf-logo">
+          <span
+            role="img"
+            aria-label="ERROR404"
+            class="e-logo e-logo-full"
+            style="
+              opacity: 0.75;
+              filter: drop-shadow(0 0 2px rgba(255, 0, 229, 0.7))
+                drop-shadow(0 0 12px rgba(161, 0, 255, 0.28)) drop-shadow(0 0 80px rgba(255, 0, 229, 0.14))
+                drop-shadow(0 0 160px rgba(161, 0, 255, 0.1));
+            "
+            ><img src="/assets/error404logo.svg" alt="" draggable="false"
+          /></span>
+        </div>
+        <div class="e-cr">
+          <span class="e8c" style="--c: #4ade80"><i></i><span>MACHINE IDLE · 41°C · 0 JOBS</span></span>
+        </div>
+        <div class="e-cr"><a class="holo" href="/">OPEN THE ARCHIVE →</a></div>
+      </div>
+      <div class="e-fbar">
+        <div class="e-fbar-in">
+          <span class="e-fbar-c">© 2026 ERROR_404<span class="e-fbar-x"> · PRODUCED IN THE UK</span></span>
+          <button type="button" class="e-fbar-top" id="backTop">↑ BACK TO TOP</button>
+          <a
+            href="https://github.com/error404website/error404-website"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="e-fbar-gh"
+            aria-label="ERROR_404 on GitHub"
+            ><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <defs>
+                <linearGradient id="e-ghg" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#FF00E5" />
+                  <stop offset="1" stop-color="#00EFFF" />
+                </linearGradient>
+              </defs>
+              <path
+                fill="url(#e-ghg)"
+                d="M12 .5C5.37.5 0 5.87 0 12.5c0 5.3 3.44 9.8 8.21 11.39.6.11.82-.26.82-.58 0-.29-.01-1.04-.02-2.05-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.34-5.47-5.96 0-1.32.47-2.39 1.24-3.23-.12-.31-.54-1.53.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.18.77.84 1.24 1.91 1.24 3.23 0 4.63-2.81 5.65-5.49 5.95.43.37.81 1.1.81 2.22 0 1.6-.01 2.9-.01 3.29 0 .32.22.7.83.58A12.01 12.01 0 0 0 24 12.5C24 5.87 18.63.5 12 .5z"
+              /></svg
+          ></a>
+        </div>
+      </div>
+    </footer>
 
     <!-- ================= W2 vitals + W1 sound (fixed) ================= -->
     <div class="vitals" id="vitals" aria-hidden="true">
@@ -840,6 +999,13 @@
           crew of AI models on one 16 GB Mac mini.
         </p>
         <div class="tldr-grid">
+          <a href="#ov" class="tc-card"
+            ><b>THE OVERLOAD</b
+            ><span
+              >One 16 GB Mac mini ran every job: stem separation, lyric alignment, beat tracking, image
+              generation and a DAW, until it hit 108°.</span
+            ></a
+          >
           <a href="#ch-sound" class="tc-card"
             ><b>THE SOUND</b
             ><span
@@ -882,13 +1048,7 @@
               over.</span
             ></a
           >
-          <a href="#ch-comics" class="tc-card"
-            ><b>THE BOOKS</b
-            ><span
-              >Four comics in production with SDXL, face lock and ControlNet on the same Mac; four anime
-              shorts next.</span
-            ></a
-          >
+
           <a href="#crew" class="tc-card"
             ><b>THE CREW</b
             ><span

@@ -17,7 +17,7 @@
   --mono: "Space Mono", monospace;
   --head: "Bebas Neue", sans-serif;
   --maxw: 1180px;
-  --topH: 54px;
+  --topH: calc(var(--navh, 80px) + 22px);
 }
 @property --foil {
   syntax: "<angle>";
@@ -154,73 +154,107 @@ a {
   box-shadow: 0 0 26px -4px rgba(255, 0, 229, 0.8);
 }
 
-/* ---------------- top bar ---------------- */
-.top {
+/* ---------------- the site's menu bar + slat menu + L1 chapter ruler (rules in site-chrome.css) ---------------- */
+.font-heading {
+  font-family: var(--head);
+  font-weight: 400;
+}
+/* the bar and the ruler float over the page, like the story's old top bar, so the opening keeps its frame */
+.snav {
   position: fixed;
   left: 0;
   right: 0;
-  top: 0;
-  z-index: 40;
-  height: var(--topH);
+}
+/* ten chapters don't fit the bar: the burger and the slat menu are there at every width */
+.snav .e4-burger {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 0 24px;
-  background: rgba(3, 4, 9, 0.78);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--hair2);
 }
-.top .e-fx-nav {
-  height: 24px;
+@media (min-width: 1024px) {
+  .vmenu {
+    display: block;
+  }
+  .vmenu .e4-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
 }
-.top-logo img {
-  display: block;
-  height: 24px;
-  width: auto;
-  filter: drop-shadow(0 0 1.5px rgba(255, 0, 229, 0.7)) drop-shadow(0 0 10px rgba(161, 0, 255, 0.3));
+.m-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 34px;
 }
-.top-tag {
-  font-family: var(--mono);
-  font-size: 9px;
-  letter-spacing: 0.26em;
-  color: var(--t3);
-  border: 1px solid var(--hair);
-  padding: 4px 7px;
+.m-two .e4c-l {
+  font-size: clamp(1.9rem, 6vw, 3.4rem);
 }
-.top-ch {
-  margin-left: auto;
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 0.24em;
-  color: var(--ghost);
+@media (max-width: 380px) {
+  .m-two {
+    grid-template-columns: 1fr;
+  }
 }
-.top-bar {
-  position: absolute;
+/* L1: the vault's ruler, with the chapters for marks, a gradient fill and a playhead */
+.story-ruler {
+  position: fixed;
   left: 0;
   right: 0;
-  bottom: -1px;
+  top: var(--navh);
+  z-index: 55;
+  background-size:
+    100% 5px,
+    0 0;
+}
+.story-ruler .mk {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding: 8px 0 0 5px;
+  border-left: 1px solid rgba(255, 0, 229, 0.6);
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 0.2em;
+  color: var(--t4);
+  white-space: nowrap;
+  transition: color 0.3s;
+}
+.story-ruler .mk b {
+  font-weight: 400;
+  color: var(--mag);
+  margin-right: 6px;
+}
+.story-ruler .mk.on {
+  color: var(--ghost);
+}
+.story-ruler .fill {
+  position: absolute;
+  left: 0;
+  bottom: 0;
   height: 2px;
-}
-.top-bar i {
-  display: block;
-  height: 100%;
-  width: 100%;
+  width: calc(var(--p, 0) * 100%);
   background: var(--grad);
-  transform-origin: 0 0;
-  transform: scaleX(0);
+  box-shadow: 0 0 10px rgba(255, 0, 229, 0.6);
 }
-@media (max-width: 640px) {
-  .top {
-    padding: 0 16px;
-    gap: 10px;
+.story-ruler .head {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--p, 0) * 100%);
+  width: 1px;
+  background: var(--ghost);
+  box-shadow: 0 0 8px var(--mag);
+}
+/* narrower screens: numbers only, with the current chapter's name */
+@media (max-width: 1180px) {
+  .story-ruler .mk {
+    font-size: 0;
   }
-  .top-tag {
-    display: none;
+  .story-ruler .mk b {
+    font-size: 8px;
   }
-  .top-ch {
-    font-size: 8.5px;
-    letter-spacing: 0.18em;
+  .story-ruler .mk.on {
+    font-size: 8px;
+    background: var(--void);
+    padding-right: 6px;
+    z-index: 1;
   }
 }
 
@@ -1486,135 +1520,151 @@ a {
   }
 }
 
-/* stage: COMICS (the press shots for now) */
-@keyframes press {
-  0% {
-    opacity: 0;
-    transform: scale(1.02);
-  }
-  4%,
-  30% {
-    opacity: 1;
-  }
-  36%,
-  100% {
-    opacity: 0;
-    transform: scale(1.12);
-  }
-}
-.press {
+/* stage: THE CREW (C3) · who checks whom */
+.map {
   position: relative;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  clip-path: inset(0);
-  border: 1px solid var(--hair);
-}
-.press figure {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  animation: press 15s linear infinite;
-}
-.press figure:nth-child(2) {
-  animation-delay: 5s;
-}
-.press figure:nth-child(3) {
-  animation-delay: 10s;
-}
-.press img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.press figcaption {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 40px 14px 14px;
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 0.24em;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
-}
-
-/* ---------------- the crew (A4) ---------------- */
-.crew {
-  padding: 140px 0 120px;
-}
-.crew-track {
-  margin-top: 46px;
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding: 10px max(28px, calc((100vw - var(--maxw)) / 2 + 28px)) 26px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 0, 229, 0.5) transparent;
-}
-.cc {
-  flex: none;
-  width: 250px;
-  min-height: 340px;
-  scroll-snap-align: start;
-  border: 1px solid transparent;
-  background:
-    linear-gradient(#07080f, #07080f) padding-box,
-    conic-gradient(from var(--foil), #ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5) border-box;
-  animation: foil 6s linear infinite;
-  padding: 18px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+.map svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.map .edge {
+  stroke: rgba(244, 244, 248, 0.14);
+  stroke-width: 1.2;
+  fill: none;
+}
+.map .edge.check {
+  stroke: rgba(0, 239, 255, 0.55);
+  stroke-dasharray: 4 6;
+  animation: dash 1.2s linear infinite;
+}
+@keyframes dash {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+.map .node {
+  cursor: pointer;
+}
+.map .node rect {
+  fill: #05060b;
+  stroke: rgba(244, 244, 248, 0.22);
+}
+.map .node:hover rect,
+.map .node:focus-visible rect {
+  stroke: rgba(255, 0, 229, 0.6);
+}
+.map .node:focus-visible {
+  outline: none;
+}
+.map .node.on rect {
+  stroke: url(#cmg);
+  stroke-width: 2;
+}
+.map .node text {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 1.6px;
+  fill: var(--ghost);
+}
+.map .node .fx {
+  fill: none;
+  stroke: var(--red);
+  stroke-width: 1.4;
+  animation: blink 1.6s infinite;
+}
+.map .hub rect {
+  fill: url(#cmg);
+}
+.map .hub text {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 1.6px;
+  font-weight: 700;
+  fill: #000;
+}
+.map-info {
+  border: 1px solid var(--hair);
+  background: rgba(3, 4, 9, 0.9);
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 18px;
+  font-weight: 300;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ghost);
+  min-height: 150px;
+}
+.map-info b {
+  grid-column: 1/-1;
+  display: flex;
+  align-items: baseline;
   gap: 10px;
-  transition: transform 0.3s;
+  font-family: var(--head);
+  font-weight: 400;
+  font-size: 30px;
+  letter-spacing: 0.04em;
+  line-height: 1;
 }
-.cc:hover {
-  transform: translateY(-4px);
+.map-info b em {
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.26em;
+  color: var(--mag);
 }
-.cc .role {
+.map-info b .st {
+  margin-left: auto;
+  font-size: 22px;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.map-info .job {
+  grid-column: 1/-1;
+  color: var(--t2);
+}
+.map-info span {
+  display: block;
   font-family: var(--mono);
   font-size: 8.5px;
   letter-spacing: 0.24em;
-  color: var(--mag);
+  color: var(--cyan);
+  margin-bottom: 3px;
 }
-.cc b {
-  font-family: var(--head);
-  font-weight: 400;
-  font-size: 34px;
-  letter-spacing: 0.04em;
-  line-height: 0.95;
-}
-.cc p {
-  font-family: var(--mono);
-  font-size: 10.5px;
-  line-height: 1.7;
-  color: var(--t2);
-}
-.cc .fail {
-  font-family: var(--mono);
-  font-size: 9.5px;
-  line-height: 1.65;
-  color: var(--t3);
-  border-left: 2px solid var(--red);
-  padding-left: 8px;
-}
-.cc .fail::before {
-  content: "FAILED · ";
+.map-info span.bad {
   color: var(--red);
-  letter-spacing: 0.16em;
 }
-.cc .st {
-  margin-top: auto;
-  font-family: var(--head);
-  font-size: 22px;
-  letter-spacing: 0.04em;
+.map-info span.ok {
+  color: var(--led);
+}
+@media (max-width: 900px) {
+  .map-info {
+    grid-template-columns: 1fr;
+    font-size: 12px;
+    min-height: 0;
+    padding: 10px 12px;
+  }
+  .map-info .job {
+    display: none;
+  }
+  .map-info b {
+    font-size: 22px;
+  }
 }
 
-/* ---------------- closing: credits + cool-down ---------------- */
+/* ---------------- closing (F2): the machine cools, then the site's cinematic credits ---------------- */
 .end {
-  height: 420vh;
+  height: 240vh;
   position: relative;
 }
 .end-stage {
@@ -1624,6 +1674,9 @@ a {
   height: 100svh;
   overflow: hidden;
   clip-path: inset(0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .end-rain {
   position: absolute;
@@ -1635,82 +1688,56 @@ a {
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(closest-side, rgba(3, 4, 9, 0.9), rgba(3, 4, 9, 0.5));
+  background: radial-gradient(closest-side, rgba(3, 4, 9, 0.9), rgba(3, 4, 9, 0.4));
   pointer-events: none;
 }
-.end-temp {
-  position: absolute;
-  left: 24px;
-  bottom: 28px;
-  z-index: 3;
-}
-.end-temp b {
-  display: block;
-  font-family: var(--head);
-  font-weight: 400;
-  font-size: clamp(54px, 8vw, 110px);
-  line-height: 0.9;
-}
-.credits {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  z-index: 3;
-  text-align: center;
-  will-change: transform;
-}
-.cr {
-  padding: 22px 16px;
-}
-.cr.gap {
-  margin-top: 60px;
-}
-.cr b {
-  display: block;
-  margin-top: 6px;
-  font-family: var(--head);
-  font-weight: 400;
-  font-size: clamp(30px, 4vw, 52px);
-  letter-spacing: 0.06em;
-  line-height: 1;
-}
-.end-final {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
+.end-cool {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 26px;
+  gap: 10px;
   text-align: center;
-  opacity: 0;
-  pointer-events: none;
-  padding: 0 20px;
 }
-.end-final.on {
-  pointer-events: auto;
-}
-.end-final .t {
+.end-cool > b {
   font-family: var(--head);
-  font-size: clamp(46px, 8vw, 110px);
-  letter-spacing: 0.03em;
-  line-height: 0.92;
+  font-weight: 400;
+  font-size: clamp(96px, 16vw, 230px);
+  line-height: 0.85;
+}
+.end-bars {
+  display: flex;
+  gap: 26px;
+}
+.end-bars b {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--head);
+  font-weight: 400;
+  font-size: 32px;
+  letter-spacing: 0.02em;
+  color: var(--ghost);
+}
+.e-cr-crew {
+  display: block;
+  max-width: 760px;
+  margin: 0 auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  line-height: 2;
+  color: var(--t2);
+}
+.e-cr-crew i {
+  font-style: normal;
+  color: var(--t4);
+}
+.vf-credits .holo {
+  margin-top: 6px;
 }
 
 /* ---------------- W2 vitals HUD · W1 sound · 60 SEC button ---------------- */
-.top-60 {
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 0.24em;
-  color: var(--ghost);
-  border: 1px solid transparent;
-  padding: 6px 10px;
-  background:
-    linear-gradient(#07080f, #07080f) padding-box,
-    var(--grad) border-box;
-}
 .vitals {
   position: fixed;
   left: 18px;
@@ -1815,7 +1842,8 @@ a {
   color: var(--t4);
 }
 body.sheet-open .snd,
-body.sheet-open .vitals {
+body.sheet-open .vitals,
+body.at-foot .snd {
   opacity: 0;
   pointer-events: none;
 }
@@ -1837,10 +1865,6 @@ body.sheet-open .vitals {
   .snd-t,
   .snd-l {
     display: none;
-  }
-  .top-60 {
-    padding: 5px 7px;
-    font-size: 8.5px;
   }
 }
 
@@ -2006,7 +2030,6 @@ body.sheet-open .vitals {
   .tc-t .l,
   .tc-t::before,
   .tc-t::after,
-  .press figure,
   .snd.on .eq i,
   .ov-hint,
   .ov-rec i {
@@ -2015,10 +2038,8 @@ body.sheet-open .vitals {
   .prs-roll {
     animation: none;
   }
-  .press figure:first-child {
-    opacity: 1;
-  }
-  .cc,
+  .map .edge.check,
+  .map .node .fx,
   .holo {
     animation: none;
   }
