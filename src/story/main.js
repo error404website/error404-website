@@ -88,6 +88,7 @@ function topBar() {
 /* ================= 00 · the overload: thermal camera ================= */
 const ov = (() => {
   const sec = $("#ov"),
+    stage = $(".ov-stage", sec),
     cv = $("#ovHeat"),
     ctx = cv.getContext("2d"),
     FW = 160,
@@ -226,8 +227,12 @@ const ov = (() => {
     rainFx = null,
     scale = 1;
   const size = () => {
-    cv.width = cv.clientWidth;
-    cv.height = cv.clientHeight;
+    // phone toolbars sliding in and out fire resize; resetting the canvas would blank it, so only do it
+    // when its box really changed (the stage is 100lvh, so that's rotation or a desktop resize)
+    if (cv.width !== cv.clientWidth || cv.height !== cv.clientHeight) {
+      cv.width = cv.clientWidth;
+      cv.height = cv.clientHeight;
+    }
     const W = cv.width,
       H = cv.height,
       s = Math.min(Math.max(W / FW, H / FH), W / 56),
@@ -341,7 +346,9 @@ const ov = (() => {
   const WARM = 0.3195;
   return function update() {
     // the camera opens already warm (three jobs running, ~65°); scrolling heats it from there
-    const raw = through(sec),
+    // measured against the stage, not innerHeight, which changes as phone toolbars come and go
+    const r = sec.getBoundingClientRect(),
+      raw = Math.min(1, Math.max(0, -r.top / (r.height - stage.offsetHeight))),
       p = WARM + raw * (1 - WARM);
     P = p;
     if (!raf && p < 0.86) raf = requestAnimationFrame(draw);
