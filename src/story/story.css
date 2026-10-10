@@ -1083,23 +1083,67 @@ a {
 .front > .sync {
   padding: 22px;
 }
-.srcbtn {
+/* top right of each visual: the chapter's page on the site (opens in a new tab), and the code flip */
+.srcbar {
   position: absolute;
   right: 0;
   top: 18px;
   z-index: 3;
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.srclink,
+.srcbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--mono);
   font-size: 10px;
   letter-spacing: 0.22em;
-  color: var(--ghost);
   padding: 9px 13px;
+  white-space: nowrap;
+}
+.srclink {
+  color: var(--ghost);
   border: 1px solid transparent;
   background:
     linear-gradient(#07080f, #07080f) padding-box,
     conic-gradient(from var(--foil), #ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5) border-box;
   animation: foil 6s linear infinite;
 }
-.chap:not(.on) .srcbtn {
+.srclink:hover .l-long,
+.srclink:hover .l-short,
+.srclink:focus-visible .l-long,
+.srclink:focus-visible .l-short {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.srclink .l-short {
+  display: none;
+}
+.srclink .priv {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding-left: 8px;
+  border-left: 1px solid var(--hair);
+  color: var(--t3);
+  font-size: 0.85em;
+}
+.srcbtn {
+  color: var(--t2);
+  border: 1px solid var(--hair);
+  background: #07080f;
+}
+.srcbtn:hover,
+.srcbtn[aria-pressed="true"] {
+  color: var(--ghost);
+  border-color: var(--cyan);
+}
+.chap:not(.on) .srcbar {
   opacity: 0;
   pointer-events: none;
 }
@@ -1163,8 +1207,11 @@ a {
     font-size: clamp(54px, 17vw, 120px);
     white-space: normal;
   }
-  .srcbtn {
+  .srcbar {
     top: 4px;
+  }
+  .srclink,
+  .srcbtn {
     font-size: 9px;
     padding: 7px 10px;
   }
@@ -1231,10 +1278,19 @@ a {
   .how summary {
     padding: 8px 12px;
   }
-  .srcbtn {
+  .srcbar {
     top: 2px;
+  }
+  .srclink,
+  .srcbtn {
     font-size: 9px;
     padding: 6px 9px;
+  }
+  .srclink .l-long {
+    display: none;
+  }
+  .srclink .l-short {
+    display: inline;
   }
 }
 /* portrait tablets keep the vitals readout, so the slide leaves room for it */
@@ -1247,6 +1303,12 @@ a {
 @media (max-width: 600px) and (orientation: portrait) {
   body .vitals {
     display: none;
+  }
+  .srclink .l-long {
+    display: none;
+  }
+  .srclink .l-short {
+    display: inline;
   }
   /* the dots sit right under the line and HOW IT WORKS right under them, just above the dock */
   .slide {

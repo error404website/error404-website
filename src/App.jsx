@@ -24,6 +24,13 @@ export default function App() {
   const finishIntro = React.useCallback(() => setIntroDone(true), []);
   const openDownload = React.useCallback(() => setDownloadOpen(true), []);
   const closeDownload = React.useCallback(() => setDownloadOpen(false), []);
+  // links like /#catalogue (from /story/): the sections only exist once the intro is done, so the
+  // browser's own jump finds nothing; go to the section once they're rendered
+  React.useEffect(() => {
+    if (!introDone || location.hash.length < 2) return;
+    const el = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (el) requestAnimationFrame(() => el.scrollIntoView({ block: "start" }));
+  }, [introDone]);
   return (
     <div className="noise scanline min-h-screen bg-void">
       <a
