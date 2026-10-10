@@ -24,7 +24,14 @@
       property="og:description"
       content="How NULLSAINT × CACHEGHOST and a crew of AI models built ARCHIVE_404 on one Mac mini."
     />
-    <meta property="og:image" content="https://error404.run/assets/og-image-v2.png" />
+    <meta property="og:image" content="https://error404.run/story/og-story.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="The ERROR_404 wordmark over digital rain with the line: Some projects fit the machine. This one melted it."
+    />
+    <meta name="twitter:image" content="https://error404.run/story/og-story.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preload" href="/fonts/bebas-neue-400.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/fonts/fonts.css" />
@@ -49,11 +56,14 @@
       /></a>
       <span class="top-tag">THE BUILD</span>
       <span class="top-ch" id="topCh" aria-live="polite">00 · THE OVERLOAD</span>
+      <button class="top-60" id="open60" type="button" aria-haspopup="dialog" aria-controls="tldr">
+        60 SEC
+      </button>
       <span class="top-bar" aria-hidden="true"><i id="topBar"></i></span>
     </header>
 
     <!-- ================= 00 · THE OVERLOAD (thermal camera) ================= -->
-    <section class="ov" id="ov" data-ch="00 · THE OVERLOAD" aria-label="The overload">
+    <section class="ov" id="ov" data-ch="00 · THE OVERLOAD" data-track="impacted" aria-label="The overload">
       <div class="ov-stage">
         <canvas class="ov-rain" id="ovRain" aria-hidden="true"></canvas>
         <canvas class="ov-heat" id="ovHeat" aria-hidden="true"></canvas>
@@ -89,7 +99,14 @@
     </section>
 
     <!-- ================= LEDE ================= -->
-    <section class="lede" data-ch="01 · THE BRIEF">
+    <section
+      class="lede"
+      id="ch-brief"
+      data-ch="01 · THE BRIEF"
+      data-track="origin"
+      data-temp="104"
+      data-jobs="9"
+    >
       <div class="wrap">
         <span class="kick">ARCHIVE_404 · 20 SONGS · 4 CHAPTERS · 2026</span>
         <h2 class="h1">TWO OPERATORS. <span class="grad">ONE MAC MINI.</span> A CREW OF AI.</h2>
@@ -104,414 +121,667 @@
       </div>
     </section>
 
-    <!-- ================= THE BOOK (sticky stage) ================= -->
-    <section class="book" id="book">
-      <div class="steps" id="steps">
-        <!-- 02 THE SOUND -->
-        <article class="step" data-vis="sound" data-ch="02 · THE SOUND">
-          <span class="num">02</span>
-          <h2 class="h2">THE <span class="grad">SOUND</span></h2>
-          <div class="talk">
-            <p class="n">
-              <b>NULLSAINT</b>Twenty songs that sound like one record. Hyperpop, metalcore, grime, a choir.
-            </p>
-            <p class="c">
-              <b>CACHEGHOST</b>Then the prompt is a spec, not a wish. One master style for the whole album,
-              five production layers to swap, and each track's own tempo, structure and vocal direction on
-              top.
-            </p>
-            <p class="n"><b>NULLSAINT</b>And the lyrics?</p>
-            <p class="c"><b>CACHEGHOST</b>Yours, with section tags telling Suno what each part does.</p>
-          </div>
-          <details class="how">
-            <summary>HOW IT WORKS</summary>
-            <ul>
-              <li>
-                Suno renders every take from three stacked layers: master style → production style → track
-                variables.
-              </li>
-              <li>
-                The five production styles (Arena polish, Raw and live, Glitch-heavy, Cinematic, Lo-fi
-                underground) are drop-in blocks, so a whole remix pass is one swap.
-              </li>
-              <li>
-                Every master was then measured in the browser with essentia.js (RhythmExtractor + three key
-                profiles), and the vault shows how many models agree.
-              </li>
-            </ul>
-          </details>
-        </article>
+    <!-- ================= THE BOOK: one section per chapter (S2 title card + S1 full-bleed body) ================= -->
+    <div class="book" id="book">
+      <canvas class="book-rain" id="bookRain" aria-hidden="true"></canvas>
+      <div class="book-tint" aria-hidden="true"></div>
 
-        <!-- 03 THE SEAMS -->
-        <article class="step" data-vis="seam" data-ch="03 · THE SEAMS">
-          <span class="num">03</span>
-          <h2 class="h2">THE <span class="grad">SEAMS</span></h2>
-          <div class="talk">
-            <p class="n">
-              <b>NULLSAINT</b>I want to perform it as one set. No gaps, and never two vocals on top of each
-              other.
-            </p>
-            <p class="c">
-              <b>CACHEGHOST</b>The first version was a blended DJ mix. Suno drifts in tempo, so every beat was
-              pinned and stretched between pins. It sounded smooth, but it was too long to sing over.
-            </p>
-            <p class="c">
-              <b>CACHEGHOST</b>So the live set keeps each song whole at its own tempo. Each seam goes after
-              the last strong bar and your last sung word. A ring-over tail by default, a glitch roll into a
-              new chapter, and an echo throw where two keys clash.
-            </p>
-            <p class="n"><b>NULLSAINT</b>Play me the one into THE FEED.</p>
-          </div>
-          <details class="how">
-            <summary>HOW IT WORKS</summary>
-            <ul>
-              <li>
-                madmom tracks beats and downbeats; Demucs separates the vocals so the last sung word can be
-                measured, not guessed.
-              </li>
-              <li>
-                19 seams: 16 ring-over tails, 2 glitch rolls (into THE_FEED and WHOLE), 1 echo throw
-                (ENDLESS_GLOW → AWAKE, a 5B → 6A key clash).
-              </li>
-              <li>
-                If two vocals would touch, the seam moves by whole bars. The 72:04 set's files line up with
-                the album masters to within 5 ms.
-              </li>
-              <li>
-                The earlier DJ mix used Rubber Band at a ratio per beat, because its keyframe map can't be
-                passed from Python.
-              </li>
-            </ul>
-          </details>
-        </article>
-
-        <!-- 04 THE SITE -->
-        <article class="step" data-vis="site" data-ch="04 · THE SITE">
-          <span class="num">04</span>
-          <h2 class="h2">THE <span class="grad">SITE</span></h2>
-          <div class="talk">
-            <p class="n">
-              <b>NULLSAINT</b>It has to feel like the album: maximal, glitchy, and fast on a phone.
-            </p>
-            <p class="c">
-              <b>CACHEGHOST</b>Vite and React on Netlify. Every change is a pull request with a CI check and a
-              deploy preview, reviewed before it merges: 77 merged so far.
-            </p>
-            <p class="n"><b>NULLSAINT</b>The holo button broke the whole page in Safari.</p>
-            <p class="c">
-              <b>CACHEGHOST</b>Safari doesn't clip GPU-composited children to overflow:hidden. The fix keeps
-              the effect inside its own box: a registered @property angle animating the border.
-            </p>
-          </div>
-          <details class="how">
-            <summary>HOW IT WORKS</summary>
-            <ul>
-              <li>
-                Audio and logo scripts get content-hash cache-busting, so a new master reaches returning
-                listeners on their next visit.
-              </li>
-              <li>
-                The whole layout scales with CSS zoom between 1280 and 1920 px, so full-window maths divides
-                by the zoom factor.
-              </li>
-              <li>
-                The site is shared by direct link only: robots.txt, meta tags and headers block search
-                engines, AI crawlers and archives.
-              </li>
-            </ul>
-          </details>
-        </article>
-
-        <!-- 05 THE VAULT -->
-        <article class="step" data-vis="vault" data-ch="05 · THE VAULT">
-          <span class="num">05</span>
-          <h2 class="h2">THE <span class="grad">VAULT</span></h2>
-          <div class="talk">
-            <p class="n">
-              <b>NULLSAINT</b>The stems, prompts and lyrics go behind a key. But the repo is public.
-            </p>
-            <p class="c">
-              <b>CACHEGHOST</b>Then the key is the only secret. The content ships encrypted with the key
-              itself and is decrypted in your browser. No account and no server session.
-            </p>
-            <p class="c">
-              <b>CACHEGHOST</b>The stems are too big for that, so one small function hands out short-lived
-              signed links from a private repo, but only to a browser that can prove it knows the key.
-            </p>
-          </div>
-          <details class="how">
-            <summary>HOW IT WORKS</summary>
-            <ul>
-              <li>
-                PBKDF2-SHA256 derives an AES-GCM-256 key; data.enc.json is the only form of the content in the
-                repo.
-              </li>
-              <li>
-                20 stem zips (WAV + MIDI) live on a private GitHub release; one chapter is over GitHub's 2 GB
-                file cap, so ALL STEMS fetches per-track zips.
-              </li>
-              <li>
-                Before release every MP3 was re-tagged and stripped of Suno links and C2PA provenance chunks,
-                with pixel-identical cover art.
-              </li>
-            </ul>
-          </details>
-        </article>
-
-        <!-- 06 THE LIVE SHOW -->
-        <article class="step" data-vis="live" data-ch="06 · THE LIVE SHOW">
-          <span class="num">06</span>
-          <h2 class="h2">THE <span class="grad">LIVE SHOW</span></h2>
-          <div class="talk">
-            <p class="n">
-              <b>NULLSAINT</b>Karaoke lyrics that fill word by word, gapless, and a console I can play.
-            </p>
-            <p class="c">
-              <b>CACHEGHOST</b>Demucs pulls your vocal out of each master. stable-ts times every word, and
-              wav2vec2 votes on each one. 8,711 words across 899 lines.
-            </p>
-            <p class="n"><b>NULLSAINT</b>Why two models?</p>
-            <p class="c">
-              <b>CACHEGHOST</b>On its own, wav2vec2 pulls lines 200–800 ms early onto your breaths. As a vote
-              within 150 ms of stable-ts, it tightens the timing instead.
-            </p>
-          </div>
-          <details class="how">
-            <summary>HOW IT WORKS</summary>
-            <ul>
-              <li>
-                Gapless in a browser: Chrome leaves 576 + 529 samples of MP3 priming, which the page trims by
-                matching a stored 64-sample fingerprint.
-              </li>
-              <li>
-                Songs decode one or two ahead (a full decode is about 1.7 GB of RAM); instrumentals and
-                timings are encrypted like the vault.
-              </li>
-              <li>
-                A phone remote pairs once through a key-protected function, then talks over direct WebRTC. A
-                KeyLab mk3 plays it over Web MIDI.
-              </li>
-            </ul>
-          </details>
-        </article>
-
-        <!-- 07 ABLETON -->
-        <article class="step" data-vis="feed" data-ch="07 · ABLETON">
-          <span class="num">07</span>
-          <h2 class="h2">THE <span class="grad">ABLETON RIG</span></h2>
-          <div class="talk">
-            <p class="n"><b>NULLSAINT</b>Same show in Ableton Live, with the browser as the backup.</p>
-            <p class="c">
-              <b>CACHEGHOST</b>The .als is written by script from Live's own templates and the /live/
-              timeline. Live gives almost no error output, so every crash was bisected with scripted test
-              loads.
-            </p>
-            <p class="c">
-              <b>CACHEGHOST</b>A Max device sends the song position over MIDI to the browser. Live lets one CC
-              per tick out of a device, so each position frame goes out over six ticks: about 6.7 frames a
-              second. If Ableton dies, the page takes over from the same spot.
-            </p>
-          </div>
-          <details class="how">
-            <summary>HOW IT WORKS</summary>
-            <ul>
-              <li>
-                Crash lessons: plain floats only, unique sibling IDs, reset template sample slices, unseal
-                rebuilt racks, and one Sampler instead of a cloned Instrument Rack.
-              </li>
-              <li>
-                The feed sends CC 110–114 (position in ms) plus CC 115 (playing) on channel 16 over the macOS
-                IAC bus, verified with a Swift CoreMIDI listener.
-              </li>
-              <li>
-                The KeyLab mk3's pads, faders and encoders were measured the same way, then mapped into the
-                generated set.
-              </li>
-            </ul>
-          </details>
-        </article>
-
-        <!-- 08 COMICS + ANIME -->
-        <article class="step" data-vis="comic" data-ch="08 · COMICS + ANIME">
-          <span class="num">08</span>
-          <h2 class="h2">COMICS <span class="grad">+ ANIME</span></h2>
-          <div class="talk">
-            <p class="n">
-              <b>NULLSAINT</b>Four books, one per chapter. Ink noir: hard blacks, violet, magenta, cyan.
-            </p>
-            <p class="c">
-              <b>CACHEGHOST</b>SDXL in ComfyUI on the same Mac. IP-Adapter locks the Subject's face, and a
-              ControlNet guide traced from the storyboard keeps each composition. Art is text-free; the
-              lettering is live.
-            </p>
-            <p class="c">
-              <b>CACHEGHOST</b>At 3 minutes a panel, about 1,700 panels is a speed problem, so batches are
-              resumable and every page gets a contact sheet. Four anime shorts, one per chapter, come after
-              the books.
-            </p>
-          </div>
-          <details class="how">
-            <summary>HOW IT WORKS</summary>
-            <ul>
-              <li>4 books × 88 scripted pages, five movements each, named after the album's tracks.</li>
-              <li>
-                A face lock at full strength turned every scene into a close-up; it now starts at 20% of the
-                steps at 0.7, with an explicit shot size.
-              </li>
-              <li>
-                Artist names in the style prompt leaked onto posters as text, so they came out; charts and
-                data panels are built as live HTML/SVG, never generated.
-              </li>
-            </ul>
-          </details>
-        </article>
-      </div>
-
-      <!-- the pinned stage: one visual per step -->
-      <div class="stage" id="stage">
-        <div class="stage-in">
-          <!-- SOUND: prompt layers -->
-          <div class="vis" data-vis="sound">
-            <div class="layers">
-              <div class="ly">
-                <span class="lab">01 · MASTER STYLE · EVERY TRACK</span>
-                <p>
-                  glitchcore hyperpop metalcore, electronic post-hardcore, UK grime flow, drop-tuned chug
-                  riffs, glitched stutter edits, bitcrushed synth leads, trap hi-hats and 808s…
-                </p>
-              </div>
-              <div class="ly">
-                <span class="lab">02 · PRODUCTION STYLE · PICK ONE</span>
-                <div class="chips">
-                  <span class="chip on">ARENA POLISH</span><span class="chip">RAW AND LIVE</span
-                  ><span class="chip">GLITCH-HEAVY</span><span class="chip">CINEMATIC</span
-                  ><span class="chip">LO-FI UNDERGROUND</span>
+      <!-- 02 THE SOUND -->
+      <section
+        class="chap"
+        id="ch-sound"
+        data-chap="sound"
+        data-ch="02 · THE SOUND"
+        data-track="left_behind"
+        data-temp="99"
+        data-jobs="8"
+        aria-labelledby="t-sound"
+      >
+        <header class="tc">
+          <p class="tc-meta">
+            <span>CHAPTER <b>02</b> / 08</span><span>SCORED BY <b>LEFT_BEHIND</b></span
+            ><span><b>B♭ MAJOR</b> · 6B</span>
+          </p>
+          <h2 class="tc-t" id="t-sound" data-t="THE SOUND">
+            <span class="o">THE SOUND</span><span class="l" aria-hidden="true">THE SOUND</span>
+          </h2>
+          <p class="tc-sub">ONE MASTER STYLE · FIVE LAYERS · TWENTY SONGS</p>
+        </header>
+        <div class="chap-body">
+          <article class="step">
+            <span class="num">02 · THE SOUND</span>
+            <div class="talk">
+              <p class="n">
+                <b>NULLSAINT</b>Twenty songs that sound like one record. Hyperpop, metalcore, grime, a choir.
+              </p>
+              <p class="c">
+                <b>CACHEGHOST</b>Then the prompt is a spec, not a wish. One master style for the whole album,
+                five production layers to swap, and each track's own tempo, structure and vocal direction on
+                top.
+              </p>
+              <p class="n"><b>NULLSAINT</b>And the lyrics?</p>
+              <p class="c"><b>CACHEGHOST</b>Yours, with section tags telling Suno what each part does.</p>
+            </div>
+            <details class="how">
+              <summary>HOW IT WORKS</summary>
+              <ul>
+                <li>
+                  Suno renders every take from three stacked layers: master style → production style → track
+                  variables.
+                </li>
+                <li>
+                  The five production styles (Arena polish, Raw and live, Glitch-heavy, Cinematic, Lo-fi
+                  underground) are drop-in blocks, so a whole remix pass is one swap.
+                </li>
+                <li>
+                  Every master was then measured in the browser with essentia.js (RhythmExtractor + three key
+                  profiles), and the vault shows how many models agree.
+                </li>
+              </ul>
+            </details>
+          </article>
+          <div class="stage">
+            <div class="stage-in">
+              <span class="ghost" aria-hidden="true">02<span>02</span></span>
+              <div class="vis" data-vis="sound">
+                <div class="tilt">
+                  <div class="flip">
+                    <div class="face front">
+                      <div class="layers">
+                        <div class="ly">
+                          <span class="lab">01 · MASTER STYLE · EVERY TRACK</span>
+                          <p>
+                            glitchcore hyperpop metalcore, electronic post-hardcore, UK grime flow, drop-tuned
+                            chug riffs, glitched stutter edits, bitcrushed synth leads, trap hi-hats and 808s…
+                          </p>
+                        </div>
+                        <div class="ly">
+                          <span class="lab">02 · PRODUCTION STYLE · PICK ONE</span>
+                          <div class="chips">
+                            <span class="chip on">ARENA POLISH</span><span class="chip">RAW AND LIVE</span
+                            ><span class="chip">GLITCH-HEAVY</span><span class="chip">CINEMATIC</span
+                            ><span class="chip">LO-FI UNDERGROUND</span>
+                          </div>
+                        </div>
+                        <div class="ly">
+                          <span class="lab">03 · TRACK VARIABLES · LEFT_BEHIND</span>
+                          <p>
+                            80 BPM ambient piano intro flips to 144 BPM; rapid UK rap verses over skittering
+                            2-step and trap hats, screamed gang-vocal hooks…
+                          </p>
+                        </div>
+                        <div class="ly out"><span class="lab">→ SUNO</span><b>20 SONGS · 4 CHAPTERS</b></div>
+                      </div>
+                    </div>
+                    <div class="face back" data-src="sound"></div>
+                  </div>
                 </div>
               </div>
-              <div class="ly">
-                <span class="lab">03 · TRACK VARIABLES · LEFT_BEHIND</span>
-                <p>
-                  80 BPM ambient piano intro flips to 144 BPM; rapid UK rap verses over skittering 2-step and
-                  trap hats, screamed gang-vocal hooks…
-                </p>
-              </div>
-              <div class="ly out"><span class="lab">→ SUNO</span><b>20 SONGS · 4 CHAPTERS</b></div>
-            </div>
-          </div>
-
-          <!-- SEAMS: S1 twin waveforms -->
-          <div class="vis" data-vis="seam">
-            <div class="seam" id="seam">
-              <div class="seam-meta">
-                <span>05 EMPTY_CITY <b>124.7 BPM · 6A</b></span
-                ><span class="mid">→ GLITCH ROLL →</span><span>06 THE_FEED <b>140.8 BPM · 6B</b></span>
-              </div>
-              <button class="wv" data-k="raw" aria-label="Play the raw cut from this point">
-                <span class="lab">A · RAW · THE TWO ALBUM FILES BUTTED TOGETHER</span><canvas></canvas
-                ><span class="seamline"></span><span class="ph"></span>
-              </button>
-              <button class="wv" data-k="eng" aria-label="Play the engineered seam from this point">
-                <span class="lab">B · ENGINEERED · THE 72:04 LIVE SET</span><canvas></canvas
-                ><span class="seamline"></span><span class="ph"></span>
-              </button>
-              <div class="seam-ctl">
-                <button class="gbtn" id="seamPlay">▶ PLAY</button
-                ><button class="gbtn ab" data-k="raw">A · RAW</button
-                ><button class="gbtn ab on" data-k="eng">B · ENGINEERED</button
-                ><span class="seam-t" id="seamT">0:00 / 0:24</span>
-              </div>
-              <p class="seam-note">
-                THE CHAPTER I → II CHANGEOVER. SWITCH WHILE IT PLAYS; IT KEEPS ITS PLACE. TAP A WAVEFORM TO
-                SEEK.
-              </p>
-            </div>
-          </div>
-
-          <!-- SITE: PR film strip -->
-          <div class="vis" data-vis="site">
-            <div class="prs"><div class="prs-roll" id="prs"></div></div>
-          </div>
-
-          <!-- VAULT: lock diagram -->
-          <div class="vis" data-vis="vault">
-            <div class="lock">
-              <div class="node key"><span class="lab">IN YOUR HEAD</span><b>ACCESS KEY</b></div>
-              <div class="arrow">PBKDF2-SHA256</div>
-              <div class="node"><span class="lab">IN THE BROWSER</span><b>AES-GCM-256 KEY</b></div>
-              <div class="arrow">DECRYPT</div>
-              <div class="node">
-                <span class="lab">IN THE PUBLIC REPO</span><b>data.enc.json</b
-                ><span class="sub">PROMPTS · LYRICS · ANALYSIS</span>
-              </div>
-              <div class="arrow">PROOF OF KEY</div>
-              <div class="node">
-                <span class="lab">NETLIFY FUNCTION</span><b>SIGNED LINK</b
-                ><span class="sub">PRIVATE RELEASE · 20 STEM ZIPS</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- LIVE: lyric sync loop (real word timings, LEFT_BEHIND line 1) -->
-          <div class="vis" data-vis="live">
-            <div class="sync">
-              <span class="lab">LEFT_BEHIND · LINE 1 · REAL WORD TIMINGS</span>
-              <p class="sync-line" id="syncLine"></p>
-              <div class="sync-lane" id="syncLane"><span class="sync-ph" id="syncPh"></span></div>
-              <div class="sync-k">
-                <span>STABLE-TS · MEDIUM.EN</span><span>WAV2VEC2 VOTE ±150 MS</span
-                ><span>ONSET SNAP ±80 MS</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- ABLETON: P4 feed -->
-          <div class="vis" data-vis="feed">
-            <div class="feed" id="feed">
-              <div class="end">
-                <span class="lab">ABLETON LIVE</span><b>E404 SHOW</b><span class="lab">MAX DEVICE</span>
-              </div>
-              <div class="wire"></div>
-              <div class="end" id="feedB">
-                <span class="lab">BROWSER</span><b>/LIVE/</b><span class="lab" id="feedS">STANDBY</span>
-              </div>
-              <div class="feed-cap">
-                ONE CC PER TICK · 6 TICKS PER FRAME · ≈ 6.7 FRAMES/S · CH 16 OVER IAC
-              </div>
-              <button class="gbtn feed-kill" id="feedKill">KILL ABLETON</button>
-            </div>
-          </div>
-
-          <!-- COMICS: storyboard → guide → final -->
-          <div class="vis" data-vis="comic">
-            <div class="tri">
-              <figure>
-                <img src="/story/storyboard-b1.webp" alt="The Book I storyboard sheet" loading="lazy" />
-                <figcaption>01 · STORYBOARD SHEET</figcaption>
-              </figure>
-              <figure>
-                <img
-                  src="/story/p02-3_guide.jpg"
-                  alt="The ControlNet guide traced for a panel of NULLSAINT on stage"
-                  loading="lazy"
-                />
-                <figcaption>02 · CONTROLNET GUIDE</figcaption>
-              </figure>
-              <figure>
-                <img
-                  src="/story/b1p02-3.webp"
-                  alt="The finished ink-noir panel: NULLSAINT alone on a dark stage, head bowed"
-                  loading="lazy"
-                />
-                <figcaption>03 · SDXL · INK NOIR</figcaption>
-              </figure>
+              <button class="srcbtn" type="button" aria-pressed="false">VIEW SOURCE ⟲</button>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      <!-- 03 THE SEAMS -->
+      <section
+        class="chap"
+        id="ch-seams"
+        data-chap="seam"
+        data-ch="03 · THE SEAMS"
+        data-track="the_feed"
+        data-temp="95"
+        data-jobs="7"
+        aria-labelledby="t-seams"
+      >
+        <header class="tc">
+          <p class="tc-meta">
+            <span>CHAPTER <b>03</b> / 08</span><span>SCORED BY <b>THE_FEED</b></span
+            ><span><b>B♭ MAJOR</b> · 6B</span>
+          </p>
+          <h2 class="tc-t" id="t-seams" data-t="THE SEAMS">
+            <span class="o">THE SEAMS</span><span class="l" aria-hidden="true">THE SEAMS</span>
+          </h2>
+          <p class="tc-sub">19 CHANGEOVERS · NEVER TWO VOICES AT ONCE</p>
+        </header>
+        <div class="chap-body">
+          <article class="step">
+            <span class="num">03 · THE SEAMS</span>
+            <div class="talk">
+              <p class="n">
+                <b>NULLSAINT</b>I want to perform it as one set. No gaps, and never two vocals on top of each
+                other.
+              </p>
+              <p class="c">
+                <b>CACHEGHOST</b>The first version was a blended DJ mix. Suno drifts in tempo, so every beat
+                was pinned and stretched between pins. It sounded smooth, but it was too long to sing over.
+              </p>
+              <p class="c">
+                <b>CACHEGHOST</b>So the live set keeps each song whole at its own tempo. Each seam goes after
+                the last strong bar and your last sung word. A ring-over tail by default, a glitch roll into a
+                new chapter, and an echo throw where two keys clash.
+              </p>
+              <p class="n"><b>NULLSAINT</b>Play me the one into THE FEED.</p>
+            </div>
+            <details class="how">
+              <summary>HOW IT WORKS</summary>
+              <ul>
+                <li>
+                  madmom tracks beats and downbeats; Demucs separates the vocals so the last sung word can be
+                  measured, not guessed.
+                </li>
+                <li>
+                  19 seams: 16 ring-over tails, 2 glitch rolls (into THE_FEED and WHOLE), 1 echo throw
+                  (ENDLESS_GLOW → AWAKE, a 5B → 6A key clash).
+                </li>
+                <li>
+                  If two vocals would touch, the seam moves by whole bars. The 72:04 set's files line up with
+                  the album masters to within 5 ms.
+                </li>
+                <li>
+                  The earlier DJ mix used Rubber Band at a ratio per beat, because its keyframe map can't be
+                  passed from Python.
+                </li>
+              </ul>
+            </details>
+          </article>
+          <div class="stage">
+            <div class="stage-in">
+              <span class="ghost" aria-hidden="true">03<span>03</span></span>
+              <div class="vis" data-vis="seam">
+                <div class="tilt">
+                  <div class="flip">
+                    <div class="face front">
+                      <div class="seam" id="seam">
+                        <div class="seam-meta">
+                          <span>05 EMPTY_CITY <b>124.7 BPM · 6A</b></span
+                          ><span class="mid">→ GLITCH ROLL →</span
+                          ><span>06 THE_FEED <b>140.8 BPM · 6B</b></span>
+                        </div>
+                        <button
+                          class="wv"
+                          data-k="raw"
+                          type="button"
+                          aria-label="Play the raw cut from this point"
+                        >
+                          <span class="lab">A · RAW · THE TWO ALBUM FILES BUTTED TOGETHER</span
+                          ><canvas></canvas><span class="seamline"></span><span class="ph"></span>
+                        </button>
+                        <button
+                          class="wv"
+                          data-k="eng"
+                          type="button"
+                          aria-label="Play the engineered seam from this point"
+                        >
+                          <span class="lab">B · ENGINEERED · THE 72:04 LIVE SET</span><canvas></canvas
+                          ><span class="seamline"></span><span class="ph"></span>
+                        </button>
+                        <div class="seam-ctl">
+                          <button class="gbtn" id="seamPlay" type="button">▶ PLAY</button
+                          ><button class="gbtn ab" data-k="raw" type="button">A · RAW</button
+                          ><button class="gbtn ab on" data-k="eng" type="button">B · ENGINEERED</button
+                          ><span class="seam-t" id="seamT">0:00 / 0:24</span>
+                        </div>
+                        <p class="seam-note">
+                          THE CHAPTER I → II CHANGEOVER. SWITCH WHILE IT PLAYS; IT KEEPS ITS PLACE. TAP A
+                          WAVEFORM TO SEEK.
+                        </p>
+                      </div>
+                    </div>
+                    <div class="face back" data-src="seam"></div>
+                  </div>
+                </div>
+              </div>
+              <button class="srcbtn" type="button" aria-pressed="false">VIEW SOURCE ⟲</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 THE SITE -->
+      <section
+        class="chap"
+        id="ch-site"
+        data-chap="site"
+        data-ch="04 · THE SITE"
+        data-track="gospel_out"
+        data-temp="91"
+        data-jobs="6"
+        aria-labelledby="t-site"
+      >
+        <header class="tc">
+          <p class="tc-meta">
+            <span>CHAPTER <b>04</b> / 08</span><span>SCORED BY <b>GOSPEL_OUT</b></span
+            ><span><b>E♭ MAJOR</b> · 5B</span>
+          </p>
+          <h2 class="tc-t" id="t-site" data-t="THE SITE">
+            <span class="o">THE SITE</span><span class="l" aria-hidden="true">THE SITE</span>
+          </h2>
+          <p class="tc-sub">VITE · REACT · NETLIFY · 77 PULL REQUESTS MERGED</p>
+        </header>
+        <div class="chap-body">
+          <article class="step">
+            <span class="num">04 · THE SITE</span>
+            <div class="talk">
+              <p class="n">
+                <b>NULLSAINT</b>It has to feel like the album: maximal, glitchy, and fast on a phone.
+              </p>
+              <p class="c">
+                <b>CACHEGHOST</b>Vite and React on Netlify. Every change is a pull request with a CI check and
+                a deploy preview, reviewed before it merges: 77 merged so far.
+              </p>
+              <p class="n"><b>NULLSAINT</b>The holo button broke the whole page in Safari.</p>
+              <p class="c">
+                <b>CACHEGHOST</b>Safari doesn't clip GPU-composited children to overflow:hidden. The fix keeps
+                the effect inside its own box: a registered @property angle animating the border.
+              </p>
+            </div>
+            <details class="how">
+              <summary>HOW IT WORKS</summary>
+              <ul>
+                <li>
+                  Audio and logo scripts get content-hash cache-busting, so a new master reaches returning
+                  listeners on their next visit.
+                </li>
+                <li>
+                  The whole layout scales with CSS zoom between 1280 and 1920 px, so full-window maths divides
+                  by the zoom factor.
+                </li>
+                <li>
+                  The site is shared by direct link only: robots.txt, meta tags and headers block search
+                  engines, AI crawlers and archives.
+                </li>
+              </ul>
+            </details>
+          </article>
+          <div class="stage">
+            <div class="stage-in">
+              <span class="ghost" aria-hidden="true">04<span>04</span></span>
+              <div class="vis" data-vis="site">
+                <div class="tilt">
+                  <div class="flip">
+                    <div class="face front">
+                      <div class="prs"><div class="prs-roll" id="prs"></div></div>
+                    </div>
+                    <div class="face back" data-src="site"></div>
+                  </div>
+                </div>
+              </div>
+              <button class="srcbtn" type="button" aria-pressed="false">VIEW SOURCE ⟲</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 05 THE VAULT -->
+      <section
+        class="chap"
+        id="ch-vault"
+        data-chap="vault"
+        data-ch="05 · THE VAULT"
+        data-track="read"
+        data-temp="87"
+        data-jobs="5"
+        aria-labelledby="t-vault"
+      >
+        <header class="tc">
+          <p class="tc-meta">
+            <span>CHAPTER <b>05</b> / 08</span><span>SCORED BY <b>READ</b></span
+            ><span><b>B♭ MAJOR</b> · 6B</span>
+          </p>
+          <h2 class="tc-t" id="t-vault" data-t="THE VAULT">
+            <span class="o">THE VAULT</span><span class="l" aria-hidden="true">THE VAULT</span>
+          </h2>
+          <p class="tc-sub">A PUBLIC REPO · PRIVATE CONTENT · ONE KEY</p>
+        </header>
+        <div class="chap-body">
+          <article class="step">
+            <span class="num">05 · THE VAULT</span>
+            <div class="talk">
+              <p class="n">
+                <b>NULLSAINT</b>The stems, prompts and lyrics go behind a key. But the repo is public.
+              </p>
+              <p class="c">
+                <b>CACHEGHOST</b>Then the key is the only secret. The content ships encrypted with the key
+                itself and is decrypted in your browser. No account and no server session.
+              </p>
+              <p class="c">
+                <b>CACHEGHOST</b>The stems are too big for that, so one small function hands out short-lived
+                signed links from a private repo, but only to a browser that can prove it knows the key.
+              </p>
+            </div>
+            <details class="how">
+              <summary>HOW IT WORKS</summary>
+              <ul>
+                <li>
+                  PBKDF2-SHA256 derives an AES-GCM-256 key; data.enc.json is the only form of the content in
+                  the repo.
+                </li>
+                <li>
+                  20 stem zips (WAV + MIDI) live on a private GitHub release; one chapter is over GitHub's 2
+                  GB file cap, so ALL STEMS fetches per-track zips.
+                </li>
+                <li>
+                  Before release every MP3 was re-tagged and stripped of Suno links and C2PA provenance
+                  chunks, with pixel-identical cover art.
+                </li>
+              </ul>
+            </details>
+          </article>
+          <div class="stage">
+            <div class="stage-in">
+              <span class="ghost" aria-hidden="true">05<span>05</span></span>
+              <div class="vis" data-vis="vault">
+                <div class="tilt">
+                  <div class="flip">
+                    <div class="face front">
+                      <div class="lock">
+                        <div class="node key"><span class="lab">IN YOUR HEAD</span><b>ACCESS KEY</b></div>
+                        <div class="arrow">PBKDF2-SHA256</div>
+                        <div class="node"><span class="lab">IN THE BROWSER</span><b>AES-GCM-256 KEY</b></div>
+                        <div class="arrow">DECRYPT</div>
+                        <div class="node">
+                          <span class="lab">IN THE PUBLIC REPO</span><b>data.enc.json</b
+                          ><span class="sub">PROMPTS · LYRICS · ANALYSIS</span>
+                        </div>
+                        <div class="arrow">PROOF OF KEY</div>
+                        <div class="node">
+                          <span class="lab">NETLIFY FUNCTION</span><b>SIGNED LINK</b
+                          ><span class="sub">PRIVATE RELEASE · 20 STEM ZIPS</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="face back" data-src="vault"></div>
+                  </div>
+                </div>
+              </div>
+              <button class="srcbtn" type="button" aria-pressed="false">VIEW SOURCE ⟲</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 06 THE LIVE SHOW -->
+      <section
+        class="chap"
+        id="ch-live"
+        data-chap="live"
+        data-ch="06 · THE LIVE SHOW"
+        data-track="down_the_front"
+        data-temp="83"
+        data-jobs="4"
+        aria-labelledby="t-live"
+      >
+        <header class="tc">
+          <p class="tc-meta">
+            <span>CHAPTER <b>06</b> / 08</span><span>SCORED BY <b>DOWN_THE_FRONT</b></span
+            ><span><b>G MINOR</b> · 6A</span>
+          </p>
+          <h2 class="tc-t" id="t-live" data-t="THE LIVE SHOW">
+            <span class="o">THE LIVE SHOW</span><span class="l" aria-hidden="true">THE LIVE SHOW</span>
+          </h2>
+          <p class="tc-sub">8,711 WORDS TIMED · GAPLESS IN A BROWSER TAB</p>
+        </header>
+        <div class="chap-body">
+          <article class="step">
+            <span class="num">06 · THE LIVE SHOW</span>
+            <div class="talk">
+              <p class="n">
+                <b>NULLSAINT</b>Karaoke lyrics that fill word by word, gapless, and a console I can play.
+              </p>
+              <p class="c">
+                <b>CACHEGHOST</b>Demucs pulls your vocal out of each master. stable-ts times every word, and
+                wav2vec2 votes on each one. 8,711 words across 899 lines.
+              </p>
+              <p class="n"><b>NULLSAINT</b>Why two models?</p>
+              <p class="c">
+                <b>CACHEGHOST</b>On its own, wav2vec2 pulls lines 200–800 ms early onto your breaths. As a
+                vote within 150 ms of stable-ts, it tightens the timing instead.
+              </p>
+            </div>
+            <details class="how">
+              <summary>HOW IT WORKS</summary>
+              <ul>
+                <li>
+                  Gapless in a browser: Chrome leaves 576 + 529 samples of MP3 priming, which the page trims
+                  by matching a stored 64-sample fingerprint.
+                </li>
+                <li>
+                  Songs decode one or two ahead (a full decode is about 1.7 GB of RAM); instrumentals and
+                  timings are encrypted like the vault.
+                </li>
+                <li>
+                  A phone remote pairs once through a key-protected function, then talks over direct WebRTC. A
+                  KeyLab mk3 plays it over Web MIDI.
+                </li>
+              </ul>
+            </details>
+          </article>
+          <div class="stage">
+            <div class="stage-in">
+              <span class="ghost" aria-hidden="true">06<span>06</span></span>
+              <div class="vis" data-vis="live">
+                <div class="tilt">
+                  <div class="flip">
+                    <div class="face front">
+                      <div class="sync">
+                        <span class="lab">LEFT_BEHIND · LINE 1 · REAL WORD TIMINGS</span>
+                        <p class="sync-line" id="syncLine"></p>
+                        <div class="sync-lane" id="syncLane"><span class="sync-ph" id="syncPh"></span></div>
+                        <div class="sync-k">
+                          <span>STABLE-TS · MEDIUM.EN</span><span>WAV2VEC2 VOTE ±150 MS</span
+                          ><span>ONSET SNAP ±80 MS</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="face back" data-src="live"></div>
+                  </div>
+                </div>
+              </div>
+              <button class="srcbtn" type="button" aria-pressed="false">VIEW SOURCE ⟲</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 07 ABLETON -->
+      <section
+        class="chap"
+        id="ch-ableton"
+        data-chap="feed"
+        data-ch="07 · ABLETON"
+        data-track="changed_the_lock"
+        data-temp="79"
+        data-jobs="3"
+        aria-labelledby="t-ableton"
+      >
+        <header class="tc">
+          <p class="tc-meta">
+            <span>CHAPTER <b>07</b> / 08</span><span>SCORED BY <b>CHANGED_THE_LOCK</b></span
+            ><span><b>B♭ MAJOR</b> · 6B</span>
+          </p>
+          <h2 class="tc-t" id="t-ableton" data-t="THE RIG">
+            <span class="o">THE RIG</span><span class="l" aria-hidden="true">THE RIG</span>
+          </h2>
+          <p class="tc-sub">A GENERATED ABLETON SET · THE BROWSER AS BACKUP</p>
+        </header>
+        <div class="chap-body">
+          <article class="step">
+            <span class="num">07 · ABLETON</span>
+            <div class="talk">
+              <p class="n"><b>NULLSAINT</b>Same show in Ableton Live, with the browser as the backup.</p>
+              <p class="c">
+                <b>CACHEGHOST</b>The .als is written by script from Live's own templates and the /live/
+                timeline. Live gives almost no error output, so every crash was bisected with scripted test
+                loads.
+              </p>
+              <p class="c">
+                <b>CACHEGHOST</b>A Max device sends the song position over MIDI to the browser. Live lets one
+                CC per tick out of a device, so each position frame goes out over six ticks: about 6.7 frames
+                a second. If Ableton dies, the page takes over from the same spot.
+              </p>
+            </div>
+            <details class="how">
+              <summary>HOW IT WORKS</summary>
+              <ul>
+                <li>
+                  Crash lessons: plain floats only, unique sibling IDs, reset template sample slices, unseal
+                  rebuilt racks, and one Sampler instead of a cloned Instrument Rack.
+                </li>
+                <li>
+                  The feed sends CC 110–114 (position in ms) plus CC 115 (playing) on channel 16 over the
+                  macOS IAC bus, verified with a Swift CoreMIDI listener.
+                </li>
+                <li>
+                  The KeyLab mk3's pads, faders and encoders were measured the same way, then mapped into the
+                  generated set.
+                </li>
+              </ul>
+            </details>
+          </article>
+          <div class="stage">
+            <div class="stage-in">
+              <span class="ghost" aria-hidden="true">07<span>07</span></span>
+              <div class="vis" data-vis="feed">
+                <div class="tilt">
+                  <div class="flip">
+                    <div class="face front">
+                      <div class="feed" id="feed">
+                        <div class="end">
+                          <span class="lab">ABLETON LIVE</span><b>E404 SHOW</b
+                          ><span class="lab">MAX DEVICE</span>
+                        </div>
+                        <div class="wire"></div>
+                        <div class="end" id="feedB">
+                          <span class="lab">BROWSER</span><b>/LIVE/</b
+                          ><span class="lab" id="feedS">STANDBY</span>
+                        </div>
+                        <div class="feed-cap">
+                          ONE CC PER TICK · 6 TICKS PER FRAME · ≈ 6.7 FRAMES/S · CH 16 OVER IAC
+                        </div>
+                        <button class="gbtn feed-kill" id="feedKill" type="button">KILL ABLETON</button>
+                      </div>
+                    </div>
+                    <div class="face back" data-src="feed"></div>
+                  </div>
+                </div>
+              </div>
+              <button class="srcbtn" type="button" aria-pressed="false">VIEW SOURCE ⟲</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 08 COMICS + ANIME (press shots for now) -->
+      <section
+        class="chap"
+        id="ch-comics"
+        data-chap="comic"
+        data-ch="08 · COMICS + ANIME"
+        data-track="open_sky"
+        data-temp="75"
+        data-jobs="2"
+        aria-labelledby="t-comics"
+      >
+        <header class="tc">
+          <p class="tc-meta">
+            <span>CHAPTER <b>08</b> / 08</span><span>SCORED BY <b>OPEN_SKY</b></span
+            ><span><b>B♭ MAJOR</b> · 6B</span>
+          </p>
+          <h2 class="tc-t" id="t-comics" data-t="THE BOOKS">
+            <span class="o">THE BOOKS</span><span class="l" aria-hidden="true">THE BOOKS</span>
+          </h2>
+          <p class="tc-sub">FOUR COMICS IN PRODUCTION · FOUR ANIME SHORTS NEXT</p>
+        </header>
+        <div class="chap-body">
+          <article class="step">
+            <span class="num">08 · COMICS + ANIME</span>
+            <div class="talk">
+              <p class="n">
+                <b>NULLSAINT</b>Four books, one per chapter. The press shots set the look: the spiked masks,
+                the violet stage, no faces.
+              </p>
+              <p class="c">
+                <b>CACHEGHOST</b>So the books have to hold that look for hundreds of pages. SDXL in ComfyUI on
+                the same Mac, a face lock for the Subject, and a ControlNet guide traced from each storyboard.
+                Art is text-free; the lettering is live.
+              </p>
+              <p class="c">
+                <b>CACHEGHOST</b>At 3 minutes a panel, about 1,700 panels is a speed problem, so batches are
+                resumable and every page gets a contact sheet. Four anime shorts, one per chapter, come after
+                the books.
+              </p>
+            </div>
+            <details class="how">
+              <summary>HOW IT WORKS</summary>
+              <ul>
+                <li>4 books × 88 scripted pages, five movements each, named after the album's tracks.</li>
+                <li>
+                  A face lock at full strength turned every scene into a close-up; it now starts at 20% of the
+                  steps at 0.7, with an explicit shot size.
+                </li>
+                <li>
+                  Artist names in the style prompt leaked onto posters as text, so they came out; charts and
+                  data panels are built as live HTML/SVG, never generated.
+                </li>
+              </ul>
+            </details>
+          </article>
+          <div class="stage">
+            <div class="stage-in">
+              <span class="ghost" aria-hidden="true">08<span>08</span></span>
+              <div class="vis" data-vis="comic">
+                <div class="tilt">
+                  <div class="flip">
+                    <div class="face front">
+                      <div class="press">
+                        <figure>
+                          <img
+                            src="/assets/brand/press-03.webp"
+                            alt="NULLSAINT and CACHEGHOST in spiked helmets behind the decks under a neon skull"
+                            loading="lazy"
+                          />
+                          <figcaption>PRESS · THE DECKS</figcaption>
+                        </figure>
+                        <figure>
+                          <img
+                            src="/assets/brand/press-01.webp"
+                            alt="NULLSAINT and CACHEGHOST on a festival stage with ARCHIVE_404 on the screen"
+                            loading="lazy"
+                          />
+                          <figcaption>PRESS · THE STAGE</figcaption>
+                        </figure>
+                        <figure>
+                          <img
+                            src="/assets/brand/press-02.webp"
+                            alt="NULLSAINT and CACHEGHOST with mic and guitar under a neon skull"
+                            loading="lazy"
+                          />
+                          <figcaption>PRESS · THE BAND</figcaption>
+                        </figure>
+                      </div>
+                    </div>
+                    <div class="face back" data-src="comic"></div>
+                  </div>
+                </div>
+              </div>
+              <button class="srcbtn" type="button" aria-pressed="false">VIEW SOURCE ⟲</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
 
     <!-- ================= THE CREW (A4) ================= -->
-    <section class="crew" id="crew" data-ch="09 · THE CREW" aria-labelledby="crew-h">
+    <section
+      class="crew"
+      id="crew"
+      data-ch="09 · THE CREW"
+      data-track="all_of_me"
+      data-temp="72"
+      data-jobs="1"
+      aria-labelledby="crew-h"
+    >
       <div class="wrap">
         <span class="kick">THE AI CREW · WHAT EACH ONE DID · WHERE IT FAILED</span>
         <h2 class="h1" id="crew-h">NOBODY WAS <span class="grad">TRUSTED ALONE.</span></h2>
@@ -520,7 +790,7 @@
     </section>
 
     <!-- ================= CLOSING: credits roll while the machine cools (C2 + C1) ================= -->
-    <section class="end" id="end" data-ch="10 · COOL DOWN" aria-label="Credits">
+    <section class="end" id="end" data-ch="10 · COOL DOWN" data-track="better_days" aria-label="Credits">
       <div class="end-stage">
         <canvas class="end-rain" id="endRain" aria-hidden="true"></canvas>
         <div class="end-temp" aria-hidden="true">
@@ -545,6 +815,94 @@
         </div>
       </div>
     </section>
+
+    <!-- ================= W2 vitals + W1 sound (fixed) ================= -->
+    <div class="vitals" id="vitals" aria-hidden="true">
+      <div><span class="lab">SOC</span><b class="grad" id="vT">104°</b></div>
+      <div><span class="lab">FAN</span><b id="vF">4,170</b></div>
+      <div><span class="lab">JOBS</span><b id="vJ">9</b></div>
+    </div>
+    <button class="snd" id="snd" type="button" aria-pressed="false">
+      <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span
+      ><span class="snd-l">SOUND OFF</span><span class="snd-t" id="sndT"></span>
+    </button>
+
+    <!-- ================= W6 60-second read (+ W9 case file: it prints as a one-page PDF) ================= -->
+    <div class="tldr" id="tldr" role="dialog" aria-modal="true" aria-labelledby="tldr-h" hidden>
+      <div class="tldr-in">
+        <div class="tldr-top">
+          <span class="lab">CASE FILE · ARCHIVE_404 · NULLSAINT × CACHEGHOST</span>
+          <button class="gbtn" id="close60" type="button">FULL STORY ✕</button>
+        </div>
+        <h2 class="tldr-h" id="tldr-h">THE BUILD IN <span class="grad">60 SECONDS.</span></h2>
+        <p class="tldr-p">
+          A 20-song hyperpop / metalcore album and everything around it, built by two operators directing a
+          crew of AI models on one 16 GB Mac mini.
+        </p>
+        <div class="tldr-grid">
+          <a href="#ch-sound" class="tc-card"
+            ><b>THE SOUND</b
+            ><span
+              >A prompt spec, not a wish: one master style, five production layers, per-track variables → 20
+              songs.</span
+            ></a
+          >
+          <a href="#ch-seams" class="tc-card"
+            ><b>THE SEAMS</b
+            ><span
+              >19 live-set seams placed after the last sung word, measured with Demucs and madmom. Files
+              within 5 ms of the masters.</span
+            ></a
+          >
+          <a href="#ch-site" class="tc-card"
+            ><b>THE SITE</b
+            ><span
+              >Vite + React on Netlify; 77 merged PRs, each CI-checked; Safari compositing bugs fixed at the
+              root.</span
+            ></a
+          >
+          <a href="#ch-vault" class="tc-card"
+            ><b>THE VAULT</b
+            ><span
+              >A public repo with private content: PBKDF2 → AES-GCM in the browser, stems via signed
+              links.</span
+            ></a
+          >
+          <a href="#ch-live" class="tc-card"
+            ><b>THE LIVE SHOW</b
+            ><span
+              >A gapless engine in a tab; 8,711 words timed by two models that vote; WebRTC phone remote, Web
+              MIDI.</span
+            ></a
+          >
+          <a href="#ch-ableton" class="tc-card"
+            ><b>THE RIG</b
+            ><span
+              >A generated Ableton set; a Max device streams position over MIDI so the browser can take
+              over.</span
+            ></a
+          >
+          <a href="#ch-comics" class="tc-card"
+            ><b>THE BOOKS</b
+            ><span
+              >Four comics in production with SDXL, face lock and ControlNet on the same Mac; four anime
+              shorts next.</span
+            ></a
+          >
+          <a href="#crew" class="tc-card"
+            ><b>THE CREW</b
+            ><span
+              >Suno, Demucs, stable-ts, wav2vec2, madmom, Rubber Band, essentia.js, SDXL, Claude Code. Nobody
+              trusted alone.</span
+            ></a
+          >
+        </div>
+        <div class="tldr-ft">
+          <button class="holo" id="print60" type="button">SAVE CASE FILE (PDF)</button>
+          <span class="lab">error404.run/story</span>
+        </div>
+      </div>
+    </div>
 
     <script type="module" src="/src/story/main.js"></script>
     <!-- the site's logo behaviours: top-bar draw-on + the reboot screen's torch-lit glitch wordmark -->
