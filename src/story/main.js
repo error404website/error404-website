@@ -193,12 +193,15 @@ const ov = (() => {
     ],
     ["CRITICAL.", "THERMAL LIMIT REACHED"],
   ];
+  const WARM = 0.262;
   return function update() {
-    const p = through(sec);
+    // the camera opens already warm (two jobs running, ~58°); scrolling heats it from there
+    const raw = through(sec),
+      p = WARM + raw * (1 - WARM);
     P = p;
     if (!raf && p < 0.86) raf = requestAnimationFrame(draw);
     const load = seg(p, 0.04, 0.72);
-    $("#ovHint").style.opacity = p < 0.03 ? 1 : 0;
+    $("#ovHint").style.opacity = raw < 0.03 ? 1 : 0;
     const phone = cv.width < 640,
       newest = SPOTS.reduce((n, s, i) => (load > s.at + 0.06 ? i : n), -1);
     SPOTS.forEach(
