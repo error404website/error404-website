@@ -3,6 +3,7 @@
 // netlify/functions/vault-stems.mjs for visitors who prove they know the key.
 import "../styles/index.css";
 import "../styles/overrides.css";
+import "../styles/dock.css";
 import "./vault.css";
 import { audioSrc } from "../lib/audioSrc";
 import { keyField } from "../lib/keyField";

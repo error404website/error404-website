@@ -18,6 +18,8 @@
   --head: "Bebas Neue", sans-serif;
   --maxw: 1180px;
   --topH: calc(var(--navh, 80px) + 22px);
+  /* the site's player dock across the bottom (--dock-h comes from ../styles/dock.css) */
+  --dockB: calc(var(--dock-h, 68px) + env(safe-area-inset-bottom));
 }
 @property --foil {
   syntax: "<angle>";
@@ -264,7 +266,8 @@ a {
   position: relative;
 }
 /* the stage spans the tallest viewport (phone toolbars collapsed), so nothing shows below it when Safari's
-   toolbars slide away; --tb is how much of it the toolbars can cover, so the bottom readouts stay above them */
+   toolbars slide away; --tb is how much of it the toolbars can cover, and --ob adds the player dock, so the
+   bottom readouts and the camera image stay above both */
 .ov-stage {
   position: sticky;
   top: 0;
@@ -273,18 +276,20 @@ a {
   overflow: hidden;
   clip-path: inset(0);
   --tb: 0px;
+  --ob: calc(var(--tb) + var(--dockB));
 }
 @supports (height: 100lvh) {
   .ov-stage {
     --tb: calc(100lvh - 100svh);
   }
 }
+/* the camera image fills the stage down to the dock, so the mini is centred in what you can see */
 .ov-heat,
 .ov-rain {
   position: absolute;
-  inset: 0;
+  inset: 0 0 var(--ob);
   width: 100%;
-  height: 100%;
+  height: calc(100% - var(--ob));
 }
 .ov-rain {
   opacity: 0;
@@ -344,19 +349,19 @@ a {
 }
 .vt.c {
   left: 14px;
-  bottom: calc(14px + var(--tb, 0px));
+  bottom: calc(14px + var(--ob));
   border-width: 0 0 1px 1px;
 }
 .vt.d {
   right: 14px;
-  bottom: calc(14px + var(--tb, 0px));
+  bottom: calc(14px + var(--ob));
   border-width: 0 1px 1px 0;
 }
 .ov-scale {
   position: absolute;
   right: 26px;
   top: calc(var(--topH) + 50px);
-  bottom: calc(70px + var(--tb));
+  bottom: calc(70px + var(--ob));
   width: 10px;
   z-index: 3;
   background: linear-gradient(
@@ -475,7 +480,7 @@ a {
 .ov-read {
   position: absolute;
   left: 24px;
-  bottom: calc(56px + var(--tb));
+  bottom: calc(56px + var(--ob));
   z-index: 3;
 }
 .ov-read b {
@@ -512,7 +517,7 @@ a {
 }
 .ov-boot {
   position: absolute;
-  inset: 0 0 var(--tb);
+  inset: 0 0 var(--ob);
   z-index: 5;
   display: flex;
   flex-direction: column;
@@ -566,7 +571,7 @@ a {
 .ov-hint {
   position: absolute;
   left: 50%;
-  bottom: calc(22px + var(--tb));
+  bottom: calc(22px + var(--ob));
   transform: translateX(-50%);
   font-family: var(--mono);
   font-size: 9px;
@@ -717,7 +722,7 @@ a {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: var(--topH) 20px 0;
+  padding: var(--topH) 20px var(--dockB);
   background: radial-gradient(55% 45% at 50% 52%, rgba(161, 0, 255, 0.18), rgba(3, 4, 9, 0.6) 70%);
 }
 .tc-meta {
@@ -792,11 +797,11 @@ a {
 .slide {
   position: sticky;
   top: var(--topH);
-  height: calc(100vh - var(--topH));
-  height: calc(100svh - var(--topH));
+  height: calc(100vh - var(--topH) - var(--dockB));
+  height: calc(100svh - var(--topH) - var(--dockB));
   max-width: 1400px;
   margin: 0 auto;
-  /* room at the bottom for the vitals HUD and the sound button */
+  /* room at the bottom for the vitals HUD */
   padding: clamp(12px, 3vh, 34px) clamp(16px, 3vw, 28px) clamp(64px, 9vh, 84px);
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
@@ -1188,6 +1193,25 @@ a {
 }
 /* short screens (landscape phones): the compact bar, no vitals readout, a tighter slide */
 @media (max-height: 500px) {
+  /* the opening, compact: the headline under the HUD, a smaller readout just above the dock */
+  .ov-lead {
+    top: calc(var(--topH) + 32px);
+  }
+  .ov-t {
+    font-size: 26px;
+  }
+  .ov-l {
+    display: none;
+  }
+  .ov-read {
+    bottom: calc(10px + var(--ob));
+  }
+  .ov-read b {
+    font-size: 40px;
+  }
+  .ov-scale {
+    bottom: calc(24px + var(--ob));
+  }
   :root {
     --navh: 64px;
   }
@@ -1195,7 +1219,7 @@ a {
     display: none;
   }
   .slide {
-    padding: 8px clamp(14px, 3vw, 24px) 52px;
+    padding: 8px clamp(14px, 3vw, 24px) 10px;
   }
   .talk p {
     font-size: 14px;
@@ -1216,7 +1240,7 @@ a {
 /* portrait tablets keep the vitals readout, so the slide leaves room for it */
 @media (min-width: 601px) and (max-width: 900px) and (orientation: portrait) {
   .slide {
-    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+    padding-bottom: 96px;
   }
 }
 /* narrow phones: the slide needs the whole screen, so the vitals readout steps aside in the chapters */
@@ -1224,17 +1248,15 @@ a {
   body .vitals {
     display: none;
   }
-  /* the dots sit right under the line, and HOW IT WORKS shares the bottom row with the sound button,
-     so the slide doesn't need to reserve a strip below it */
+  /* the dots sit right under the line and HOW IT WORKS right under them, just above the dock */
   .slide {
-    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    padding-bottom: 10px;
   }
   .talk-dots {
     margin-top: 8px;
   }
   .how {
     margin-top: 12px;
-    margin-right: 46px;
   }
   .ghost {
     font-size: 46vw;
@@ -1796,8 +1818,8 @@ a {
 .end-stage {
   position: sticky;
   top: 0;
-  height: 100vh;
-  height: 100svh;
+  height: calc(100vh - var(--dockB));
+  height: calc(100svh - var(--dockB));
   overflow: hidden;
   clip-path: inset(0);
   display: flex;
@@ -1863,11 +1885,11 @@ a {
   margin-top: 6px;
 }
 
-/* ---------------- W2 vitals HUD · W1 sound · 60 SEC button ---------------- */
+/* ---------------- W2 vitals HUD · 60 SEC button ---------------- */
 .vitals {
   position: fixed;
   left: 18px;
-  bottom: 18px;
+  bottom: calc(18px + var(--dockB));
   z-index: 30;
   display: flex;
   gap: 18px;
@@ -1898,99 +1920,19 @@ a {
   line-height: 0.95;
   min-width: 2.6em;
 }
-@keyframes eq {
-  from {
-    height: 20%;
-  }
-  to {
-    height: 100%;
-  }
-}
-.snd {
-  position: fixed;
-  right: 18px;
-  bottom: 18px;
-  z-index: 30;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: 0.24em;
-  color: var(--t2);
-  border: 1px solid var(--hair);
-  background: rgba(3, 4, 9, 0.82);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-}
-.snd:hover {
-  color: var(--ghost);
-  border-color: rgba(255, 0, 229, 0.5);
-}
-.snd.on {
-  color: var(--ghost);
-  border-color: transparent;
-  background:
-    linear-gradient(#07080f, #07080f) padding-box,
-    conic-gradient(from var(--foil), #ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5) border-box;
-  animation: foil 6s linear infinite;
-}
-.snd .eq {
-  display: inline-flex;
-  gap: 2px;
-  align-items: flex-end;
-  height: 12px;
-}
-.snd .eq i {
-  width: 2px;
-  height: 30%;
-  background: var(--t3);
-}
-.snd.on .eq i {
-  background: var(--grad);
-  animation: eq 0.9s ease-in-out infinite alternate;
-}
-.snd.on .eq i:nth-child(2) {
-  animation-delay: -0.3s;
-}
-.snd.on .eq i:nth-child(3) {
-  animation-delay: -0.6s;
-}
-.snd.on .eq i:nth-child(4) {
-  animation-delay: -0.15s;
-}
-.snd-t:not(:empty) {
-  color: var(--cyan);
-}
-.snd-t:not(:empty)::before {
-  content: "· ";
-  color: var(--t4);
-}
-body.sheet-open .snd,
-body.sheet-open .vitals,
-body.at-foot .snd {
+body.sheet-open .vitals {
   opacity: 0;
   pointer-events: none;
 }
 @media (max-width: 640px) {
   .vitals {
     left: 10px;
-    bottom: 10px;
+    bottom: calc(10px + var(--dockB));
     gap: 12px;
     padding: 8px 10px;
   }
   .vitals b {
     font-size: 20px;
-  }
-  .snd {
-    right: 10px;
-    bottom: 10px;
-    padding: 9px 10px;
-  }
-  .snd-t,
-  .snd-l {
-    display: none;
   }
 }
 
@@ -2156,7 +2098,6 @@ body.at-foot .snd {
   .tc-t .l,
   .tc-t::before,
   .tc-t::after,
-  .snd.on .eq i,
   .ov-hint,
   .ov-rec i {
     animation: none;

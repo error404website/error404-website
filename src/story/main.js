@@ -9,7 +9,7 @@ import "./story.css";
 import { rain, REDUCE } from "../lib/rain.js";
 import { CHAPTERS } from "../data/chapters.js";
 import { SOURCES, highlight } from "./sources.js";
-import { score } from "./sound.js";
+import { mountDock } from "./dock.jsx";
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -89,6 +89,8 @@ function topBar() {
 const ov = (() => {
   const sec = $("#ov"),
     stage = $(".ov-stage", sec),
+    // phones, and short screens (landscape phones) where the dock leaves too little height for callouts
+    compact = () => cv.width < 640 || cv.height < 420,
     cv = $("#ovHeat"),
     ctx = cv.getContext("2d"),
     FW = 160,
@@ -237,7 +239,7 @@ const ov = (() => {
       H = cv.height,
       s = Math.min(Math.max(W / FW, H / FH), W / 56),
       k = Math.min(1, W / 900),
-      phone = W < 640;
+      phone = compact();
     scale = s;
     SPOTS.forEach((sp, i) => {
       const t = tags[i];
@@ -354,7 +356,7 @@ const ov = (() => {
     if (!raf && p < 0.86) raf = requestAnimationFrame(draw);
     const load = seg(p, 0.04, 0.72);
     $("#ovHint").style.opacity = raw < 0.03 ? 1 : 0;
-    const phone = cv.width < 640,
+    const phone = compact(),
       newest = SPOTS.reduce((n, s, i) => (load > s.at + 0.06 ? i : n), -1);
     SPOTS.forEach(
       (s, i) => (tags[i].style.opacity = p < 0.72 && (phone ? i === newest : load > s.at + 0.06) ? 1 : 0),
@@ -368,7 +370,7 @@ const ov = (() => {
     if ($("#ovT").innerHTML !== lead[0]) {
       $("#ovT").innerHTML = lead[0];
       $("#ovL").textContent = lead[1];
-      if (cv.width < 640) size(); // the job line sits under the headline
+      if (compact()) size(); // the job line sits under the headline
     }
     $("#ovFlash").style.opacity = REDUCE ? 0 : seg(p, 0.76, 0.8) - seg(p, 0.82, 0.88);
     // the skull stays burnt into the white for a beat, like sensor burn-in
@@ -427,14 +429,17 @@ new IntersectionObserver(
   { threshold: 0.4 },
 ).observe($("#stats"));
 
-/* ================= W1 score ================= */
-const bed = score({
-  button: $("#snd"),
-  label: $("#sndT"),
-  onChange: (on) => $$("[data-snd]").forEach((b) => (b.textContent = on ? "♪ SOUND: ON" : "♪ SOUND")),
-});
-// the menu bar's and the menu's SOUND buttons drive the same switch
-for (const b of $$("[data-snd]")) b.addEventListener("click", () => $("#snd").click());
+/* ================= the site's player dock ================= */
+mountDock($("#dock"));
+// the menu bar's and the menu's SOUND buttons play and pause the dock, and say whether it's playing
+for (const b of $$("[data-snd]")) b.addEventListener("click", () => $(".e-dock .e-playbtn")?.click());
+let dockOn = null;
+new MutationObserver(() => {
+  const on = !!$(".e-dock")?.classList.contains("playing");
+  if (on === dockOn) return;
+  dockOn = on;
+  $$("[data-snd]").forEach((b) => (b.textContent = on ? "♪ SOUND: ON" : "♪ SOUND"));
+}).observe($("#dock"), { subtree: true, childList: true, attributes: true, attributeFilter: ["class"] });
 
 /* ================= the book: one section per chapter ================= */
 const chaps = $$(".chap");
@@ -458,8 +463,12 @@ function fitTalk(c) {
     talk = $(".talk", c);
   step.style.minHeight = "";
   if (!SUBS.matches) return;
-  const tallest = Math.max(...$$(".talk p", c).map((p) => p.offsetHeight));
-  step.style.minHeight = step.offsetHeight - talk.offsetHeight + tallest + "px";
+  const tallest = Math.max(...$$(".talk p", c).map((p) => p.offsetHeight)),
+    slide = step.parentElement,
+    cs = getComputedStyle(slide),
+    room = slide.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  // never more than the slide has (landscape phones, where the dock takes a big share of the height)
+  step.style.minHeight = Math.min(room, step.offsetHeight - talk.offsetHeight + tallest) + "px";
 }
 // every visual is scaled to fit the room its slide gives it, on any screen
 function fitVisuals(c) {
@@ -490,8 +499,9 @@ function book() {
       onVis[name]?.(inView);
     }
     if (r.top < H && r.bottom > 0) {
-      // progress through the pinned slide: 0 when it locks under the bar, 1 when it lets go
-      const run = r.height - (H - topH()),
+      // progress through the pinned slide: 0 when it locks under the bar, 1 when it lets go (measured
+      // against the slide, which ends above the dock and doesn't change as phone toolbars come and go)
+      const run = r.height - $(".slide", c).offsetHeight,
         p = Math.min(1, Math.max(0, (topH() - r.top) / run));
       c.style.setProperty("--fill", (p * 100).toFixed(1) + "%");
       c.style.setProperty("--ry", lerp(-16, -3, p).toFixed(2) + "deg");
@@ -539,7 +549,7 @@ for (const btn of $$(".srcbtn")) {
   });
 }
 
-/* ================= sections: score track, vitals (W2), chapter name ================= */
+/* ================= sections: vitals (W2), chapter name ================= */
 const zones = $$("[data-track]");
 const vit = { t: 104, f: 4170, j: 9, show: false };
 let vitTarget = { t: 104, j: 9 },
@@ -547,7 +557,6 @@ let vitTarget = { t: 104, j: 9 },
 function zonesTick() {
   let z = zones[0];
   for (const el of zones) if (el.getBoundingClientRect().top < innerHeight * 0.5) z = el;
-  bed.track("gospel_out"); // the score is GOSPEL_OUT throughout
   const show = z.dataset.temp != null && !$("#tldr").classList.contains("open");
   $("#vitals").classList.toggle("on", show);
   if (z.dataset.temp != null) vitTarget = { t: +z.dataset.temp, j: +z.dataset.jobs };
@@ -682,7 +691,8 @@ const seam = (() => {
     ui();
   }
   function ui() {
-    bed.duck(S.playing); // the score steps aside while the A/B plays
+    // the site's players step aside for each other: the dock pauses while the A/B plays
+    if (S.playing) dispatchEvent(new CustomEvent("e404-audio-play", { detail: S }));
     $("#seamPlay").textContent = S.playing ? "❚❚ PAUSE" : "▶ PLAY";
     $$("#seam .ab").forEach((b) => b.classList.toggle("on", b.dataset.k === S.mode));
     $$("#seam .wv").forEach((w) => w.classList.toggle("dim", w.dataset.k !== S.mode));
@@ -720,6 +730,8 @@ const seam = (() => {
       }
     }
   }
+  // and the A/B stops when the dock starts
+  addEventListener("e404-audio-play", (e) => e.detail !== S && pause());
   $("#seamPlay").onclick = async () => {
     await load();
     await S.ctx.resume();
@@ -1040,10 +1052,6 @@ new IntersectionObserver(
     }),
   { rootMargin: "-10%" },
 ).observe($("#vfoot"));
-// the footer bar has the bottom corners to itself
-new IntersectionObserver((es) =>
-  es.forEach((e) => document.body.classList.toggle("at-foot", e.isIntersecting)),
-).observe($(".e-fbar"));
 $("#backTop").addEventListener("click", () => scrollTo({ top: 0, behavior: REDUCE ? "auto" : "smooth" }));
 
 /* ================= scroll loop ================= */

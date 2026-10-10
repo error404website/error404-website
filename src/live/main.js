@@ -6,6 +6,7 @@
 // /audio files. PRELOAD stores everything in the browser's Cache Storage, so the show runs offline.
 import "../styles/index.css";
 import "../styles/overrides.css";
+import "../styles/dock.css";
 import "../vault/vault.css";
 import "./live.css";
 import { audioSrc } from "../lib/audioSrc";

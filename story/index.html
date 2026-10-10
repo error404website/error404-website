@@ -995,16 +995,15 @@
       </div>
     </footer>
 
-    <!-- ================= W2 vitals + W1 sound (fixed) ================= -->
+    <!-- ================= the site's player dock (src/story/dock.jsx mounts PlayerDock here) ================= -->
+    <div id="dock"></div>
+
+    <!-- ================= W2 vitals (fixed) ================= -->
     <div class="vitals" id="vitals" aria-hidden="true">
       <div><span class="lab">SOC</span><b class="grad" id="vT">104°</b></div>
       <div><span class="lab">FAN</span><b id="vF">4,170</b></div>
       <div><span class="lab">JOBS</span><b id="vJ">9</b></div>
     </div>
-    <button class="snd" id="snd" type="button" aria-pressed="false">
-      <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span
-      ><span class="snd-l">SOUND OFF</span><span class="snd-t" id="sndT"></span>
-    </button>
 
     <!-- ================= W6 60-second read (+ W9 case file: it prints as a one-page PDF) ================= -->
     <div class="tldr" id="tldr" role="dialog" aria-modal="true" aria-labelledby="tldr-h" hidden>
