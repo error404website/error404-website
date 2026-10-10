@@ -239,7 +239,18 @@ function reveal() {
   $$(".abl-chap.reveal").forEach((el) => io.observe(el));
 }
 
-const SECTIONS = ["setup", "keylab", "flow", "setlist", "test", "help", "night", "offline", "built"];
+const SECTIONS = [
+  "setup",
+  "keylab",
+  "flow",
+  "setlist",
+  "instruments",
+  "test",
+  "help",
+  "night",
+  "offline",
+  "built",
+];
 function startNav() {
   const burger = $("#burger"),
     menu = $("#vmenu");
@@ -274,6 +285,7 @@ function startNav() {
     keylab: "keylab",
     flow: "flow",
     setlist: "setlist",
+    instruments: "setlist",
     test: "test",
     help: "help",
     night: "help",
@@ -719,7 +731,21 @@ function apply(data) {
     return `${head}<div class="r"><span><span class="cam" style="background:${CAM[s.ch]}">${String(s.n).padStart(2, "0")}</span></span><span class="tt">${s.t}</span><span>${s.bpm}</span><span class="k">${s.key.toUpperCase()}</span><span class="cp">${s.chops.map((c, i) => `<span class="pc"><b>${i + 1}</b>${esc(c)}</span>`).join("")}</span></div>`;
   }).join("")}</div>`;
 
-  /* 05 · rig tester */
+  /* 05 · the instruments */
+  $("#in").innerHTML = `<div class="abl-inst">${C.instruments
+    .map((x) => {
+      const w = x.name.split(" ");
+      const name =
+        w.length > 1
+          ? `${w.slice(0, -1).join(" ")} <span class="grad">${w.at(-1)}</span>`
+          : `<span class="grad">${x.name}</span>`;
+      return `<div class="ic"><div class="ih"><b>${name}</b><span>${x.sub}</span></div><p>${esc(x.text)}</p>
+  <div class="ik">${x.keys.map(([k, v]) => `<div><span>${k}</span>${v}</div>`).join("")}</div>
+  ${x.macros.length ? `<div class="im">${x.macros.map((m, i) => `<span><b>${i + 1}</b>${m}</span>`).join("")}</div>` : ""}</div>`;
+    })
+    .join("")}</div>`;
+
+  /* 06 · rig tester */
   const TROWS = ["KEYLAB PADS · CH 10", "ENCODERS", "FADERS", "MOVE KEYS · C C♯ D", "ABLETON FEED · IAC"];
   $("#ts").innerHTML =
     `<div class="abl-test"><div class="hd"><span class="abl-chap-e" style="margin:0">LISTENING FOR YOUR RIG</span><button class="holo" id="tGo">CONNECT MIDI</button></div>
@@ -769,7 +795,7 @@ function apply(data) {
     log.textContent = `INPUTS · ${[...a.inputs.values()].map((i) => i.name.toUpperCase()).join(" · ") || "NONE"}`;
   };
 
-  /* 06 · troubleshooting · 07 · the night · 08 · offline · 09 · built */
+  /* 07 · troubleshooting · 08 · the night · 09 · offline · 10 · built */
   $("#tr").innerHTML =
     `<div class="abl-ts">${C.trouble.map(([q, a]) => `<details><summary>${q}</summary><p>${esc(a)}</p></details>`).join("")}</div>`;
   $("#ps").innerHTML =

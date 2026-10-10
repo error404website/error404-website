@@ -1,5 +1,5 @@
 {
-  "version": "v1.2",
+  "version": "v1.3",
   "steps": [
     [
       "WHAT YOU NEED",
@@ -15,10 +15,10 @@
       "DOWNLOAD AND UNZIP",
       [
         "Press DOWNLOAD THE PROJECT (0.9 GB)",
-        "Unzip it anywhere and keep the folder together; an SSD is best",
-        "Optional: check the download with the SHA-256 shown in the transfer panel, or run  shasum -a 256 -c CHECKSUMS.txt  inside the folder"
+        "Unzip it anywhere and keep the folders together; an SSD is best",
+        "Optional: check the download with the SHA-256 shown in the transfer panel, or run  shasum -a 256 -c CHECKSUMS.txt  inside each folder"
       ],
-      "you have a folder called ARCHIVE_404 Live Project"
+      "you have ARCHIVE_404 Live Project and ERROR 404 Instruments Project"
     ],
     [
       "OPEN THE SET",
@@ -151,6 +151,48 @@
     ],
     ["188", "locators: every song and section, so REPEAT and SKIP land where you expect"],
     ["120", "vocal chops cut on word timings, six per song, swapping at every changeover"],
+    ["124", "guitar hits behind CHUG: four tones, round robin, two velocity layers, all from the album"],
     ["0", "hand edits: rebuild after any timing change and the set, the prompter and /live/ still agree"]
+  ],
+  "instruments": [
+    {
+      "name": "CHUG",
+      "sub": "DJENT GUITAR · 4 TONES",
+      "text": "The album's drop-tuned chugs, cut at every guitar note in its MIDI. Low keys chug, pitched per key, with round robin so fast 16ths never machine-gun; play harder for the sharper picks.",
+      "keys": [
+        ["C1–B2", "CHUGS · AN OCTAVE DOWN"],
+        ["C3–B3", "12 ONE-BAR RIFFS · HOLD TO LOOP, AT YOUR TEMPO"],
+        ["C4 UP · PADS", "HELD POWER CHORDS"]
+      ],
+      "macros": ["TONE", "TIGHT", "GAIN", "CAB", "WIDTH", "DROP", "RIFFS", "CHUGS"]
+    },
+    {
+      "name": "GLITCH VOX",
+      "sub": "44 SUNG CHOPS · CHROMATIC",
+      "text": "Lead, backing and gang syllables, each pitch-checked and fine-tuned to its note. Pick a chop with CHOP; every key then plays it at exactly that note.",
+      "keys": [["ALL KEYS", "THE CHOSEN CHOP AT THE NOTE YOU PLAY"]],
+      "macros": ["CHOP", "STUTTER", "TAPE", "OCT DOWN", "REVERSE", "404", "ECHO", "GLIDE"]
+    },
+    {
+      "name": "SUB 404",
+      "sub": "SINE SUB + ALBUM GRIT",
+      "text": "A clean, mono sine sub that stays in tune on every key, with the album's own bass notes looped underneath as a grit layer through Roar and OTT.",
+      "keys": [["ALL KEYS", "MONO · LEGATO GLIDE"]],
+      "macros": ["SUB", "GRIT", "DRIVE", "GROWL", "GLIDE", "OTT", "GRIT TONE", "OCTAVE"]
+    },
+    {
+      "name": "KIT 404",
+      "sub": "8 SONG KITS · ONE PER OCTAVE",
+      "text": "Kick, rim, snare, clap, toms, hats, 808 and crash from eight songs' drum stems, laid out the same way in every octave. The KeyLab's octave buttons pick which four kits are under your hands.",
+      "keys": [["EACH OCTAVE", "C KICK · D SNARE · D♯ CLAP · F♯ HAT · A OPEN HAT · A♯ 808 · B CRASH"]],
+      "macros": []
+    },
+    {
+      "name": "ATMOS",
+      "sub": "10 ENDLESS PADS",
+      "text": "Held chords from the strings, synths and keys, stretched in Simpler's Texture mode into pads that last as long as you hold them. Play one key for the whole chord.",
+      "keys": [["ALL KEYS", "THE CHORD, ROOTED ON THE KEY YOU PLAY"]],
+      "macros": ["TEXTURE", "ATTACK", "RELEASE", "FILTER", "RES", "SPREAD", "OCTAVE", "DRIFT"]
+    }
   ]
 }
