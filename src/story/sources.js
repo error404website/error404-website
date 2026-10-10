@@ -143,20 +143,23 @@ function feed(t, playing) {
 	slot = (slot + 1) % 6;
 }`,
   },
-  comic: {
-    file: "e404-comics-work/comfy_render.py",
+  crew: {
+    file: "e404-mix-work/refine.py",
     lang: "py",
-    code: `# face lock: an image in ComfyUI's input folder + IP-Adapter weight
-"22": {"class_type": "IPAdapterModelLoader",
-       "inputs": {"ipadapter_file": "ip-adapter-plus-face_sdxl_vit-h.safetensors"}},
-"24": {"class_type": "IPAdapterAdvanced",
-       "inputs": {"model": ["4", 0], "ipadapter": ["22", 0], "image": ["21", 0],
-                  "clip_vision": ["23", 0], "weight": a.fw, "weight_type": "linear",
-                  "combine_embeds": "concat",
-                  "start_at": a.fstart, "end_at": 1.0, "embeds_scaling": "V only"}},
+    code: `# wav2vec2 is a vote, not a replacement: in a dense mix it lets a line's first word grab the
+# breath / ad-lib before the entry. Per word, take its timing only when the two agree within
+# AGREE; otherwise stable-ts stands. Squashed stable-ts words always take wav2vec2's spread.
+AGREE = 0.15    # S3: wav2vec2 moves a word only when within this of stable-ts
 …
-p.add_argument("--face", default=None); p.add_argument("--fw", type=float, default=0.75)
-p.add_argument("--fstart", type=float, default=0.0)`,
+pick, used = [], 0
+for k2, a in enumerate(A):
+    b = B[k2] if B else None
+    short = a["e"] - a["s"] < SQUASH
+    if b and (abs(b["s"] - a["s"]) <= AGREE or (short and abs(b["s"] - a["s"]) <= 2 * AGREE)):
+        pick.append({"w": a["w"], "s": b["s"], "e": b["e"]})
+        used += 1
+    else:
+        pick.append(dict(a))`,
   },
 };
 

@@ -3,6 +3,7 @@
 // then a title card + full-bleed body per chapter (each visual flips to its real source code), the AI crew,
 // and credits that roll while the machine cools. Optional score (SOUND ON), a vitals HUD carried over from
 // the opening, and a 60-second case file that prints as a one-page PDF.
+import "./site-chrome.css";
 import "./logo-fx.css";
 import "./story.css";
 import { rain, REDUCE } from "../lib/rain.js";
@@ -22,14 +23,65 @@ const through = (el) => {
   return Math.min(1, Math.max(0, -r.top / (r.height - innerHeight)));
 };
 
-/* ================= top bar: chapter name + reading progress ================= */
-const chapterEls = $$("[data-ch]");
+/* ================= the site's menu bar + slat menu (the vault's behaviour) + L1 chapter ruler ================= */
+const navH = () => parseInt(getComputedStyle(document.documentElement).getPropertyValue("--navh")) || 80;
+const menu = (() => {
+  const burger = $("#burger"),
+    m = $("#vmenu");
+  const set = (o) => {
+    m.classList.toggle("is-open", o);
+    m.setAttribute("aria-hidden", !o);
+    m.inert = !o;
+    burger.setAttribute("aria-expanded", o);
+    burger.classList.toggle("is-open", o);
+    burger.setAttribute("aria-label", o ? "Close menu" : "Open menu");
+    document.body.classList.toggle("menu-open", o);
+  };
+  burger.onclick = () => set(!m.classList.contains("is-open"));
+  addEventListener("keydown", (e) => e.key === "Escape" && m.classList.contains("is-open") && set(false));
+  return { set };
+})();
+// every chapter link lands its section just under the bar + ruler
+for (const a of $$("[data-nav]"))
+  a.addEventListener("click", (e) => {
+    e.preventDefault();
+    menu.set(false);
+    const t = document.getElementById(a.dataset.nav);
+    if (!t) return;
+    const y = t.id === "ov" ? 0 : t.getBoundingClientRect().top + scrollY - navH() - 22;
+    scrollTo({ top: y, behavior: REDUCE ? "auto" : "smooth" });
+  });
+// the ruler's marks sit where each chapter really starts on the page
+const marks = $$("#ruler .mk"),
+  spyIds = marks.map((m) => m.dataset.for);
+function placeMarks() {
+  const H = document.documentElement.scrollHeight - innerHeight;
+  for (const m of marks) {
+    const t = document.getElementById(m.dataset.for),
+      y = t.id === "ov" ? 0 : t.getBoundingClientRect().top + scrollY - navH() - 22;
+    m.style.left = Math.min(0.985, Math.max(0, y / H)) * 100 + "%";
+  }
+}
+addEventListener("resize", placeMarks);
+addEventListener("load", placeMarks);
+let spied = "";
 function topBar() {
-  const h = document.documentElement.scrollHeight - innerHeight;
-  $("#topBar").style.transform = `scaleX(${h > 0 ? scrollY / h : 0})`;
-  let name = chapterEls[0].dataset.ch;
-  for (const el of chapterEls) if (el.getBoundingClientRect().top < innerHeight * 0.5) name = el.dataset.ch;
-  if ($("#topCh").textContent !== name) $("#topCh").textContent = name;
+  const H = document.documentElement.scrollHeight - innerHeight;
+  $("#ruler").style.setProperty("--p", H > 0 ? Math.min(1, scrollY / H) : 0);
+  // scroll spy: the last chapter whose top has passed under the bar
+  let cur = "ov";
+  for (const id of spyIds)
+    if (document.getElementById(id).getBoundingClientRect().top < navH() + 120) cur = id;
+  if (cur === spied) return;
+  spied = cur;
+  for (const a of $$("[data-nav]")) {
+    const on = a.dataset.nav === cur,
+      desk = a.classList.contains("e8-link");
+    a.classList.toggle("active", on && desk);
+    a.classList.toggle("on", on && !desk);
+    on && desk ? a.setAttribute("aria-current", "location") : a.removeAttribute("aria-current");
+  }
+  marks.forEach((m) => m.classList.toggle("on", m.dataset.for === cur));
 }
 
 /* ================= 00 · the overload: thermal camera ================= */
@@ -276,7 +328,13 @@ new IntersectionObserver(
 ).observe($("#stats"));
 
 /* ================= W1 score ================= */
-const bed = score({ button: $("#snd"), label: $("#sndT") });
+const bed = score({
+  button: $("#snd"),
+  label: $("#sndT"),
+  onChange: (on) => $$("[data-snd]").forEach((b) => (b.textContent = on ? "♪ SOUND: ON" : "♪ SOUND")),
+});
+// the menu bar's and the menu's SOUND buttons drive the same switch
+for (const b of $$("[data-snd]")) b.addEventListener("click", () => $("#snd").click());
 
 /* ================= the book: one section per chapter ================= */
 const chaps = $$(".chap");
@@ -390,6 +448,12 @@ function vitStep() {
       close($(a.getAttribute("href")));
     });
   $("#print60").addEventListener("click", () => window.print());
+  for (const b of $$("[data-open60]"))
+    b.addEventListener("click", () => {
+      menu.set(false);
+      open();
+    });
+  for (const b of $$("[data-print]")) b.addEventListener("click", () => window.print());
 })();
 
 /* ---- SITE: the PR film strip (real merged PRs) ---- */
@@ -649,13 +713,15 @@ onVis.seam = seam.show;
   onVis.feed = run;
 })();
 
-/* ================= the crew (A4) ================= */
+/* ================= 08 · the crew (C3): who checks whom ================= */
+// name, role, job, failure on record (real), what checks it, stat
 const CREW = [
   [
     "SUNO",
     "TAKES",
     "Rendered every take from the three-layer style spec.",
     "Drifts in tempo, and its stems are a different render from the masters (±1.5 s), so they're never used for timing.",
+    "essentia.js measures every master: BPM, key, and how many models agree.",
     "20 SONGS",
   ],
   [
@@ -663,6 +729,7 @@ const CREW = [
     "STEMS",
     "Separated the vocal from every master; the instrumental is master minus vocal.",
     "",
+    "stable-ts and wav2vec2 run on its vocal; a sync report flags any line that looks wrong.",
     "40 FILES",
   ],
   [
@@ -670,6 +737,7 @@ const CREW = [
     "LYRIC TIMING",
     "First pass of word timings on the separated vocals, on the Mac's GPU.",
     "",
+    "wav2vec2 votes on every word.",
     "899 LINES",
   ],
   [
@@ -677,14 +745,23 @@ const CREW = [
     "SECOND OPINION",
     "Votes on each word within 150 ms of stable-ts.",
     "On its own it pulled lines 200–800 ms early onto breaths and ad-libs.",
+    "Only counts when it agrees with stable-ts within 150 ms.",
     "8,711 WORDS",
   ],
-  ["MADMOM", "BEATS", "Beat and downbeat tracking, so every seam lands on a bar.", "", "19 SEAMS"],
+  [
+    "MADMOM",
+    "BEATS",
+    "Beat and downbeat tracking, so every seam lands on a bar.",
+    "",
+    "The vocal stem: a seam moves on by whole bars if two voices would touch.",
+    "19 SEAMS",
+  ],
   [
     "RUBBER BAND",
     "TIME",
     "Stretched the DJ mix between beat pins as Suno drifted.",
     "Its keyframe map can't be passed from Python, so it ran in real-time mode with a ratio per beat.",
+    "madmom's beat pins.",
     "PER BEAT",
   ],
   [
@@ -692,6 +769,7 @@ const CREW = [
     "ANALYSIS",
     "Measured BPM and key in the browser with three key profiles.",
     "",
+    "Three key profiles; the vault shows how many agree.",
     "20 TRACKS",
   ],
   [
@@ -699,6 +777,7 @@ const CREW = [
     "PANELS",
     "Ink-noir comic panels, text-free, on a 16 GB Mac.",
     "Artist names in the style prompt came out as text on posters.",
+    "A ControlNet guide from the storyboard, and a contact sheet per page.",
     "3 MIN / PANEL",
   ],
   [
@@ -706,6 +785,7 @@ const CREW = [
     "FACE LOCK",
     "Keeps the Subject's face the same across a book.",
     "At full strength from step 0 it turned every scene into a close-up.",
+    "An explicit shot size in every prompt; it starts at 20% of the steps.",
     "0.7 FROM 20%",
   ],
   [
@@ -713,26 +793,77 @@ const CREW = [
     "COMPOSITION",
     "Traces each storyboard's framing into a guide for the render.",
     "",
+    "The storyboard itself.",
     "GUIDE 0.6",
   ],
   [
     "CLAUDE CODE",
     "ENGINEERING",
-    "Wrote, tested and opened the pull requests; every merge was reviewed.",
+    "Wrote, tested and opened the pull requests.",
     "Shipped a holo button that leaked across the page in Safari (#17); root-caused and fixed in #18.",
+    "CI on every PR, and NULLSAINT × CACHEGHOST review every merge.",
     "77 MERGED",
   ],
 ];
-$("#crewTrack").innerHTML = CREW.map(
-  ([n, r, p, f, s]) =>
-    `<article class="cc"><span class="role">${r}</span><b>${n}</b><p>${p}</p>${f ? `<p class="fail">${f}</p>` : ""}<span class="st grad">${s}</span></article>`,
-).join("");
+(() => {
+  const W = 660,
+    H = 470,
+    cx = W / 2,
+    cy = H / 2;
+  const pos = CREW.map((_, k) => {
+    const a = (k / CREW.length) * Math.PI * 2 - Math.PI / 2;
+    return [cx + Math.cos(a) * 250, cy + Math.sin(a) * 180];
+  });
+  // the real cross-checks: stable-ts ↔ wav2vec2, madmom ↔ Demucs' vocal, Rubber Band ↔ madmom,
+  // Suno ↔ essentia.js, SDXL ↔ ControlNet, IP-Adapter ↔ SDXL, Demucs → stable-ts
+  const CHECK = [
+    [2, 3],
+    [4, 1],
+    [5, 4],
+    [0, 6],
+    [7, 9],
+    [8, 7],
+    [1, 2],
+  ];
+  const node = (c, k) =>
+    `<g class="node${c[3] ? " x" : ""}" data-k="${k}" tabindex="0" role="button" aria-label="${c[0]}" transform="translate(${(pos[k][0] - 64).toFixed(1)},${(pos[k][1] - 16).toFixed(1)})"><rect width="128" height="32"/>${c[3] ? '<rect class="fx" x="-4" y="-4" width="136" height="40"/>' : ""}<text x="64" y="20" text-anchor="middle">${c[0]}</text></g>`;
+  $("#crewMap").innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" role="group" aria-label="The AI crew and what checks each one"><defs><linearGradient id="cmg" x1="0" x2="1"><stop offset="0" stop-color="#ff00e5"/><stop offset="1" stop-color="#00efff"/></linearGradient></defs>
+    ${CREW.map((_, k) => `<path class="edge" d="M${cx},${cy} L${pos[k][0].toFixed(1)},${pos[k][1].toFixed(1)}"/>`).join("")}
+    ${CHECK.map(([a, b]) => `<path class="edge check" d="M${pos[a][0].toFixed(1)},${pos[a][1].toFixed(1)} Q${cx},${cy} ${pos[b][0].toFixed(1)},${pos[b][1].toFixed(1)}"/>`).join("")}
+    ${CREW.map(node).join("")}<g class="hub" transform="translate(${cx - 122},${cy - 21})"><rect width="244" height="42"/><text x="122" y="26" text-anchor="middle">NULLSAINT × CACHEGHOST</text></g></svg>
+    <div class="map-info" id="crewInfo" aria-live="polite"></div>`;
+  let i = 3,
+    timer = 0;
+  const show = (k) => {
+    i = k;
+    const c = CREW[k];
+    $$("#crewMap .node").forEach((n) => n.classList.toggle("on", +n.dataset.k === k));
+    $("#crewInfo").innerHTML =
+      `<b>${c[0]} <em>${c[1]}</em><span class="st">${c[5]}</span></b><p class="job">${c[2]}</p><div><span>CHECKED BY</span>${c[4]}</div><div><span class="${c[3] ? "bad" : "ok"}">${c[3] ? "FAILED" : "FAILURES"}</span>${c[3] || "None on record."}</div>`;
+  };
+  const cycle = (on) => {
+    clearInterval(timer);
+    if (on && !REDUCE) timer = setInterval(() => show((i + 1) % CREW.length), 4000);
+  };
+  for (const n of $$("#crewMap .node")) {
+    const pick = () => {
+      show(+n.dataset.k);
+      cycle(false); // a reader's pick stays put
+    };
+    n.addEventListener("click", pick);
+    n.addEventListener(
+      "keydown",
+      (e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), pick()),
+    );
+  }
+  show(i);
+  onVis.crew = cycle;
+})();
 
-/* ================= closing: credits roll while the machine cools ================= */
+/* ================= closing (F2): the machine cools, then the site's cinematic credits ================= */
 const end = (() => {
-  const sec = $("#end"),
-    cr = $("#credits"),
-    fin = $("#endFinal");
+  const sec = $("#end");
   let fx = null;
   return function update() {
     const r = sec.getBoundingClientRect(),
@@ -742,20 +873,34 @@ const end = (() => {
       fx.stop();
       fx = null;
     }
-    const p = through(sec),
-      roll = seg(p, 0.02, 0.74),
-      cool = seg(p, 0, 0.8);
-    cr.style.transform = `translateY(${-roll * (cr.offsetHeight + innerHeight)}px)`;
-    $("#endTemp").textContent = Math.round(lerp(108, 41, 1 - (1 - cool) ** 2)) + "°";
-    $("#endJobs").textContent = cool < 1 ? "ALL JOBS COMPLETE · FANS SPINNING DOWN" : "IDLE · 41°C";
+    const cool = 1 - (1 - seg(through(sec), 0, 0.85)) ** 2,
+      t = lerp(75, 41, cool);
+    $("#endTemp").textContent = Math.round(t) + "°";
+    $("#endFan").textContent = Math.round(((t - 41) / (108 - 41)) * 4900).toLocaleString("en-GB");
+    $("#endJ").textContent = Math.round(2 * (1 - cool));
+    $("#endJobs").textContent = cool < 1 ? "ALL JOBS COMPLETE · FANS SPINNING DOWN" : "IDLE · 41°C · 0 JOBS";
     fx?.speed(lerp(1, 0.25, cool));
     $("#endRain").style.opacity = lerp(1, 0.35, cool);
-    const f = seg(p, 0.78, 0.9);
-    fin.style.opacity = f;
-    fin.classList.toggle("on", f > 0.5);
-    $(".end-temp").style.opacity = 1 - f;
   };
 })();
+// the credits rise line by line, as on the vault
+new IntersectionObserver(
+  (es, o) =>
+    es.forEach((e) => {
+      if (!e.isIntersecting) return;
+      $$(".vf-credits .e-cr").forEach(
+        (c, k) => (c.style.transitionDelay = (REDUCE ? 0 : 0.2 + k * 0.35) + "s"),
+      );
+      $(".vf-credits").classList.add("in");
+      o.disconnect();
+    }),
+  { rootMargin: "-10%" },
+).observe($("#vfoot"));
+// the footer bar has the bottom corners to itself
+new IntersectionObserver((es) =>
+  es.forEach((e) => document.body.classList.toggle("at-foot", e.isIntersecting)),
+).observe($(".e-fbar"));
+$("#backTop").addEventListener("click", () => scrollTo({ top: 0, behavior: REDUCE ? "auto" : "smooth" }));
 
 /* ================= scroll loop ================= */
 let ticking = false;
