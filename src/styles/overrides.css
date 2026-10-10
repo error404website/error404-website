@@ -2929,6 +2929,29 @@ body {
   background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(161, 0, 255, 0.14), transparent 70%);
 }
 
+/* intro on phones: the page is held still while it plays (no scroll, no toolbar slide), and the
+   overlay spans the large viewport so the rain canvas never resizes or stretches mid-intro; the
+   readout card stays centred in the visible (small) viewport */
+html.e-boot-lock,
+html.e-boot-lock body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+.e-boot {
+  touch-action: none;
+}
+@media (max-width: 1279px) {
+  .e-boot {
+    bottom: auto;
+    height: 100vh;
+    height: 100lvh;
+  }
+  .e-boot .e-icard {
+    top: 50vh;
+    top: 50svh;
+  }
+}
+
 /* intro readout card (site intro + vault unlock): the vault gate's viewfinder card. No box, four
    corner ticks, the rain fading to dark behind the text; a tag, a small title, the readout lines and
    a gradient bar that fills with the 00 → 20 count. */
