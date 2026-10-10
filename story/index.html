@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#030409" />
+    <!-- kept out of every search engine and AI index (also robots.txt + the X-Robots-Tag header) -->
+    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, noai, noimageai" />
+    <meta name="tdm-reservation" content="1" />
+    <title>The Build · ERROR_404</title>
+    <meta
+      name="description"
+      content="How NULLSAINT × CACHEGHOST and a crew of AI models built ARCHIVE_404 on one Mac mini."
+    />
+    <link rel="canonical" href="https://error404.run/story/" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://error404.run/story/" />
+    <meta property="og:site_name" content="ERROR_404" />
+    <meta property="og:title" content="The Build · ERROR_404" />
+    <meta
+      property="og:description"
+      content="How NULLSAINT × CACHEGHOST and a crew of AI models built ARCHIVE_404 on one Mac mini."
+    />
+    <meta property="og:image" content="https://error404.run/assets/og-image-v2.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preload" href="/fonts/bebas-neue-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- ================= TOP BAR ================= -->
+    <header class="top" id="top">
+      <a href="/" class="top-logo" aria-label="ERROR_404 home"
+        ><img src="/assets/error404logo.svg" alt="ERROR404" width="1414" height="348" draggable="false"
+      /></a>
+      <span class="top-tag">THE BUILD</span>
+      <span class="top-ch" id="topCh" aria-live="polite">00 · THE OVERLOAD</span>
+      <span class="top-bar" aria-hidden="true"><i id="topBar"></i></span>
+    </header>
+
+    <!-- ================= 00 · THE OVERLOAD (thermal camera) ================= -->
+    <section class="ov" id="ov" data-ch="00 · THE OVERLOAD" aria-label="The overload">
+      <div class="ov-stage">
+        <canvas class="ov-rain" id="ovRain" aria-hidden="true"></canvas>
+        <canvas class="ov-heat" id="ovHeat" aria-hidden="true"></canvas>
+        <div class="ov-scan" aria-hidden="true"></div>
+        <div class="ov-hud" aria-hidden="true">
+          <span class="ov-rec"><i></i>IR · MAC MINI · M4 · 16 GB</span><span>NULLSAINT × CACHEGHOST</span>
+        </div>
+        <i class="vt a" aria-hidden="true"></i><i class="vt b" aria-hidden="true"></i
+        ><i class="vt c" aria-hidden="true"></i><i class="vt d" aria-hidden="true"></i>
+        <div class="ov-cross" aria-hidden="true"></div>
+        <div class="ov-scale" aria-hidden="true">
+          <span style="top: -4px">110°</span><span style="top: 50%">70°</span
+          ><span style="bottom: -4px">30°</span>
+        </div>
+        <div class="ov-lead">
+          <h1 class="ov-t" id="ovT">EVERY JOB LEAVES <span class="grad">HEAT.</span></h1>
+          <p class="ov-l" id="ovL">ONE MACHINE · TWENTY SONGS · FOUR BOOKS</p>
+        </div>
+        <div class="ov-tags" id="ovTags" aria-hidden="true"></div>
+        <div class="ov-read" aria-hidden="true">
+          <span class="lab">MAX · SOC</span><b id="ovMax">34.2°</b>
+        </div>
+        <div class="ov-flash" id="ovFlash" aria-hidden="true"></div>
+        <div class="ov-boot" id="ovBoot">
+          <img src="/assets/error404logo.svg" alt="" width="1414" height="348" draggable="false" />
+          <span class="by">NULLSAINT × CACHEGHOST · THE BUILD</span>
+          <p class="t">SOME PROJECTS FIT THE MACHINE. <span class="grad">THIS ONE MELTED IT.</span></p>
+        </div>
+        <div class="ov-hint" id="ovHint" aria-hidden="true">SCROLL TO HEAT IT UP ↓</div>
+      </div>
+    </section>
+
+    <!-- ================= LEDE ================= -->
+    <section class="lede" data-ch="01 · THE BRIEF">
+      <div class="wrap">
+        <span class="kick">ARCHIVE_404 · 20 SONGS · 4 CHAPTERS · 2026</span>
+        <h2 class="h1">TWO OPERATORS. <span class="grad">ONE MAC MINI.</span> A CREW OF AI.</h2>
+        <p class="lede-p">
+          ARCHIVE_404 is a hyperpop / metalcore album in four chapters by NULLSAINT × CACHEGHOST. Around it
+          they built a website, an encrypted source vault, a live show that runs in a browser tab, a generated
+          Ableton rig and four comic books now in production, with four anime shorts to follow. There was no
+          label, no studio and no team: two operators directed a crew of AI models on one 16 GB Mac mini. This
+          is how it was built, what broke and how it was fixed.
+        </p>
+        <div class="stats" id="stats"></div>
+      </div>
+    </section>
+
+    <!-- ================= THE BOOK (sticky stage) ================= -->
+    <section class="book" id="book">
+      <div class="steps" id="steps">
+        <!-- 02 THE SOUND -->
+        <article class="step" data-vis="sound" data-ch="02 · THE SOUND">
+          <span class="num">02</span>
+          <h2 class="h2">THE <span class="grad">SOUND</span></h2>
+          <div class="talk">
+            <p class="n">
+              <b>NULLSAINT</b>Twenty songs that sound like one record. Hyperpop, metalcore, grime, a choir.
+            </p>
+            <p class="c">
+              <b>CACHEGHOST</b>Then the prompt is a spec, not a wish. One master style for the whole album,
+              five production layers to swap, and each track's own tempo, structure and vocal direction on
+              top.
+            </p>
+            <p class="n"><b>NULLSAINT</b>And the lyrics?</p>
+            <p class="c"><b>CACHEGHOST</b>Yours, with section tags telling Suno what each part does.</p>
+          </div>
+          <details class="how">
+            <summary>HOW IT WORKS</summary>
+            <ul>
+              <li>
+                Suno renders every take from three stacked layers: master style → production style → track
+                variables.
+              </li>
+              <li>
+                The five production styles (Arena polish, Raw and live, Glitch-heavy, Cinematic, Lo-fi
+                underground) are drop-in blocks, so a whole remix pass is one swap.
+              </li>
+              <li>
+                Every master was then measured in the browser with essentia.js (RhythmExtractor + three key
+                profiles), and the vault shows how many models agree.
+              </li>
+            </ul>
+          </details>
+        </article>
+
+        <!-- 03 THE SEAMS -->
+        <article class="step" data-vis="seam" data-ch="03 · THE SEAMS">
+          <span class="num">03</span>
+          <h2 class="h2">THE <span class="grad">SEAMS</span></h2>
+          <div class="talk">
+            <p class="n">
+              <b>NULLSAINT</b>I want to perform it as one set. No gaps, and never two vocals on top of each
+              other.
+            </p>
+            <p class="c">
+              <b>CACHEGHOST</b>The first version was a blended DJ mix. Suno drifts in tempo, so every beat was
+              pinned and stretched between pins. It sounded smooth, but it was too long to sing over.
+            </p>
+            <p class="c">
+              <b>CACHEGHOST</b>So the live set keeps each song whole at its own tempo. Each seam goes after
+              the last strong bar and your last sung word. A ring-over tail by default, a glitch roll into a
+              new chapter, and an echo throw where two keys clash.
+            </p>
+            <p class="n"><b>NULLSAINT</b>Play me the one into THE FEED.</p>
+          </div>
+          <details class="how">
+            <summary>HOW IT WORKS</summary>
+            <ul>
+              <li>
+                madmom tracks beats and downbeats; Demucs separates the vocals so the last sung word can be
+                measured, not guessed.
+              </li>
+              <li>
+                19 seams: 16 ring-over tails, 2 glitch rolls (into THE_FEED and WHOLE), 1 echo throw
+                (ENDLESS_GLOW → AWAKE, a 5B → 6A key clash).
+              </li>
+              <li>
+                If two vocals would touch, the seam moves by whole bars. The 72:04 set's files line up with
+                the album masters to within 5 ms.
+              </li>
+              <li>
+                The earlier DJ mix used Rubber Band at a ratio per beat, because its keyframe map can't be
+                passed from Python.
+              </li>
+            </ul>
+          </details>
+        </article>
+
+        <!-- 04 THE SITE -->
+        <article class="step" data-vis="site" data-ch="04 · THE SITE">
+          <span class="num">04</span>
+          <h2 class="h2">THE <span class="grad">SITE</span></h2>
+          <div class="talk">
+            <p class="n">
+              <b>NULLSAINT</b>It has to feel like the album: maximal, glitchy, and fast on a phone.
+            </p>
+            <p class="c">
+              <b>CACHEGHOST</b>Vite and React on Netlify. Every change is a pull request with a CI check and a
+              deploy preview, reviewed before it merges: 77 merged so far.
+            </p>
+            <p class="n"><b>NULLSAINT</b>The holo button broke the whole page in Safari.</p>
+            <p class="c">
+              <b>CACHEGHOST</b>Safari doesn't clip GPU-composited children to overflow:hidden. The fix keeps
+              the effect inside its own box: a registered @property angle animating the border.
+            </p>
+          </div>
+          <details class="how">
+            <summary>HOW IT WORKS</summary>
+            <ul>
+              <li>
+                Audio and logo scripts get content-hash cache-busting, so a new master reaches returning
+                listeners on their next visit.
+              </li>
+              <li>
+                The whole layout scales with CSS zoom between 1280 and 1920 px, so full-window maths divides
+                by the zoom factor.
+              </li>
+              <li>
+                The site is shared by direct link only: robots.txt, meta tags and headers block search
+                engines, AI crawlers and archives.
+              </li>
+            </ul>
+          </details>
+        </article>
+
+        <!-- 05 THE VAULT -->
+        <article class="step" data-vis="vault" data-ch="05 · THE VAULT">
+          <span class="num">05</span>
+          <h2 class="h2">THE <span class="grad">VAULT</span></h2>
+          <div class="talk">
+            <p class="n">
+              <b>NULLSAINT</b>The stems, prompts and lyrics go behind a key. But the repo is public.
+            </p>
+            <p class="c">
+              <b>CACHEGHOST</b>Then the key is the only secret. The content ships encrypted with the key
+              itself and is decrypted in your browser. No account and no server session.
+            </p>
+            <p class="c">
+              <b>CACHEGHOST</b>The stems are too big for that, so one small function hands out short-lived
+              signed links from a private repo, but only to a browser that can prove it knows the key.
+            </p>
+          </div>
+          <details class="how">
+            <summary>HOW IT WORKS</summary>
+            <ul>
+              <li>
+                PBKDF2-SHA256 derives an AES-GCM-256 key; data.enc.json is the only form of the content in the
+                repo.
+              </li>
+              <li>
+                20 stem zips (WAV + MIDI) live on a private GitHub release; one chapter is over GitHub's 2 GB
+                file cap, so ALL STEMS fetches per-track zips.
+              </li>
+              <li>
+                Before release every MP3 was re-tagged and stripped of Suno links and C2PA provenance chunks,
+                with pixel-identical cover art.
+              </li>
+            </ul>
+          </details>
+        </article>
+
+        <!-- 06 THE LIVE SHOW -->
+        <article class="step" data-vis="live" data-ch="06 · THE LIVE SHOW">
+          <span class="num">06</span>
+          <h2 class="h2">THE <span class="grad">LIVE SHOW</span></h2>
+          <div class="talk">
+            <p class="n">
+              <b>NULLSAINT</b>Karaoke lyrics that fill word by word, gapless, and a console I can play.
+            </p>
+            <p class="c">
+              <b>CACHEGHOST</b>Demucs pulls your vocal out of each master. stable-ts times every word, and
+              wav2vec2 votes on each one. 8,711 words across 899 lines.
+            </p>
+            <p class="n"><b>NULLSAINT</b>Why two models?</p>
+            <p class="c">
+              <b>CACHEGHOST</b>On its own, wav2vec2 pulls lines 200–800 ms early onto your breaths. As a vote
+              within 150 ms of stable-ts, it tightens the timing instead.
+            </p>
+          </div>
+          <details class="how">
+            <summary>HOW IT WORKS</summary>
+            <ul>
+              <li>
+                Gapless in a browser: Chrome leaves 576 + 529 samples of MP3 priming, which the page trims by
+                matching a stored 64-sample fingerprint.
+              </li>
+              <li>
+                Songs decode one or two ahead (a full decode is about 1.7 GB of RAM); instrumentals and
+                timings are encrypted like the vault.
+              </li>
+              <li>
+                A phone remote pairs once through a key-protected function, then talks over direct WebRTC. A
+                KeyLab mk3 plays it over Web MIDI.
+              </li>
+            </ul>
+          </details>
+        </article>
+
+        <!-- 07 ABLETON -->
+        <article class="step" data-vis="feed" data-ch="07 · ABLETON">
+          <span class="num">07</span>
+          <h2 class="h2">THE <span class="grad">ABLETON RIG</span></h2>
+          <div class="talk">
+            <p class="n"><b>NULLSAINT</b>Same show in Ableton Live, with the browser as the backup.</p>
+            <p class="c">
+              <b>CACHEGHOST</b>The .als is written by script from Live's own templates and the /live/
+              timeline. Live gives almost no error output, so every crash was bisected with scripted test
+              loads.
+            </p>
+            <p class="c">
+              <b>CACHEGHOST</b>A Max device sends the song position over MIDI to the browser. Live lets one CC
+              per tick out of a device, so each position frame goes out over six ticks: about 6.7 frames a
+              second. If Ableton dies, the page takes over from the same spot.
+            </p>
+          </div>
+          <details class="how">
+            <summary>HOW IT WORKS</summary>
+            <ul>
+              <li>
+                Crash lessons: plain floats only, unique sibling IDs, reset template sample slices, unseal
+                rebuilt racks, and one Sampler instead of a cloned Instrument Rack.
+              </li>
+              <li>
+                The feed sends CC 110–114 (position in ms) plus CC 115 (playing) on channel 16 over the macOS
+                IAC bus, verified with a Swift CoreMIDI listener.
+              </li>
+              <li>
+                The KeyLab mk3's pads, faders and encoders were measured the same way, then mapped into the
+                generated set.
+              </li>
+            </ul>
+          </details>
+        </article>
+
+        <!-- 08 COMICS + ANIME -->
+        <article class="step" data-vis="comic" data-ch="08 · COMICS + ANIME">
+          <span class="num">08</span>
+          <h2 class="h2">COMICS <span class="grad">+ ANIME</span></h2>
+          <div class="talk">
+            <p class="n">
+              <b>NULLSAINT</b>Four books, one per chapter. Ink noir: hard blacks, violet, magenta, cyan.
+            </p>
+            <p class="c">
+              <b>CACHEGHOST</b>SDXL in ComfyUI on the same Mac. IP-Adapter locks the Subject's face, and a
+              ControlNet guide traced from the storyboard keeps each composition. Art is text-free; the
+              lettering is live.
+            </p>
+            <p class="c">
+              <b>CACHEGHOST</b>At 3 minutes a panel, about 1,700 panels is a speed problem, so batches are
+              resumable and every page gets a contact sheet. Four anime shorts, one per chapter, come after
+              the books.
+            </p>
+          </div>
+          <details class="how">
+            <summary>HOW IT WORKS</summary>
+            <ul>
+              <li>4 books × 88 scripted pages, five movements each, named after the album's tracks.</li>
+              <li>
+                A face lock at full strength turned every scene into a close-up; it now starts at 20% of the
+                steps at 0.7, with an explicit shot size.
+              </li>
+              <li>
+                Artist names in the style prompt leaked onto posters as text, so they came out; charts and
+                data panels are built as live HTML/SVG, never generated.
+              </li>
+            </ul>
+          </details>
+        </article>
+      </div>
+
+      <!-- the pinned stage: one visual per step -->
+      <div class="stage" id="stage">
+        <div class="stage-in">
+          <!-- SOUND: prompt layers -->
+          <div class="vis" data-vis="sound">
+            <div class="layers">
+              <div class="ly">
+                <span class="lab">01 · MASTER STYLE · EVERY TRACK</span>
+                <p>
+                  glitchcore hyperpop metalcore, electronic post-hardcore, UK grime flow, drop-tuned chug
+                  riffs, glitched stutter edits, bitcrushed synth leads, trap hi-hats and 808s…
+                </p>
+              </div>
+              <div class="ly">
+                <span class="lab">02 · PRODUCTION STYLE · PICK ONE</span>
+                <div class="chips">
+                  <span class="chip on">ARENA POLISH</span><span class="chip">RAW AND LIVE</span
+                  ><span class="chip">GLITCH-HEAVY</span><span class="chip">CINEMATIC</span
+                  ><span class="chip">LO-FI UNDERGROUND</span>
+                </div>
+              </div>
+              <div class="ly">
+                <span class="lab">03 · TRACK VARIABLES · LEFT_BEHIND</span>
+                <p>
+                  80 BPM ambient piano intro flips to 144 BPM; rapid UK rap verses over skittering 2-step and
+                  trap hats, screamed gang-vocal hooks…
+                </p>
+              </div>
+              <div class="ly out"><span class="lab">→ SUNO</span><b>20 SONGS · 4 CHAPTERS</b></div>
+            </div>
+          </div>
+
+          <!-- SEAMS: S1 twin waveforms -->
+          <div class="vis" data-vis="seam">
+            <div class="seam" id="seam">
+              <div class="seam-meta">
+                <span>05 EMPTY_CITY <b>124.7 BPM · 6A</b></span
+                ><span class="mid">→ GLITCH ROLL →</span><span>06 THE_FEED <b>140.8 BPM · 6B</b></span>
+              </div>
+              <button class="wv" data-k="raw" aria-label="Play the raw cut from this point">
+                <span class="lab">A · RAW · THE TWO ALBUM FILES BUTTED TOGETHER</span><canvas></canvas
+                ><span class="seamline"></span><span class="ph"></span>
+              </button>
+              <button class="wv" data-k="eng" aria-label="Play the engineered seam from this point">
+                <span class="lab">B · ENGINEERED · THE 72:04 LIVE SET</span><canvas></canvas
+                ><span class="seamline"></span><span class="ph"></span>
+              </button>
+              <div class="seam-ctl">
+                <button class="gbtn" id="seamPlay">▶ PLAY</button
+                ><button class="gbtn ab" data-k="raw">A · RAW</button
+                ><button class="gbtn ab on" data-k="eng">B · ENGINEERED</button
+                ><span class="seam-t" id="seamT">0:00 / 0:24</span>
+              </div>
+              <p class="seam-note">
+                THE CHAPTER I → II CHANGEOVER. SWITCH WHILE IT PLAYS; IT KEEPS ITS PLACE. TAP A WAVEFORM TO
+                SEEK.
+              </p>
+            </div>
+          </div>
+
+          <!-- SITE: PR film strip -->
+          <div class="vis" data-vis="site">
+            <div class="prs"><div class="prs-roll" id="prs"></div></div>
+          </div>
+
+          <!-- VAULT: lock diagram -->
+          <div class="vis" data-vis="vault">
+            <div class="lock">
+              <div class="node key"><span class="lab">IN YOUR HEAD</span><b>ACCESS KEY</b></div>
+              <div class="arrow">PBKDF2-SHA256</div>
+              <div class="node"><span class="lab">IN THE BROWSER</span><b>AES-GCM-256 KEY</b></div>
+              <div class="arrow">DECRYPT</div>
+              <div class="node">
+                <span class="lab">IN THE PUBLIC REPO</span><b>data.enc.json</b
+                ><span class="sub">PROMPTS · LYRICS · ANALYSIS</span>
+              </div>
+              <div class="arrow">PROOF OF KEY</div>
+              <div class="node">
+                <span class="lab">NETLIFY FUNCTION</span><b>SIGNED LINK</b
+                ><span class="sub">PRIVATE RELEASE · 20 STEM ZIPS</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- LIVE: lyric sync loop (real word timings, LEFT_BEHIND line 1) -->
+          <div class="vis" data-vis="live">
+            <div class="sync">
+              <span class="lab">LEFT_BEHIND · LINE 1 · REAL WORD TIMINGS</span>
+              <p class="sync-line" id="syncLine"></p>
+              <div class="sync-lane" id="syncLane"><span class="sync-ph" id="syncPh"></span></div>
+              <div class="sync-k">
+                <span>STABLE-TS · MEDIUM.EN</span><span>WAV2VEC2 VOTE ±150 MS</span
+                ><span>ONSET SNAP ±80 MS</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ABLETON: P4 feed -->
+          <div class="vis" data-vis="feed">
+            <div class="feed" id="feed">
+              <div class="end">
+                <span class="lab">ABLETON LIVE</span><b>E404 SHOW</b><span class="lab">MAX DEVICE</span>
+              </div>
+              <div class="wire"></div>
+              <div class="end" id="feedB">
+                <span class="lab">BROWSER</span><b>/LIVE/</b><span class="lab" id="feedS">STANDBY</span>
+              </div>
+              <div class="feed-cap">
+                ONE CC PER TICK · 6 TICKS PER FRAME · ≈ 6.7 FRAMES/S · CH 16 OVER IAC
+              </div>
+              <button class="gbtn feed-kill" id="feedKill">KILL ABLETON</button>
+            </div>
+          </div>
+
+          <!-- COMICS: storyboard → guide → final -->
+          <div class="vis" data-vis="comic">
+            <div class="tri">
+              <figure>
+                <img src="/story/storyboard-b1.webp" alt="The Book I storyboard sheet" loading="lazy" />
+                <figcaption>01 · STORYBOARD SHEET</figcaption>
+              </figure>
+              <figure>
+                <img
+                  src="/story/p02-3_guide.jpg"
+                  alt="The ControlNet guide traced for a panel of NULLSAINT on stage"
+                  loading="lazy"
+                />
+                <figcaption>02 · CONTROLNET GUIDE</figcaption>
+              </figure>
+              <figure>
+                <img
+                  src="/story/b1p02-3.webp"
+                  alt="The finished ink-noir panel: NULLSAINT alone on a dark stage, head bowed"
+                  loading="lazy"
+                />
+                <figcaption>03 · SDXL · INK NOIR</figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= THE CREW (A4) ================= -->
+    <section class="crew" id="crew" data-ch="09 · THE CREW" aria-labelledby="crew-h">
+      <div class="wrap">
+        <span class="kick">THE AI CREW · WHAT EACH ONE DID · WHERE IT FAILED</span>
+        <h2 class="h1" id="crew-h">NOBODY WAS <span class="grad">TRUSTED ALONE.</span></h2>
+      </div>
+      <div class="crew-track" id="crewTrack" tabindex="0" aria-label="The AI crew, scroll sideways"></div>
+    </section>
+
+    <!-- ================= CLOSING: credits roll while the machine cools (C2 + C1) ================= -->
+    <section class="end" id="end" data-ch="10 · COOL DOWN" aria-label="Credits">
+      <div class="end-stage">
+        <canvas class="end-rain" id="endRain" aria-hidden="true"></canvas>
+        <div class="end-temp" aria-hidden="true">
+          <span class="lab" id="endJobs">ALL JOBS COMPLETE</span><b class="grad" id="endTemp">108°</b>
+        </div>
+        <div class="credits" id="credits">
+          <div class="cr"><span class="lab">VOICE · DIRECTION</span><b>NULLSAINT</b></div>
+          <div class="cr"><span class="lab">OPERATOR · SYSTEMS</span><b>CACHEGHOST</b></div>
+          <div class="cr gap"><span class="lab">TAKES</span><b>SUNO</b></div>
+          <div class="cr"><span class="lab">STEMS</span><b>DEMUCS</b></div>
+          <div class="cr"><span class="lab">LYRIC SYNC</span><b>STABLE-TS · WAV2VEC2</b></div>
+          <div class="cr"><span class="lab">BEATS · TIME</span><b>MADMOM · RUBBER BAND</b></div>
+          <div class="cr"><span class="lab">ANALYSIS</span><b>ESSENTIA.JS</b></div>
+          <div class="cr"><span class="lab">PANELS</span><b>SDXL · IP-ADAPTER · CONTROLNET</b></div>
+          <div class="cr"><span class="lab">ENGINEERING PARTNER</span><b>CLAUDE CODE</b></div>
+          <div class="cr gap"><span class="lab">HARDWARE</span><b>ONE MAC MINI · M4 · 16 GB</b></div>
+          <div class="cr"><span class="lab">RECOVERED FROM</span><b class="grad">ARCHIVE_404</b></div>
+        </div>
+        <div class="end-final" id="endFinal">
+          <p class="t">THE MACHINE <span class="grad">SURVIVED.</span></p>
+          <a class="holo" href="/">OPEN THE ARCHIVE →</a>
+        </div>
+      </div>
+    </section>
+
+    <script type="module" src="/src/story/main.js"></script>
+  </body>
+</html>

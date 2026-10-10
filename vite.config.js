@@ -44,7 +44,7 @@ export default defineConfig({
     // colliding with the un-hashed files in public/assets.
     assetsDir: "_app",
     // the site, the password-gated Source Vault at /vault/, the live show at /live/ and its phone remote,
-    // and the Ableton set at /ableton/
+    // the Ableton set at /ableton/, and The Build at /story/
     rollupOptions: {
       input: {
         main: "index.html",
@@ -52,6 +52,7 @@ export default defineConfig({
         live: "live/index.html",
         ableton: "ableton/index.html",
         remote: "live/remote/index.html",
+        story: "story/index.html",
       },
     },
   },
