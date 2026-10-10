@@ -678,6 +678,8 @@ a {
 }
 .book {
   position: relative;
+  /* the giant chapter numbers may hang past the edge; clip (not hidden) keeps the slides sticky */
+  overflow-x: clip;
 }
 /* the rain + tint sit behind every chapter, fixed to the screen while the book is on it */
 .book-rain,
@@ -778,18 +780,35 @@ a {
   letter-spacing: 0.26em;
   color: var(--t2);
 }
-/* S1: the chapter body, full bleed */
+/* S1: the chapter body. The body is a scroll runway (one stretch per line of dialogue); the slide (text +
+   visual) is pinned under the bar + ruler for the whole of it, so nothing on the page scrolls. The scroll
+   plays the chapter in place instead: the dialogue appears line by line, the number fills, the visual turns. */
 .chap-body {
-  display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-  gap: 40px;
+  position: relative;
+  height: calc(100vh + var(--lines, 4) * 42vh);
+  height: calc(100svh + var(--lines, 4) * 42svh);
+}
+.slide {
+  position: sticky;
+  top: var(--topH);
+  height: calc(100vh - var(--topH));
+  height: calc(100svh - var(--topH));
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 28px;
-  min-height: 150vh;
+  /* room at the bottom for the vitals HUD and the sound button */
+  padding: clamp(12px, 3vh, 34px) clamp(16px, 3vw, 28px) clamp(64px, 9vh, 84px);
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(20px, 3vw, 44px);
+  align-items: center;
 }
 .step {
-  padding: 22vh 0 30vh;
+  position: relative;
+  min-height: 0;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   opacity: 0.35;
   transition: opacity 0.6s;
 }
@@ -804,18 +823,32 @@ a {
   color: var(--mag);
 }
 .talk {
-  margin-top: 22px;
+  margin-top: clamp(12px, 2.4vh, 22px);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: clamp(10px, 1.8vh, 16px);
 }
 .talk p {
   font-weight: 300;
-  font-size: 17px;
-  line-height: 1.7;
+  font-size: clamp(15px, 0.9vw + 0.6vh, 18px);
+  line-height: 1.65;
   color: var(--ghost);
   padding-left: 16px;
   border-left: 2px solid var(--hair);
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.45s,
+    transform 0.45s;
+}
+/* lines already said stay, dimmed; the line being said is full; the rest wait (they keep their space) */
+.talk p.past {
+  opacity: 0.38;
+  transform: none;
+}
+.talk p.now {
+  opacity: 1;
+  transform: none;
 }
 .talk p b {
   display: block;
@@ -837,8 +870,41 @@ a {
 .talk p.c b {
   color: var(--cyan);
 }
+.talk-dots {
+  display: none;
+  gap: 5px;
+  margin-top: 12px;
+}
+.talk-dots i {
+  width: 14px;
+  height: 2px;
+  background: var(--hair);
+  transition: background 0.3s;
+}
+.talk-dots i.on {
+  background: var(--grad);
+}
+/* subtitles: phones and portrait tablets, and any short screen. One line at a time in a fixed box. */
+@media (max-width: 900px) and (orientation: portrait), (max-height: 760px) {
+  .talk {
+    display: grid;
+  }
+  .talk p {
+    grid-area: 1 / 1;
+    align-self: end;
+  }
+  .talk p.past {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  .talk-dots {
+    display: flex;
+  }
+}
+/* HOW IT WORKS opens as a panel over the slide (upwards from its button), so the layout never grows */
 .how {
-  margin-top: 26px;
+  position: relative;
+  margin-top: clamp(14px, 2.6vh, 26px);
   border: 1px solid var(--hair);
   background: rgba(5, 6, 11, 0.85);
 }
@@ -867,11 +933,21 @@ a {
   color: var(--ghost);
 }
 .how ul {
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  bottom: calc(100% + 8px);
+  z-index: 6;
   list-style: none;
-  padding: 0 14px 14px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#05060b, #05060b) padding-box,
+    var(--grad) border-box;
+  box-shadow: 0 20px 60px -10px rgba(0, 0, 0, 0.9);
 }
 .how li {
   font-family: var(--mono);
@@ -890,11 +966,12 @@ a {
 }
 .stage {
   position: relative;
+  height: 100%;
+  min-height: 0;
 }
 .stage-in {
-  position: sticky;
-  top: var(--topH);
-  height: calc(100vh - var(--topH));
+  position: relative;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -929,7 +1006,7 @@ a {
   position: relative;
   width: 100%;
   max-width: 640px;
-  height: min(620px, calc(100vh - var(--topH) - 120px));
+  height: min(620px, 100%);
   perspective: 1400px;
   opacity: 0;
   transform: translateY(24px);
@@ -1072,45 +1149,74 @@ a {
     font-size: clamp(54px, 17vw, 120px);
     white-space: normal;
   }
-  .chap-body {
-    display: flex;
-    flex-direction: column-reverse;
-    padding: 0;
-    min-height: 0;
-  }
-  .stage {
-    position: sticky;
-    top: var(--topH);
-    height: 54vh;
-    z-index: 2;
-  }
-  .stage-in {
-    position: absolute;
-    inset: 8px 12px 0;
-    height: auto;
-  }
-  .ghost {
-    font-size: 46vw;
-  }
-  .vis {
-    height: 100%;
-  }
   .srcbtn {
     top: 4px;
     font-size: 9px;
     padding: 7px 10px;
   }
-  .step {
-    position: relative;
-    z-index: 3;
-    margin: 0 16px 40vh;
-    padding: 26px 18px 30px;
-    background: rgba(3, 4, 9, 0.94);
-    border: 1px solid var(--hair2);
-    opacity: 1;
-  }
   .src pre {
     font-size: 9.5px;
+  }
+  .how li {
+    font-size: 10px;
+  }
+}
+/* phones and portrait tablets: the visual on top, the subtitles under it, both on screen */
+@media (max-width: 900px) and (orientation: portrait) {
+  .slide {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: stretch;
+    padding: 10px 14px calc(64px + env(safe-area-inset-bottom));
+  }
+  .stage {
+    order: -1;
+  }
+  .step {
+    justify-content: flex-end;
+  }
+}
+/* short screens (landscape phones): the compact bar, no vitals readout, a tighter slide */
+@media (max-height: 500px) {
+  :root {
+    --navh: 64px;
+  }
+  body .vitals {
+    display: none;
+  }
+  .slide {
+    padding: 8px clamp(14px, 3vw, 24px) 52px;
+  }
+  .talk p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .how {
+    margin-top: 8px;
+  }
+  .how summary {
+    padding: 8px 12px;
+  }
+  .srcbtn {
+    top: 2px;
+    font-size: 9px;
+    padding: 6px 9px;
+  }
+}
+/* portrait tablets keep the vitals readout, so the slide leaves room for it */
+@media (min-width: 601px) and (max-width: 900px) and (orientation: portrait) {
+  .slide {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+}
+/* narrow phones: the slide needs the whole screen, so the vitals readout steps aside in the chapters */
+@media (max-width: 600px) and (orientation: portrait) {
+  body .vitals {
+    display: none;
+  }
+  .ghost {
+    font-size: 46vw;
   }
 }
 
@@ -1524,7 +1630,6 @@ a {
 .map {
   position: relative;
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;

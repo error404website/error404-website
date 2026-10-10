@@ -1,6 +1,6 @@
-// SOUND ON (W1): an opt-in score. Each section names a track (data-track); while sound is on, the page
-// crossfades to that track's MP3 (the same public files the site's player streams) as you scroll.
-// The seam A/B ducks it. Volume runs through Web Audio gain because iOS ignores <audio>.volume.
+// SOUND ON (W1): an opt-in score. While sound is on the page plays GOSPEL_OUT (the same public file the
+// site's player streams), looping from past its intro; tracks change by crossfade if a section asks for
+// another. The seam A/B ducks it. Volume runs through Web Audio gain because iOS ignores <audio>.volume.
 import { audioSrc } from "../lib/audioSrc.js";
 
 const FADE = 1.6, // s
