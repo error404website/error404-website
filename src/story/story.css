@@ -344,33 +344,6 @@ a {
   bottom: 14px;
   border-width: 0 1px 1px 0;
 }
-.ov-cross {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 46px;
-  height: 46px;
-  transform: translate(-50%, -50%);
-  z-index: 3;
-}
-.ov-cross::before,
-.ov-cross::after {
-  content: "";
-  position: absolute;
-  background: rgba(244, 244, 248, 0.7);
-}
-.ov-cross::before {
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 1px;
-}
-.ov-cross::after {
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-}
 .ov-scale {
   position: absolute;
   right: 26px;
@@ -449,10 +422,10 @@ a {
 }
 .ov-tag .box {
   position: absolute;
-  width: 30px;
-  height: 30px;
-  left: -15px;
-  top: -15px;
+  width: var(--bw, 30px);
+  height: var(--bw, 30px);
+  left: calc(var(--bw, 30px) / -2);
+  top: calc(var(--bw, 30px) / -2);
   border: 1px solid rgba(244, 244, 248, 0.85);
 }
 .ov-tag .tx {
@@ -469,6 +442,13 @@ a {
   border-left: 0;
   border-right: 2px solid var(--mag);
   text-align: right;
+}
+.ov-tag.etch .tx {
+  border-color: var(--cyan);
+}
+.ov-tag.etch .box {
+  border-style: dashed;
+  border-color: rgba(0, 239, 255, 0.8);
 }
 .ov-tag.list::after,
 .ov-tag.list .box {
@@ -508,6 +488,19 @@ a {
   z-index: 6;
   opacity: 0;
   pointer-events: none;
+}
+/* the etched skull, burnt into the flash for a beat (mask set from main.js) */
+.ov-ghost {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 7;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  background: #1a0630;
+  -webkit-mask: var(--sk) center / contain no-repeat;
+  mask: var(--sk) center / contain no-repeat;
 }
 .ov-boot {
   position: absolute;

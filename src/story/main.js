@@ -15,6 +15,7 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const seg = (p, a, b) => Math.min(1, Math.max(0, (p - a) / (b - a)));
 const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const TITLES = CHAPTERS.flatMap((c) => c.tracks.map((t) => t.title));
 
 // progress (0..1) through a tall section whose sticky child fills the screen
@@ -159,11 +160,67 @@ const ov = (() => {
       sub: "MADMOM + RUBBER BAND · PER BEAT",
     },
   ];
-  $("#ovTags").innerHTML = SPOTS.map(
-    (s) =>
-      `<div class="ov-tag"><span class="box"></span><span class="tx">${s.lab}<em>${s.sub}</em></span></div>`,
-  ).join("");
-  const tags = $$(".ov-tag");
+  $("#ovTags").innerHTML =
+    SPOTS.map(
+      (s) =>
+        `<div class="ov-tag"><span class="box"></span><span class="tx">${s.lab}<em>${s.sub}</em></span></div>`,
+    ).join("") +
+    `<div class="ov-tag etch"><span class="box"></span><span class="tx">ETCH · BARE ALUMINIUM<em id="ovEtch"></em></span></div>`;
+  const tags = $$(".ov-tag"),
+    etchTag = tags[SPOTS.length];
+  // the field as a continuous function, so the etch patch can sample it finer than the 160×100 grid
+  const heat = (x, y, t, load) => {
+    // the slab: a rounded square, warmer than the desk
+    const dx = Math.abs(x - 80),
+      dy = Math.abs(y - 50),
+      body = Math.max(0, 1 - Math.max(0, Math.hypot(Math.max(dx - 18, 0), Math.max(dy - 18, 0)) - 6) / 4);
+    let v = 0.06 + body * (0.2 + load * 0.12) + Math.sin(x * 0.3 + t) * 0.004;
+    for (const s of SPOTS) {
+      const on = seg(load, s.at, s.at + 0.2);
+      if (!on) continue;
+      const k = Math.exp(-((x - s.x) ** 2 + (y - s.y) ** 2) / (2 * (s.r * (0.8 + load * 0.3)) ** 2));
+      v += k * on * (0.26 + 0.05 * Math.sin(t * 3 + s.x));
+    }
+    // the plume rising off the back vent
+    return (
+      v +
+      load *
+        0.25 *
+        Math.exp(-((x - 80 - Math.sin(y * 0.2 + t * 2) * 4) ** 2) / 120) *
+        Math.max(0, (30 - y) / 30)
+    );
+  };
+  // the skull etched into the lid, where the Apple logo sits on a real one. Bare polished aluminium gives off
+  // less heat than the anodised lid, so the camera reads the etch cooler, and more so the hotter the lid gets.
+  const ES = 30, // etch size in field units
+    EN = 300, // etch patch resolution
+    EMASK = new Float32Array(EN * EN),
+    epatch = document.createElement("canvas");
+  epatch.width = epatch.height = EN;
+  const ex = epatch.getContext("2d"),
+    eimg = ex.createImageData(EN, EN);
+  let etchReady = false;
+  const skull = new Image();
+  skull.onload = () => {
+    const c = document.createElement("canvas");
+    c.width = c.height = EN;
+    const x = c.getContext("2d");
+    x.drawImage(skull, 0, 0, EN, EN);
+    const d = x.getImageData(0, 0, EN, EN).data,
+      a = x.createImageData(EN, EN);
+    for (let i = 0; i < EN * EN; i++) {
+      const u = clamp((Math.max(d[i * 4], d[i * 4 + 1], d[i * 4 + 2]) / 255 - 0.16) / 0.34, 0, 1);
+      EMASK[i] = u * u * (3 - 2 * u);
+      a.data[i * 4 + 3] = Math.round(EMASK[i] * 255);
+    }
+    // an alpha copy for the afterimage on the flash (Safari's luminance masks aren't reliable)
+    x.putImageData(a, 0, 0);
+    $("#ovGhost").style.setProperty("--sk", `url(${c.toDataURL()})`);
+    etchReady = true;
+    if (!raf && P < 0.86) raf = requestAnimationFrame(draw);
+  };
+  skull.src = "/story/skull-etch.jpg";
+  const etchCool = (v) => -0.46 * Math.max(0, v - 0.06);
   let P = 0,
     raf = 0,
     rainFx = null,
@@ -197,6 +254,18 @@ const ov = (() => {
       t.style.left = W / 2 + (sp.x - 80) * s + "px";
       t.style.top = H / 2 + (sp.y - 50) * s + "px";
     });
+    // the etch callout: a dashed box round the skull, its label straight down under the lid
+    const dx = -60 * k,
+      dy = (ES / 2 + 4) * s + 40 * k + 24;
+    etchTag.classList.add("lft");
+    etchTag.style.setProperty("--bw", ES * s + 8 + "px");
+    etchTag.style.setProperty("--len", Math.hypot(dx, dy) + "px");
+    etchTag.style.setProperty("--ang", Math.atan2(dy, dx) + "rad");
+    etchTag.style.setProperty("--dxr", -dx + "px");
+    etchTag.style.setProperty("--dy", dy - 14 + "px");
+    etchTag.style.left = W / 2 + "px";
+    etchTag.style.top = H / 2 + "px";
+    $("#ovGhost").style.width = $("#ovGhost").style.height = ES * s * 1.04 + "px";
   };
   function draw(now) {
     raf = 0;
@@ -206,25 +275,8 @@ const ov = (() => {
       d = img.data;
     for (let y = 0; y < FH; y++)
       for (let x = 0; x < FW; x++) {
-        // the slab: a rounded square, warmer than the desk
-        const dx = Math.abs(x - 80),
-          dy = Math.abs(y - 50),
-          body = Math.max(0, 1 - Math.max(0, Math.hypot(Math.max(dx - 18, 0), Math.max(dy - 18, 0)) - 6) / 4);
-        let v = 0.06 + body * (0.2 + load * 0.12) + Math.sin(x * 0.3 + t) * 0.004;
-        for (const s of SPOTS) {
-          const on = seg(load, s.at, s.at + 0.2);
-          if (!on) continue;
-          const k = Math.exp(-((x - s.x) ** 2 + (y - s.y) ** 2) / (2 * (s.r * (0.8 + load * 0.3)) ** 2));
-          v += k * on * (0.26 + 0.05 * Math.sin(t * 3 + s.x));
-        }
-        // the plume rising off the back vent
-        v +=
-          load *
-          0.25 *
-          Math.exp(-((x - 80 - Math.sin(y * 0.2 + t * 2) * 4) ** 2) / 120) *
-          Math.max(0, (30 - y) / 30);
-        v = Math.min(1, v + burn * 1.2);
-        const c = LUT[Math.round(v * 255)],
+        const v = Math.min(1, heat(x, y, t, load) + burn * 1.2),
+          c = LUT[Math.round(v * 255)],
           o = (y * FW + x) * 4;
         d[o] = c[0];
         d[o + 1] = c[1];
@@ -237,6 +289,42 @@ const ov = (() => {
     ctx.fillStyle = `rgb(${LUT[15].join(",")})`;
     ctx.fillRect(0, 0, W, H);
     ctx.drawImage(off, (W - FW * scale) / 2, (H - FH * scale) / 2, FW * scale, FH * scale);
+    if (etchReady) {
+      // sample the lid at patch resolution (the grid draws field pixel i centred on i + 0.5), then cool the
+      // etch; through the burn-out it stays dark, so it's still there when the flash hits
+      const e = eimg.data;
+      for (let j = 0; j < EN; j++)
+        for (let i = 0; i < EN; i++) {
+          const n = j * EN + i,
+            m = EMASK[n],
+            o = n * 4;
+          if (m < 0.004) {
+            e[o + 3] = 0;
+            continue;
+          }
+          const v = heat(
+              80 - ES / 2 + ((i + 0.5) / EN) * ES - 0.5,
+              50 - ES / 2 + ((j + 0.5) / EN) * ES - 0.5,
+              t,
+              load,
+            ),
+            dv = m * etchCool(v),
+            w = clamp(Math.min(1, v + dv + burn * 1.2) - m * burn * 0.7, 0, 1),
+            c = LUT[Math.round(w * 255)];
+          e[o] = c[0];
+          e[o + 1] = c[1];
+          e[o + 2] = c[2];
+          e[o + 3] = Math.round(255 * Math.min(1, Math.abs(dv) * 60 + m * burn * 3));
+        }
+      ex.putImageData(eimg, 0, 0);
+      ctx.drawImage(
+        epatch,
+        (W - ES * scale) / 2 + 0.5 * scale,
+        (H - ES * scale) / 2 + 0.5 * scale,
+        ES * scale,
+        ES * scale,
+      );
+    }
     // keep the camera "live" while it's on screen and before the burn-out
     if (P < 0.86 && sec.getBoundingClientRect().bottom > 0) raf = requestAnimationFrame(draw);
   }
@@ -264,6 +352,9 @@ const ov = (() => {
     SPOTS.forEach(
       (s, i) => (tags[i].style.opacity = p < 0.72 && (phone ? i === newest : load > s.at + 0.06) ? 1 : 0),
     );
+    const dl = etchCool(heat(80, 50, 0, load)) * 80; // the camera's scale spans 80°
+    etchTag.style.opacity = p < 0.72 && !phone ? 1 : 0;
+    $("#ovEtch").textContent = `SKULL · Δ −${Math.abs(dl).toFixed(1)}° VS LID`;
     $("#ovMax").textContent = lerp(34.2, 108.4, load).toFixed(1) + "°";
     $(".ov-read").classList.toggle("hot", load > 0.85);
     const lead = LEADS[load < 0.4 ? 0 : load < 0.85 ? 1 : 2];
@@ -273,8 +364,10 @@ const ov = (() => {
       if (cv.width < 640) size(); // the job line sits under the headline
     }
     $("#ovFlash").style.opacity = REDUCE ? 0 : seg(p, 0.76, 0.8) - seg(p, 0.82, 0.88);
+    // the skull stays burnt into the white for a beat, like sensor burn-in
+    $("#ovGhost").style.opacity = REDUCE ? 0 : seg(p, 0.77, 0.8) * (1 - seg(p, 0.84, 0.93)) * 0.85;
     const gone = p > 0.82 ? 0 : 1;
-    for (const q of [".ov-heat", ".ov-scan", ".ov-cross", ".ov-read", ".ov-lead", ".ov-scale", ".ov-tags"])
+    for (const q of [".ov-heat", ".ov-scan", ".ov-read", ".ov-lead", ".ov-scale", ".ov-tags"])
       $(q).style.opacity = gone;
     const b = seg(p, 0.86, 0.96);
     $("#ovBoot").style.opacity = b;
