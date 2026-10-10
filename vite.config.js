@@ -43,13 +43,14 @@ export default defineConfig({
     // Hashed JS/CSS go to /_app so they can be cached forever without
     // colliding with the un-hashed files in public/assets.
     assetsDir: "_app",
-    // three pages: the site, the password-gated Source Vault at /vault/, and the live show at /live/
+    // the site, the password-gated Source Vault at /vault/, the live show at /live/ (+ its phone remote), and The Build at /story/
     rollupOptions: {
       input: {
         main: "index.html",
         vault: "vault/index.html",
         live: "live/index.html",
         remote: "live/remote/index.html",
+        story: "story/index.html",
       },
     },
   },
