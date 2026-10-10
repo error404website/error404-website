@@ -1,0 +1,271 @@
+/* The site's logo behaviours (public/assets/logo-fx.js): nav draw-on and the hero's torch-lit outline
+   with glitch bursts. Copied from src/styles/overrides.css, which /story/ doesn't load. */
+/* ===== logo behaviours (assets/logo-fx.js) ===== */
+[data-fx="hero"] > img,
+[data-fx="closing"] > img {
+  visibility: hidden;
+}
+.e-logo-slam > .e-gh {
+  display: none;
+}
+.e-fx-layer {
+  position: absolute;
+  left: 5.1%;
+  top: 29.3%;
+  width: 92%;
+  aspect-ratio: 1414/348;
+}
+.e-fx-layer svg,
+.e-fx-layer img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+}
+.fx-strokes path {
+  fill: none;
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+}
+.fx-fill {
+  opacity: 0;
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.filled .fx-fill {
+  opacity: 1;
+}
+.filled .fx-strokes {
+  opacity: 0;
+  transition: opacity 1s ease 0.3s;
+}
+/* hero: interference */
+.e-fx-slice {
+  opacity: 0;
+  pointer-events: none;
+}
+.e-fx-layer.g > svg {
+  opacity: 0;
+}
+.e-fx-layer.g > .e-fx-slice {
+  opacity: 1;
+  transform: translateX(var(--dx, 0));
+  filter: drop-shadow(calc(var(--dx, 0px) * -0.4) 0 rgba(255, 0, 229, 0.9))
+    drop-shadow(calc(var(--dx, 0px) * 0.4) 0 rgba(0, 239, 255, 0.9));
+}
+/* nav: draw-on */
+[data-fx="nav"] > img.e4-lock-logo {
+  display: none;
+}
+.e-fx-nav {
+  position: relative;
+  display: block;
+  height: clamp(26px, 3vw, 32px);
+  aspect-ratio: 1414/348;
+  filter: drop-shadow(0 0 1.5px rgba(255, 0, 229, 0.7)) drop-shadow(0 0 10px rgba(161, 0, 255, 0.3));
+}
+.e-fx-nav svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.e-fx-nav .fx-strokes path {
+  stroke-width: 1;
+}
+/* closing: spotlight */
+.e-fx-spot .fx-base path {
+  fill: none;
+  stroke: rgba(244, 244, 248, 0.4);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+.e-fx-spot .fx-lit {
+  -webkit-mask: radial-gradient(
+    circle var(--r, 150px) at var(--x, 50%) var(--y, 50%),
+    #000 0,
+    #000 35%,
+    transparent 100%
+  );
+  mask: radial-gradient(
+    circle var(--r, 150px) at var(--x, 50%) var(--y, 50%),
+    #000 0,
+    #000 35%,
+    transparent 100%
+  );
+}
+.e-fx-spot.all-lit .fx-lit {
+  -webkit-mask: none;
+  mask: none;
+}
+/* the torch glow: a full-size layer masked to the letter shapes, so the light only
+   shows inside the cut-out (never on the background). The glow follows the cursor
+   through the gradient's centre, not by moving a layer, so nothing can escape the
+   logo in Safari. */
+.e-fx-bloom {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle calc(var(--r, 150px) * 1.3) at var(--x, 50%) var(--y, 50%),
+    rgba(255, 0, 229, 0.38),
+    rgba(161, 0, 255, 0.26) 45%,
+    transparent 100%
+  );
+  -webkit-mask: url(/assets/error404logo.svg) center / 100% 100% no-repeat;
+  mask: url(/assets/error404logo.svg) center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+.e-fx-spot.all-lit .e-fx-bloom {
+  display: none;
+}
+
+.e-fx-glitch :is(.fx-base, .fx-gm, .fx-gc, .fx-s1, .fx-s2) path {
+  fill: none;
+  stroke: rgba(244, 244, 248, 0.62);
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+}
+.e-fx-glitch .fx-gm path {
+  stroke: #ff00e5;
+}
+.e-fx-glitch .fx-gc path {
+  stroke: #00efff;
+}
+.e-fx-glitch .fx-gm,
+.e-fx-glitch .fx-gc,
+.e-fx-glitch .fx-s1,
+.e-fx-glitch .fx-s2 {
+  opacity: 0;
+  mix-blend-mode: screen;
+}
+.e-fx-glitch .fx-s1 {
+  clip-path: inset(16% 0 58% 0);
+}
+.e-fx-glitch .fx-s2 {
+  clip-path: inset(60% 0 14% 0);
+}
+.e-fx-glitch.burst .fx-gm {
+  animation: e-gl-m 0.52s steps(1) both;
+}
+.e-fx-glitch.burst .fx-gc {
+  animation: e-gl-c 0.52s steps(1) both;
+}
+.e-fx-glitch.burst .fx-s1 {
+  animation: e-gl-s1 0.52s steps(1) both;
+}
+.e-fx-glitch.burst .fx-s2 {
+  animation: e-gl-s2 0.52s steps(1) both;
+}
+.e-fx-glitch.burst .fx-base,
+.e-fx-glitch.burst .fx-lit,
+.e-fx-glitch.burst .e-fx-bloom {
+  animation: e-gl-base 0.52s steps(1) both;
+}
+@keyframes e-gl-m {
+  0% {
+    opacity: 0.9;
+    transform: translate(-1.1%, 2%);
+  }
+  25% {
+    transform: translate(1.4%, -1%);
+    clip-path: inset(8% 0 48% 0);
+  }
+  50% {
+    transform: translate(-0.6%, 0);
+    clip-path: inset(52% 0 6% 0);
+  }
+  75% {
+    transform: translate(0.5%, 1%);
+    clip-path: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+@keyframes e-gl-c {
+  0% {
+    opacity: 0.9;
+    transform: translate(1.1%, -2%);
+  }
+  25% {
+    transform: translate(-1.2%, 1%);
+    clip-path: inset(46% 0 12% 0);
+  }
+  50% {
+    transform: translate(0.8%, 0);
+    clip-path: inset(0 0 62% 0);
+  }
+  75% {
+    transform: translate(-0.4%, -1%);
+    clip-path: none;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+@keyframes e-gl-s1 {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(2.6%);
+  }
+  55% {
+    opacity: 1;
+    transform: translateX(-1.4%);
+  }
+  75% {
+    opacity: 0;
+  }
+}
+@keyframes e-gl-s2 {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+    transform: translateX(-3%);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(1.8%);
+  }
+  80% {
+    opacity: 0;
+  }
+}
+@keyframes e-gl-base {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  60% {
+    opacity: 0.35;
+  }
+  40% {
+    opacity: 0.8;
+  }
+}
+[data-fx="hero"] {
+  filter: drop-shadow(0 0 2px rgba(255, 0, 229, 0.7)) drop-shadow(0 0 12px rgba(161, 0, 255, 0.3)) !important;
+}
+[data-fx="hero"] .e-fx-spot .fx-base path {
+  stroke: rgba(244, 244, 248, 0.62);
+  stroke-width: 1.6;
+}
+@media (prefers-reduced-motion: reduce) {
+  .e-fx-glitch .fx-gm,
+  .e-fx-glitch .fx-gc,
+  .e-fx-glitch .fx-s1,
+  .e-fx-glitch .fx-s2 {
+    display: none;
+  }
+}
