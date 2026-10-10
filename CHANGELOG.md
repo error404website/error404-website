@@ -5,6 +5,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Fixed
+
+- **Ableton set and Source Vault:** on opening, the menu no longer lights CREDITS (the scroll-spy measured the footer while it was still hidden); nothing is lit while the header is in view.
+- **Ableton set:** the big chapter numbers (01–09) are no longer clipped at the top and bottom; the PDF buttons sit side by side; the guide's page count is right (7 pages).
+
 ### Added
 
 - **Ableton set** at `/ableton/` (same access key as the Source Vault): the live show as an Ableton Live 12 Suite project. One download (0.9 GB, lossless FLAC stems, stock devices only, works from any folder) from a key-checked signed link (`netlify/functions/ableton-download.mjs`, the vault's token and proof), a nine-step setup checklist that remembers your progress, an interactive KeyLab 49 mk3 map, the signal flow, the setlist with each song's pad chops, a Web MIDI rig tester (KeyLab + Ableton's position feed), troubleshooting, a pre-show checklist, the setup guide and a one-page stage card as PDFs, and how the set is built. In the vault's look: gate rain, intro, gutter rain, ruler, seal and cinematic footer.

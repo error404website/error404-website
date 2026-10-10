@@ -200,8 +200,8 @@ function reveal() {
   $("#snav").hidden = false;
   $("#ruler").hidden = false;
   requestAnimationFrame(drawRuler);
+  $("#vfoot").hidden = false; // before the nav starts: its scroll-spy measures the footer
   startNav();
-  $("#vfoot").hidden = false;
   $("#dock").hidden = false;
   startGutters();
   if (!window.__efx) {
@@ -471,7 +471,9 @@ function startNav() {
       .forEach((el) => {
         if (el.getBoundingClientRect().top < line) cur = el.id;
       });
-    if (document.getElementById("vfoot").getBoundingClientRect().top < innerHeight * 0.5) cur = "vfoot";
+    // a hidden footer measures as 0 × 0 at the top of the screen: it only counts once it's really there
+    const fr = document.getElementById("vfoot").getBoundingClientRect();
+    if (fr.height > 0 && fr.top < innerHeight * 0.5) cur = "vfoot";
     $$("[data-nav]").forEach((a) => {
       const desk = a.classList.contains("e8-link"),
         // the phone menu always lights one link, like the site's: PROMPTS while the header is in view

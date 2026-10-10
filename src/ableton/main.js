@@ -204,8 +204,8 @@ function reveal() {
   $("#snav").hidden = false;
   $("#ruler").hidden = false;
   requestAnimationFrame(drawRuler);
+  $("#vfoot").hidden = false; // before the nav starts: its scroll-spy measures the footer
   startNav();
-  $("#vfoot").hidden = false;
   startGutters();
   if (!window.__efx) {
     const fx = document.createElement("script");
@@ -286,7 +286,9 @@ function startNav() {
     SECTIONS.forEach((id) => {
       if (document.getElementById(id).getBoundingClientRect().top < line) cur = id;
     });
-    const foot = $("#vfoot").getBoundingClientRect().top < innerHeight * 0.5;
+    // a hidden footer measures as 0 × 0 at the top of the screen: it only counts once it's really there
+    const fr = $("#vfoot").getBoundingClientRect(),
+      foot = fr.height > 0 && fr.top < innerHeight * 0.5;
     $$("[data-rail]").forEach((a) => a.classList.toggle("on", !foot && a.dataset.rail === cur));
     const n = foot ? "vfoot" : cur && navOf[cur];
     $$("[data-nav]").forEach((a) => {
@@ -777,7 +779,7 @@ function apply(data) {
     `<div class="abl-docs"><div class="abl-doc cover"><span class="dl">ARCHIVE_404 · Nº404</span><span class="dt grad">ABLETON SET<br>SETUP GUIDE</span><span class="dl" style="margin-top:auto">${r.version}</span></div>
   <div class="abl-doc page"><span class="dl">01 · WHAT YOU NEED</span><span class="acc"></span><span class="ln"></span><span class="ln" style="width:72%"></span><span class="ln" style="width:86%"></span><span class="dl" style="margin-top:8px">02 · DOWNLOAD</span><span class="ln"></span><span class="ln" style="width:58%"></span></div>
   <div class="abl-doc card"><span class="dl">STAGE CARD · KEYLAB + PRE-SHOW</span><span class="acc"></span><span class="ln"></span><span class="ln" style="width:80%"></span><span class="ln" style="width:64%"></span><span class="ln" style="width:76%"></span></div></div>
-  <div class="actions" style="margin-top:22px"><button class="holo" data-dl="guide">↓ SETUP GUIDE · PDF</button><button class="gbtn" data-dl="card">↓ STAGE CARD · 1 PAGE</button></div>`;
+  <div class="abl-dl-row"><button class="holo" data-dl="guide">↓ SETUP GUIDE · PDF</button><button class="gbtn" data-dl="card">↓ STAGE CARD · 1 PAGE</button></div>`;
   $("#bt").innerHTML =
     `<div class="abl-pipe"><div class="pb"><b>live_timeline.json</b>THE SAME DATA /LIVE/ PLAYS</div><span class="ar">→</span><div class="pb"><b>live_als_assets.py</b>STEMS · CHOPS · CUES · KIT</div><span class="ar">→</span><div class="pb"><b>live_als.py</b>FROM ABLETON'S OWN PRESETS</div><span class="ar">→</span><div class="pb"><b>live_package.py</b>FLAC · ZIP · CHECKSUMS · TEST-LOAD</div></div>
   <div class="abl-facts">${C.facts.map(([n, t]) => `<div><b>${n}</b>${esc(t)}</div>`).join("")}</div>`;

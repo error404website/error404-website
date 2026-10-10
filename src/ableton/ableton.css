@@ -134,7 +134,10 @@
 .abl-chap-n {
   font-family: var(--head);
   font-size: clamp(64px, 9vw, 120px);
-  line-height: 0.78;
+  /* gradient text paints only inside the box: give the digits their full height (no clipped tops or
+     bottoms) and take it back with negative margins, so the heading still sits tight against them */
+  line-height: 1;
+  margin: -0.11em 0;
   color: transparent;
   -webkit-text-stroke: 1px rgba(244, 244, 248, 0.22);
   background: linear-gradient(90deg, var(--mag), var(--vio), var(--cyan), var(--mag)) 0 0 / 300% 100%;
@@ -848,6 +851,13 @@
 .abl-doc .acc {
   height: 3px;
   background: var(--grad);
+}
+
+.abl-dl-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
 }
 
 /* 09 · how it's built */
