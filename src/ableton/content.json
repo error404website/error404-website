@@ -1,0 +1,156 @@
+{
+  "version": "v1.2",
+  "steps": [
+    [
+      "WHAT YOU NEED",
+      [
+        "Ableton Live 12.4 or later, Suite edition (Max for Live is built in). No plug-ins.",
+        "Optional: an Arturia KeyLab 49 mk3; everything also works with the mouse",
+        "For the in-ear mix: an audio interface with 4 outputs",
+        "Chrome or Edge, for the /live/ backup"
+      ],
+      "Live 12.4 Suite is open"
+    ],
+    [
+      "DOWNLOAD AND UNZIP",
+      [
+        "Press DOWNLOAD THE PROJECT (0.9 GB)",
+        "Unzip it anywhere and keep the folder together; an SSD is best",
+        "Optional: check the download with the SHA-256 shown in the transfer panel, or run  shasum -a 256 -c CHECKSUMS.txt  inside the folder"
+      ],
+      "you have a folder called ARCHIVE_404 Live Project"
+    ],
+    [
+      "OPEN THE SET",
+      [
+        "Double-click ARCHIVE_404 Live.als",
+        "Arrangement view: 20 songs, 188 locators, a tempo lane that follows every beat",
+        "If Live asks for missing files, the unzip went wrong: unzip again"
+      ],
+      "the SETLIST track shows 20 coloured song blocks"
+    ],
+    [
+      "AUDIO SETTINGS",
+      [
+        "Settings › Audio: your interface, 48 kHz, buffer 128 (64 if your voice feels late)",
+        "Outputs 1/2 = the PA. Outputs 3/4 = your ears: click, spoken cues, guide vocal",
+        "Main › Cue Out = 3/4, so the click never reaches the PA"
+      ],
+      "you hear the set on the PA and nothing else"
+    ],
+    [
+      "MIDI SETTINGS",
+      [
+        "Settings › Link, Tempo & MIDI: Control Surface 1 = KeyLab_mk3 (its DAW ports)",
+        "KeyLab 49 mk3 (MIDI) port: Track ON and Remote ON",
+        "Audio MIDI Setup › Window › Show MIDI Studio › IAC Driver › Device is online",
+        "Back in Live, IAC Driver (Bus 1) has two rows: on the OUT row, Track ON"
+      ],
+      "the OUT row of IAC Driver shows Track ON"
+    ],
+    [
+      "MIC AND TUNER",
+      [
+        "Mic into input 1: the MIC track already monitors IN",
+        "TUNE is Ableton's Auto Shift (hard tune); its key changes with every song by itself",
+        "Sing a line: the guide vocal drops 12 dB under you and comes back 0.4 s after you stop"
+      ],
+      "the GUIDE VOX meter dips when you sing"
+    ],
+    [
+      "THE KEYLAB",
+      [
+        "Pads in Arturia mode: 1–6 = this song's vocal chops, 7–12 = one-shots",
+        "Lowest keys C, C♯, D = REPEAT, SKIP, NEXT SONG, landing on the next bar",
+        "Encoders 1–8 = the E404 FX macros, 9 = the mic's echo throw; faders = the mix",
+        "Every control is drawn in THE KEYLAB below, and TEST YOUR RIG checks them"
+      ],
+      "pad 1 plays a vocal chop"
+    ],
+    [
+      "PRE-SHOW CHECK",
+      [
+        "Click the SETLIST track, then CHECK on the E404 SHOW device",
+        "Every line green: data, position feed, REC, tuner, tape stop, click, 48 kHz",
+        "PROMPTER opens the big lyric window for a second screen"
+      ],
+      "CHECK shows all green"
+    ],
+    [
+      "THE BACKUP",
+      [
+        "In Chrome, open /live/ and enter the key",
+        "Menu › CONTROL › ABLETON STANDBY: the page follows Ableton, silent",
+        "If Ableton stops, the bar turns amber: TAKE OVER carries on from the same spot"
+      ],
+      "the standby bar counts along with Ableton"
+    ]
+  ],
+  "pads": [80, 81, 82, 83, 76, 77, 78, 79, 72, 73, 74, 75],
+  "encoders": [74, 71, 76, 77, 93, 18, 19, 16, 17],
+  "faders": [73, 75, 79, 72, 80, 81, 82, 83, 85],
+  "faderNames": ["INST", "GUIDE VOX", "MIC", "VOX PADS", "KIT PADS", "PLATE", "ECHO THROW", "EARS", "MAIN"],
+  "macros": ["ROLL", "TAPE STOP", "ECHO THROW", "PING-PONG", "CRUSH", "REVERB", "FILTER", "GLITCH"],
+  "kit": ["808 DROP", "SUB BOOM", "RISER", "SIREN", "GLITCH", "REWIND"],
+  "moves": [
+    ["C", "REPEAT", "Back to the start of this section, landing on the next bar.", 36],
+    ["C♯", "SKIP", "On to the next section, landing on the next bar.", 37],
+    ["D", "NEXT SONG", "Straight to the next song, landing on the next bar.", 38]
+  ],
+  "flow": {
+    "mic": "Your voice: input 1 → TUNE (Auto Shift) → GRIT → DOUBLER → the PA. A PLATE send and the ECHO THROW (encoder 9) sit on the side.",
+    "duck": "The duck: your mic keys a gate on GUIDE VOX. While you sing, the recorded vocal drops 12 dB; 0.4 s after you stop, it's back to cover you.",
+    "pads": "Pads: the KeyLab's pads on channel 10 play the song's chops and the one-shots into the SONG group, so ROLL, TAPE STOP and the rest catch them.",
+    "ears": "In-ears: the click (Live's metronome on the Cue out), the spoken cues and the full guide vocal go to outputs 3/4 only, never the PA.",
+    "feed": "Backup: the E404 SHOW device sends the playhead over the Mac's IAC bus; /live/ in Chrome follows it, silent, ready to TAKE OVER."
+  },
+  "trouble": [
+    [
+      "CHECK SAYS “IAC NOT OFFERED”",
+      "In Live's Settings › Link, Tempo & MIDI, IAC Driver (Bus 1) has two rows. Switch Track ON on the OUT row, then press CHECK again. If there's no IAC row at all, switch the IAC Driver on in Audio MIDI Setup first."
+    ],
+    [
+      "NOTHING IN MY IN-EARS",
+      "The ears are on outputs 3/4. A 2-output interface has none: use a 4-output interface, or an aggregate device in Audio MIDI Setup."
+    ],
+    [
+      "THE PADS DO NOTHING",
+      "Put the KeyLab's pads in Arturia mode (not DAW). VOX PADS and KIT PADS listen to channel 10 only, so the keys can never fire them."
+    ],
+    [
+      "THE GUIDE DOESN'T DROP WHEN I SING",
+      "Raise your mic gain, or lower the threshold of DUCK UNDER MIC on GUIDE VOX until it reacts to your voice but not to the room."
+    ],
+    [
+      "MY VOICE FEELS LATE",
+      "Lower the buffer to 64 in Settings › Audio. Auto Shift adds very little delay; the buffer is usually the cause."
+    ],
+    [
+      "STANDBY SAYS “WAITING FOR THE FEED”",
+      "Run CHECK in Ableton (POSITION FEED must read OK · Ch. 16), use Chrome or Edge, and allow MIDI when Chrome asks."
+    ],
+    [
+      "LIVE SAYS IT CAN'T OPEN THE SET",
+      "The set needs Live 12.4 or later, Suite edition. Earlier versions can't read it."
+    ]
+  ],
+  "pre": [
+    "INTERFACE ON · 48 KHZ · BUFFER 128",
+    "KEYLAB ON · PADS IN ARTURIA MODE",
+    "IAC ON · TRACK ON ITS OUT ROW",
+    "SET OPEN · CHECK ALL GREEN",
+    "MIC · GUIDE VOX DIPS WHEN YOU SING",
+    "EARS ON 3/4 · CLICK AND CUES HEARD",
+    "/LIVE/ ON ABLETON STANDBY (CHROME)",
+    "REC TRACKS ARMED"
+  ],
+  "facts": [
+    [
+      "10,327",
+      "tempo points, one per analysed beat: the approved audio plays untouched while the grid sits on the music"
+    ],
+    ["188", "locators: every song and section, so REPEAT and SKIP land where you expect"],
+    ["120", "vocal chops cut on word timings, six per song, swapping at every changeover"],
+    ["0", "hand edits: rebuild after any timing change and the set, the prompter and /live/ still agree"]
+  ]
+}

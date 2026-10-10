@@ -40,6 +40,14 @@
   [headers.values]
     Cache-Control = "public, max-age=604800"
 
+# Ableton set (/ableton/): private like the vault; the download comes from netlify/functions/ableton-download.mjs
+[[headers]]
+  for = "/ableton/*"
+  [headers.values]
+    Cache-Control = "no-cache"
+    Referrer-Policy = "no-referrer"
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+
 # Hashed JS/CSS bundles never change once published, so they can be cached forever.
 [[headers]]
   for = "/_app/*"

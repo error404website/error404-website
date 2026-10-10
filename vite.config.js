@@ -43,12 +43,14 @@ export default defineConfig({
     // Hashed JS/CSS go to /_app so they can be cached forever without
     // colliding with the un-hashed files in public/assets.
     assetsDir: "_app",
-    // three pages: the site, the password-gated Source Vault at /vault/, and the live show at /live/
+    // the site, the password-gated Source Vault at /vault/, the live show at /live/ and its phone remote,
+    // and the Ableton set at /ableton/
     rollupOptions: {
       input: {
         main: "index.html",
         vault: "vault/index.html",
         live: "live/index.html",
+        ableton: "ableton/index.html",
         remote: "live/remote/index.html",
       },
     },
