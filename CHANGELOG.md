@@ -5,6 +5,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+
+- **Ableton set · five instruments (download v1.3):** a new chapter 05 THE INSTRUMENTS on /ableton and a page in the setup guide (now 11 pages). CHUG (djent guitar: chugs pitched per key in four album tones with round robin, one-bar riffs warped to your tempo, held power chords), GLITCH VOX (44 sung chops, each playable chromatically), SUB 404 (a clean sine sub with the album's bass as a grit layer), KIT 404 (eight song kits, one per octave) and ATMOS (ten endless pads from the strings, synths and keys), all cut from the album stems at the notes in their MIDI. They ship in the set as a folded INSTRUMENTS group (keys only, with a guard so C, C♯ and D stay REPEAT / SKIP / NEXT SONG) and on their own as ERROR 404 Instruments Project for the User Library. The tuner's per-song key automation is fixed too (Live was ignoring it).
+
 ### Changed
 
 - **The Build · pinned chapters:** each chapter body is now one locked screen: the text and the visual stay put under the menu bar and ruler while the scroll plays the chapter in place (the dialogue appears line by line, the number fills, the visual turns), so nothing on the left scrolls or slips under the bar. On phones, portrait tablets and short screens the dialogue runs as subtitles (one line at a time, with progress dots) under the visual; every visual scales to the room it has; HOW IT WORKS opens as a panel over the slide; landscape phones get the compact 64 px bar. SOUND ON now plays GOSPEL_OUT throughout, and the title cards read TRACK instead of SCORED BY.
