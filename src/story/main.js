@@ -450,8 +450,20 @@ for (const c of chaps) {
     `<div class="talk-dots" aria-hidden="true">${lines.map(() => "<i></i>").join("")}</div>`,
   );
 }
+// subtitles show one line at a time in a box that fits it; the step keeps room for the tallest line
+// (above the chapter label) so the visual above doesn't resize from line to line
+const SUBS = matchMedia("(max-width: 900px) and (orientation: portrait), (max-height: 760px)");
+function fitTalk(c) {
+  const step = $(".step", c),
+    talk = $(".talk", c);
+  step.style.minHeight = "";
+  if (!SUBS.matches) return;
+  const tallest = Math.max(...$$(".talk p", c).map((p) => p.offsetHeight));
+  step.style.minHeight = step.offsetHeight - talk.offsetHeight + tallest + "px";
+}
 // every visual is scaled to fit the room its slide gives it, on any screen
 function fitVisuals(c) {
+  fitTalk(c);
   for (const face of $$(".face.front", c)) {
     const el = face.firstElementChild;
     if (!el) continue;
@@ -461,6 +473,7 @@ function fitVisuals(c) {
   }
 }
 addEventListener("resize", () => chaps.forEach(fitVisuals));
+document.fonts?.ready.then(() => chaps.forEach(fitVisuals));
 const topH = () => navH() + 22;
 function book() {
   const H = innerHeight;

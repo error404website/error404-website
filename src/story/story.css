@@ -885,14 +885,22 @@ a {
 .talk-dots i.on {
   background: var(--grad);
 }
-/* subtitles: phones and portrait tablets, and any short screen. One line at a time in a fixed box. */
+/* subtitles: phones and portrait tablets, and any short screen. One line at a time. */
 @media (max-width: 900px) and (orientation: portrait), (max-height: 760px) {
+  /* the box fits the line on screen; the others wait out of flow. main.js reserves the tallest line's
+     height above the chapter label, so the visual never resizes between lines */
   .talk {
-    display: grid;
+    display: block;
+    position: relative;
   }
   .talk p {
-    grid-area: 1 / 1;
-    align-self: end;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+  .talk p.now {
+    position: relative;
   }
   .talk p.past {
     opacity: 0;
