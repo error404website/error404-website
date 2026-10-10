@@ -534,7 +534,7 @@ addEventListener("resize", () => {
   bookRain = rain($("#bookRain"), TITLES);
 });
 
-/* ---- W5 VIEW SOURCE: every visual flips to the code behind it ---- */
+/* ---- each chapter links to its page on the site; </> CODE flips the visual to the code behind it ---- */
 for (const back of $$(".face.back")) {
   const src = SOURCES[back.dataset.src];
   back.innerHTML = `<div class="src"><div class="src-hd"><span class="lab">SOURCE</span><span class="src-f">${src.file}</span></div><pre><code>${highlight(src.code, src.lang)}</code></pre></div>`;
@@ -545,7 +545,7 @@ for (const btn of $$(".srcbtn")) {
     const on = !flip.classList.contains("src");
     flip.classList.toggle("src", on);
     btn.setAttribute("aria-pressed", on);
-    btn.textContent = on ? "← BACK TO VISUAL" : "VIEW SOURCE ⟲";
+    btn.textContent = on ? "← VISUAL" : "</> CODE";
   });
 }
 
