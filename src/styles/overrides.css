@@ -1384,8 +1384,23 @@
 
 /* global scale support: keep full-screen sections full-screen when the site is zoomed */
 .hero-vh {
-  /* the hero ends where the player dock begins, so its tagline and scroll cue stay visible */
+  /* the hero ends where the player dock begins, so its tagline and scroll cue stay visible.
+     svh: the height with the phone browser's bars showing, so they never push the centre around */
   min-height: calc(100vh / var(--ez, 1) - var(--dock-h, 0px));
+  min-height: calc(100svh / var(--ez, 1) - var(--dock-h, 0px));
+}
+/* H2 · the hero's logo + ARCHIVE_404 + tagline: one block at the optical centre (46%) at every size.
+   The hero logo's box is just the wordmark (the old 1536x1024 canvas left ~half of it empty below the
+   letters, which pushed the text down); the footer credits keep their own box. */
+.e-hero .e-logo-full {
+  aspect-ratio: 1414/348;
+}
+.e-hero .e-logo-full > img,
+.e-hero .e-logo-full > .e-gh,
+.e-hero .e-logo-full > .e-fx-layer {
+  left: 0;
+  top: 0;
+  width: 100%;
 }
 
 /* fluid scale: browsers don't rescale vw/vh under CSS zoom, so full-window sizes are divided by the scale */

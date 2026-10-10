@@ -162,7 +162,7 @@ export function Hero() {
         }}
         aria-hidden="true"
       />
-      <div className="absolute inset-x-0 top-1/2 top-[50dvh] -translate-y-1/2 sm:top-auto sm:translate-y-0 sm:bottom-[7vh] flex justify-center px-4 sm:px-6">
+      <div className="e-hero-c absolute inset-x-0 top-[46%] -translate-y-1/2 flex justify-center px-4 sm:px-6">
         <motion.div
           className="flex flex-col items-center gap-0 w-full"
           style={{
@@ -183,7 +183,7 @@ export function Hero() {
             transition={{
               duration: 0.3,
             }}
-            className="e-logo e-logo-full e-logo-slam w-[min(92vw,820px)] sm:w-[min(88vw,820px)] select-none"
+            className="e-logo e-logo-full e-logo-slam w-[min(84.6vw,754px)] sm:w-[min(81vw,754px)] select-none"
             style={{
               filter:
                 "drop-shadow(0 0 2px rgba(255,0,229,0.7)) drop-shadow(0 0 12px rgba(161,0,255,0.28)) drop-shadow(0 0 80px rgba(255,0,229,0.14)) drop-shadow(0 0 160px rgba(161,0,255,0.10))",
@@ -193,7 +193,7 @@ export function Hero() {
             <div className="e-gh c" aria-hidden={true} />
             <img src="/assets/error404logo.svg" alt="" draggable={false} decoding="async" />
           </motion.div>
-          <div className="flex flex-col items-center gap-4 mt-1">
+          <div className="flex flex-col items-center gap-4 mt-[18px] sm:mt-6">
             <motion.p
               initial={{
                 opacity: 0,
