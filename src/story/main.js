@@ -341,6 +341,27 @@ const chaps = $$(".chap");
 const onVis = {}; // per-chapter visual hooks: called with true when its body scrolls in, false when it leaves
 const live = new Set();
 let bookRain = null;
+// each chapter's runway is one stretch of scroll per line of dialogue; dots show where you are
+for (const c of chaps) {
+  const lines = $$(".talk p", c);
+  $(".chap-body", c).style.setProperty("--lines", lines.length);
+  $(".talk", c).insertAdjacentHTML(
+    "afterend",
+    `<div class="talk-dots" aria-hidden="true">${lines.map(() => "<i></i>").join("")}</div>`,
+  );
+}
+// every visual is scaled to fit the room its slide gives it, on any screen
+function fitVisuals(c) {
+  for (const face of $$(".face.front", c)) {
+    const el = face.firstElementChild;
+    if (!el) continue;
+    el.style.transform = "";
+    const k = Math.min(1, face.clientWidth / el.offsetWidth, face.clientHeight / el.offsetHeight);
+    el.style.transform = k < 0.999 ? `scale(${k.toFixed(3)})` : "";
+  }
+}
+addEventListener("resize", () => chaps.forEach(fitVisuals));
+const topH = () => navH() + 22;
 function book() {
   const H = innerHeight;
   for (const c of chaps) {
@@ -352,14 +373,24 @@ function book() {
       if (inView) live.add(name);
       else live.delete(name);
       c.classList.toggle("on", inView);
+      if (inView) fitVisuals(c);
       onVis[name]?.(inView);
     }
     if (r.top < H && r.bottom > 0) {
-      // the ghost number fills and the visual turns towards you as the chapter is read
-      const p = Math.min(1, Math.max(0, (H - r.top) / (r.height + H * 0.4)));
+      // progress through the pinned slide: 0 when it locks under the bar, 1 when it lets go
+      const run = r.height - (H - topH()),
+        p = Math.min(1, Math.max(0, (topH() - r.top) / run));
       c.style.setProperty("--fill", (p * 100).toFixed(1) + "%");
       c.style.setProperty("--ry", lerp(-16, -3, p).toFixed(2) + "deg");
       c.style.setProperty("--rx", lerp(7, 2, p).toFixed(2) + "deg");
+      // the dialogue plays in place: one line per stretch, the first one there as soon as the slide locks
+      const lines = $$(".talk p", c),
+        k = Math.min(lines.length - 1, Math.floor(p * lines.length * 1.08));
+      lines.forEach((l, i) => {
+        l.classList.toggle("past", i < k);
+        l.classList.toggle("now", i === k);
+      });
+      $$(".talk-dots i", c).forEach((d, i) => d.classList.toggle("on", i <= k));
     }
   }
   // the rain behind the chapters runs only while the book is on screen
@@ -403,7 +434,7 @@ let vitTarget = { t: 104, j: 9 },
 function zonesTick() {
   let z = zones[0];
   for (const el of zones) if (el.getBoundingClientRect().top < innerHeight * 0.5) z = el;
-  bed.track(z.dataset.track);
+  bed.track("gospel_out"); // the score is GOSPEL_OUT throughout
   const show = z.dataset.temp != null && !$("#tldr").classList.contains("open");
   $("#vitals").classList.toggle("on", show);
   if (z.dataset.temp != null) vitTarget = { t: +z.dataset.temp, j: +z.dataset.jobs };
