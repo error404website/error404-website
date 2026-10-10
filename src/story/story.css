@@ -263,13 +263,21 @@ a {
   height: 370vh;
   position: relative;
 }
+/* the stage spans the tallest viewport (phone toolbars collapsed), so nothing shows below it when Safari's
+   toolbars slide away; --tb is how much of it the toolbars can cover, so the bottom readouts stay above them */
 .ov-stage {
   position: sticky;
   top: 0;
   height: 100vh;
-  height: 100svh;
+  height: 100lvh;
   overflow: hidden;
   clip-path: inset(0);
+  --tb: 0px;
+}
+@supports (height: 100lvh) {
+  .ov-stage {
+    --tb: calc(100lvh - 100svh);
+  }
 }
 .ov-heat,
 .ov-rain {
@@ -336,19 +344,19 @@ a {
 }
 .vt.c {
   left: 14px;
-  bottom: 14px;
+  bottom: calc(14px + var(--tb, 0px));
   border-width: 0 0 1px 1px;
 }
 .vt.d {
   right: 14px;
-  bottom: 14px;
+  bottom: calc(14px + var(--tb, 0px));
   border-width: 0 1px 1px 0;
 }
 .ov-scale {
   position: absolute;
   right: 26px;
   top: calc(var(--topH) + 50px);
-  bottom: 70px;
+  bottom: calc(70px + var(--tb));
   width: 10px;
   z-index: 3;
   background: linear-gradient(
@@ -467,7 +475,7 @@ a {
 .ov-read {
   position: absolute;
   left: 24px;
-  bottom: 56px;
+  bottom: calc(56px + var(--tb));
   z-index: 3;
 }
 .ov-read b {
@@ -504,7 +512,7 @@ a {
 }
 .ov-boot {
   position: absolute;
-  inset: 0;
+  inset: 0 0 var(--tb);
   z-index: 5;
   display: flex;
   flex-direction: column;
@@ -558,7 +566,7 @@ a {
 .ov-hint {
   position: absolute;
   left: 50%;
-  bottom: 22px;
+  bottom: calc(22px + var(--tb));
   transform: translateX(-50%);
   font-family: var(--mono);
   font-size: 9px;
