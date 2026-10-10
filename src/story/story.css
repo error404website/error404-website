@@ -1208,6 +1208,18 @@ a {
   body .vitals {
     display: none;
   }
+  /* the dots sit right under the line, and HOW IT WORKS shares the bottom row with the sound button,
+     so the slide doesn't need to reserve a strip below it */
+  .slide {
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+  .talk-dots {
+    margin-top: 8px;
+  }
+  .how {
+    margin-top: 12px;
+    margin-right: 46px;
+  }
   .ghost {
     font-size: 46vw;
   }
