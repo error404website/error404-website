@@ -1,10 +1,14 @@
 // The Build (/story/): a scrolling storybook for engineers about how ARCHIVE_404 was made,
 // credited to NULLSAINT × CACHEGHOST. Opens on a thermal camera view of the Mac mini overheating,
-// then one pinned visual per chapter, the AI crew, and credits that roll while the machine cools.
+// then a title card + full-bleed body per chapter (each visual flips to its real source code), the AI crew,
+// and credits that roll while the machine cools. Optional score (SOUND ON), a vitals HUD carried over from
+// the opening, and a 60-second case file that prints as a one-page PDF.
 import "./logo-fx.css";
 import "./story.css";
 import { rain, REDUCE } from "../lib/rain.js";
 import { CHAPTERS } from "../data/chapters.js";
+import { SOURCES, highlight } from "./sources.js";
+import { score } from "./sound.js";
 
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -271,35 +275,122 @@ new IntersectionObserver(
   { threshold: 0.4 },
 ).observe($("#stats"));
 
-/* ================= the book: steps switch the pinned visual ================= */
-const steps = $$(".step"),
-  visEls = $$(".vis");
-let current = "";
-const onVis = {};
-function setVis(name) {
-  if (name === current) return;
-  const prev = current;
-  current = name;
-  visEls.forEach((v) => v.classList.toggle("on", v.dataset.vis === name));
-  steps.forEach((s) => s.classList.toggle("on", s.dataset.vis === name));
-  onVis[prev]?.(false);
-  onVis[name]?.(true);
-}
-function pickStep() {
-  let best = null,
-    bd = Infinity;
-  for (const s of steps) {
-    const r = s.getBoundingClientRect(),
-      d = Math.abs(r.top + Math.min(r.height, innerHeight) / 2 - innerHeight * 0.5);
-    if (r.bottom > 0 && r.top < innerHeight && d < bd) {
-      bd = d;
-      best = s;
+/* ================= W1 score ================= */
+const bed = score({ button: $("#snd"), label: $("#sndT") });
+
+/* ================= the book: one section per chapter ================= */
+const chaps = $$(".chap");
+const onVis = {}; // per-chapter visual hooks: called with true when its body scrolls in, false when it leaves
+const live = new Set();
+let bookRain = null;
+function book() {
+  const H = innerHeight;
+  for (const c of chaps) {
+    const body = $(".chap-body", c),
+      r = body.getBoundingClientRect(),
+      inView = r.top < H * 0.75 && r.bottom > H * 0.25,
+      name = c.dataset.chap;
+    if (inView !== live.has(name)) {
+      if (inView) live.add(name);
+      else live.delete(name);
+      c.classList.toggle("on", inView);
+      onVis[name]?.(inView);
+    }
+    if (r.top < H && r.bottom > 0) {
+      // the ghost number fills and the visual turns towards you as the chapter is read
+      const p = Math.min(1, Math.max(0, (H - r.top) / (r.height + H * 0.4)));
+      c.style.setProperty("--fill", (p * 100).toFixed(1) + "%");
+      c.style.setProperty("--ry", lerp(-16, -3, p).toFixed(2) + "deg");
+      c.style.setProperty("--rx", lerp(7, 2, p).toFixed(2) + "deg");
     }
   }
-  const book = $("#book").getBoundingClientRect();
-  if (book.bottom < 0 || book.top > innerHeight) return;
-  if (best) setVis(best.dataset.vis);
+  // the rain behind the chapters runs only while the book is on screen
+  const b = $("#book").getBoundingClientRect(),
+    show = b.top < H && b.bottom > 0 && !REDUCE;
+  if (show && !bookRain) {
+    bookRain = rain($("#bookRain"), TITLES);
+    $("#book").classList.add("raining");
+  } else if (!show && bookRain) {
+    bookRain.stop();
+    bookRain = null;
+    $("#book").classList.remove("raining");
+  }
 }
+addEventListener("resize", () => {
+  if (!bookRain) return;
+  bookRain.stop();
+  bookRain = rain($("#bookRain"), TITLES);
+});
+
+/* ---- W5 VIEW SOURCE: every visual flips to the code behind it ---- */
+for (const back of $$(".face.back")) {
+  const src = SOURCES[back.dataset.src];
+  back.innerHTML = `<div class="src"><div class="src-hd"><span class="lab">SOURCE</span><span class="src-f">${src.file}</span></div><pre><code>${highlight(src.code, src.lang)}</code></pre></div>`;
+}
+for (const btn of $$(".srcbtn")) {
+  const flip = $(".flip", btn.closest(".stage-in"));
+  btn.addEventListener("click", () => {
+    const on = !flip.classList.contains("src");
+    flip.classList.toggle("src", on);
+    btn.setAttribute("aria-pressed", on);
+    btn.textContent = on ? "← BACK TO VISUAL" : "VIEW SOURCE ⟲";
+  });
+}
+
+/* ================= sections: score track, vitals (W2), chapter name ================= */
+const zones = $$("[data-track]");
+const vit = { t: 104, f: 4170, j: 9, show: false };
+let vitTarget = { t: 104, j: 9 },
+  vitRaf = 0;
+function zonesTick() {
+  let z = zones[0];
+  for (const el of zones) if (el.getBoundingClientRect().top < innerHeight * 0.5) z = el;
+  bed.track(z.dataset.track);
+  const show = z.dataset.temp != null && !$("#tldr").classList.contains("open");
+  $("#vitals").classList.toggle("on", show);
+  if (z.dataset.temp != null) vitTarget = { t: +z.dataset.temp, j: +z.dataset.jobs };
+  if (!vitRaf) vitRaf = requestAnimationFrame(vitStep);
+}
+function vitStep() {
+  vitRaf = 0;
+  vit.t += (vitTarget.t - vit.t) * 0.08;
+  // fan speed follows the temperature between the idle 41° and the 108° peak
+  const f = Math.max(0, ((vit.t - 41) / (108 - 41)) * 4900);
+  $("#vT").textContent = vit.t.toFixed(1) + "°";
+  $("#vF").textContent = Math.round(f).toLocaleString("en-GB");
+  $("#vJ").textContent = vitTarget.j;
+  if (Math.abs(vitTarget.t - vit.t) > 0.05) vitRaf = requestAnimationFrame(vitStep);
+}
+
+/* ================= W6 60-second read + W9 case file ================= */
+(() => {
+  const sheet = $("#tldr"),
+    opener = $("#open60");
+  const open = () => {
+    sheet.hidden = false;
+    requestAnimationFrame(() => sheet.classList.add("open"));
+    document.body.classList.add("sheet-open");
+    $("#close60").focus();
+    zonesTick();
+  };
+  const close = (to) => {
+    sheet.classList.remove("open");
+    document.body.classList.remove("sheet-open");
+    setTimeout(() => (sheet.hidden = true), 300);
+    if (to) to.scrollIntoView({ behavior: REDUCE ? "auto" : "smooth" });
+    else opener.focus();
+    zonesTick();
+  };
+  opener.addEventListener("click", open);
+  $("#close60").addEventListener("click", () => close());
+  addEventListener("keydown", (e) => e.key === "Escape" && !sheet.hidden && close());
+  for (const a of $$(".tc-card", sheet))
+    a.addEventListener("click", (e) => {
+      e.preventDefault();
+      close($(a.getAttribute("href")));
+    });
+  $("#print60").addEventListener("click", () => window.print());
+})();
 
 /* ---- SITE: the PR film strip (real merged PRs) ---- */
 const PRS = [
@@ -383,6 +474,7 @@ const seam = (() => {
     ui();
   }
   function ui() {
+    bed.duck(S.playing); // the score steps aside while the A/B plays
     $("#seamPlay").textContent = S.playing ? "❚❚ PAUSE" : "▶ PLAY";
     $$("#seam .ab").forEach((b) => b.classList.toggle("on", b.dataset.k === S.mode));
     $$("#seam .wv").forEach((w) => w.classList.toggle("dim", w.dataset.k !== S.mode));
@@ -537,7 +629,7 @@ onVis.seam = seam.show;
   };
   kill.onclick = () => {
     dead = !dead;
-    run(current === "feed");
+    run(live.has("feed"));
     b.classList.remove("dead", "live");
     if (dead) {
       kill.textContent = "RESTART ABLETON";
@@ -674,7 +766,8 @@ function onScroll() {
     ticking = false;
     topBar();
     ov();
-    pickStep();
+    book();
+    zonesTick();
     end();
   });
 }

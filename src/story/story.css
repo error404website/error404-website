@@ -590,25 +590,176 @@ a {
   }
 }
 
-/* ---------------- the book: steps + pinned stage ---------------- */
+/* ---------------- the book: S2 title card + S1 full-bleed body per chapter ---------------- */
+@property --tx {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 20%;
+}
+@property --ty {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 40%;
+}
+@keyframes torch {
+  0%,
+  100% {
+    --tx: 10%;
+    --ty: 30%;
+  }
+  25% {
+    --tx: 45%;
+    --ty: 85%;
+  }
+  50% {
+    --tx: 92%;
+    --ty: 40%;
+  }
+  75% {
+    --tx: 55%;
+    --ty: 8%;
+  }
+}
+@keyframes tc-gl {
+  0%,
+  88%,
+  100% {
+    opacity: 0;
+    transform: none;
+    clip-path: none;
+  }
+  90% {
+    opacity: 0.9;
+    transform: translate(-1.1%, 2%);
+    clip-path: inset(10% 0 50% 0);
+  }
+  93% {
+    opacity: 0.9;
+    transform: translate(0.8%, -1.4%);
+    clip-path: inset(55% 0 5% 0);
+  }
+  96% {
+    opacity: 0;
+  }
+}
 .book {
+  position: relative;
+}
+/* the rain + tint sit behind every chapter, fixed to the screen while the book is on it */
+.book-rain,
+.book-tint {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.8s;
+}
+.book.raining .book-rain {
+  opacity: 0.35;
+}
+.book.raining .book-tint {
+  opacity: 1;
+}
+.book-tint {
+  background:
+    radial-gradient(60% 55% at 78% 55%, rgba(161, 0, 255, 0.22), transparent 70%),
+    linear-gradient(90deg, rgba(3, 4, 9, 0.95) 28%, rgba(3, 4, 9, 0.45));
+}
+.chap {
+  position: relative;
+  z-index: 1;
+}
+/* S2: the title card, in the wordmark's own treatment (outline, torch inside the letters, glitch) */
+.tc {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--topH) 20px 0;
+  background: radial-gradient(55% 45% at 50% 52%, rgba(161, 0, 255, 0.18), rgba(3, 4, 9, 0.6) 70%);
+}
+.tc-meta {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: var(--t3);
+  margin-bottom: 12px;
+}
+.tc-meta b {
+  font-weight: 400;
+  color: var(--ghost);
+}
+.tc-t {
+  position: relative;
+  font-family: var(--head);
+  font-weight: 400;
+  font-size: clamp(76px, 15vw, 250px);
+  line-height: 0.86;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.tc-t .o {
+  color: transparent;
+  -webkit-text-stroke: 1.6px rgba(244, 244, 248, 0.55);
+}
+.tc-t .l {
+  position: absolute;
+  inset: 0;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-mask: radial-gradient(circle 0.9em at var(--tx) var(--ty), #000 0, #000 35%, transparent 100%);
+  mask: radial-gradient(circle 0.9em at var(--tx) var(--ty), #000 0, #000 35%, transparent 100%);
+  animation: torch 8s ease-in-out infinite;
+}
+.tc-t::before,
+.tc-t::after {
+  content: attr(data-t);
+  position: absolute;
+  inset: 0;
+  color: transparent;
+  -webkit-text-stroke: 1.6px var(--mag);
+  opacity: 0;
+  animation: tc-gl 5s steps(1) infinite;
+  pointer-events: none;
+}
+.tc-t::after {
+  -webkit-text-stroke-color: var(--cyan);
+  animation-delay: 0.06s;
+}
+.tc-sub {
+  margin-top: 24px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.26em;
+  color: var(--t2);
+}
+/* S1: the chapter body, full bleed */
+.chap-body {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: 48px;
-  max-width: 1320px;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 40px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 28px;
-}
-.steps {
-  padding: 10vh 0 30vh;
+  min-height: 150vh;
 }
 .step {
-  min-height: 92vh;
-  padding: 12vh 0;
-  opacity: 0.32;
-  transition: opacity 0.5s;
+  padding: 22vh 0 30vh;
+  opacity: 0.35;
+  transition: opacity 0.6s;
 }
-.step.on {
+.chap.on .step {
   opacity: 1;
 }
 .step .num {
@@ -617,17 +768,16 @@ a {
   font-size: 10px;
   letter-spacing: 0.3em;
   color: var(--mag);
-  margin-bottom: 10px;
 }
 .talk {
-  margin-top: 26px;
+  margin-top: 22px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 .talk p {
   font-weight: 300;
-  font-size: 16px;
+  font-size: 17px;
   line-height: 1.7;
   color: var(--ghost);
   padding-left: 16px;
@@ -656,7 +806,7 @@ a {
 .how {
   margin-top: 26px;
   border: 1px solid var(--hair);
-  background: #05060b;
+  background: rgba(5, 6, 11, 0.85);
 }
 .how summary {
   list-style: none;
@@ -709,74 +859,224 @@ a {
 }
 .stage-in {
   position: sticky;
-  top: calc(var(--topH) + 4vh);
-  height: calc(100vh - var(--topH) - 8vh);
-  border: 1px solid var(--hair);
-  background: #000;
-  overflow: hidden;
-  clip-path: inset(0);
-}
-.vis {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  visibility: hidden;
-  transform: scale(1.02);
-  transition:
-    opacity 0.6s,
-    transform 0.6s,
-    visibility 0s 0.6s;
+  top: var(--topH);
+  height: calc(100vh - var(--topH));
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 28px;
 }
-.vis.on {
-  opacity: 1;
-  visibility: visible;
-  transform: none;
+/* the giant outlined chapter number behind the visual; fills with the gradient as it's read */
+.ghost {
+  position: absolute;
+  right: -2%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--head);
+  font-size: min(64vh, 40vw);
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(244, 244, 248, 0.16);
+  pointer-events: none;
+  user-select: none;
+}
+.ghost span {
+  position: absolute;
+  inset: 0;
+  -webkit-text-stroke: 0;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0.3;
+  -webkit-mask: linear-gradient(0deg, #000 var(--fill, 0%), transparent 0);
+  mask: linear-gradient(0deg, #000 var(--fill, 0%), transparent 0);
+}
+.vis {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  height: min(620px, calc(100vh - var(--topH) - 120px));
+  perspective: 1400px;
+  opacity: 0;
+  transform: translateY(24px);
   transition:
-    opacity 0.6s,
-    transform 0.6s;
+    opacity 0.7s,
+    transform 0.7s;
+}
+.chap.on .vis {
+  opacity: 1;
+  transform: none;
+}
+.tilt {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateY(var(--ry, -10deg)) rotateX(var(--rx, 4deg));
+  transition: transform 0.2s linear;
+}
+.flip {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.7, 0, 0.2, 1);
+}
+.flip.src {
+  transform: rotateY(180deg);
+}
+/* the code reads flat: the tilt straightens while a visual shows its source */
+.tilt:has(.flip.src) {
+  transform: none;
+}
+.face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.face.back {
+  transform: rotateY(180deg);
+}
+.flip.src .front,
+.flip:not(.src) .back {
+  pointer-events: none;
+}
+.front > * {
+  filter: drop-shadow(0 30px 40px rgba(0, 0, 0, 0.7));
+}
+/* open visuals get a dark panel so the rain and the ghost number stay behind them */
+.front > .seam,
+.front > .sync,
+.front > .feed,
+.front > .prs {
+  background: rgba(3, 4, 9, 0.86);
+  border: 1px solid var(--hair);
+}
+.front > .seam,
+.front > .sync {
+  padding: 22px;
+}
+.srcbtn {
+  position: absolute;
+  right: 0;
+  top: 18px;
+  z-index: 3;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--ghost);
+  padding: 9px 13px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(#07080f, #07080f) padding-box,
+    conic-gradient(from var(--foil), #ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5) border-box;
+  animation: foil 6s linear infinite;
+}
+.chap:not(.on) .srcbtn {
+  opacity: 0;
+  pointer-events: none;
+}
+.src {
+  width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--hair);
+  background: rgba(5, 6, 11, 0.96);
+  box-shadow: 0 0 40px -14px rgba(0, 239, 255, 0.5);
+}
+.src-hd {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--hair2);
+}
+.src-f {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  color: var(--cyan);
+}
+.src pre {
+  margin: 0;
+  padding: 14px;
+  overflow: auto;
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--t2);
+  tab-size: 2;
+}
+.src i {
+  font-style: normal;
+}
+.src i.k {
+  color: var(--mag);
+}
+.src i.s {
+  color: var(--cyan);
+}
+.src i.c {
+  color: var(--t4);
+}
+.src i.n {
+  color: var(--amber);
 }
 @media (max-width: 900px) {
-  .book {
-    display: block;
+  .tc {
+    min-height: 82vh;
+    min-height: 82svh;
+  }
+  .tc-meta {
+    gap: 6px 16px;
+    font-size: 8.5px;
+  }
+  .tc-t {
+    font-size: clamp(54px, 17vw, 120px);
+    white-space: normal;
+  }
+  .chap-body {
+    display: flex;
+    flex-direction: column-reverse;
     padding: 0;
-    position: relative;
+    min-height: 0;
   }
   .stage {
     position: sticky;
     top: var(--topH);
-    height: 48vh;
+    height: 54vh;
     z-index: 2;
-    margin-top: -1px;
   }
   .stage-in {
     position: absolute;
-    inset: 8px 12px;
+    inset: 8px 12px 0;
     height: auto;
-    top: 8px;
   }
-  .steps {
-    position: relative;
-    z-index: 3;
-    padding: 0 16px 20vh;
+  .ghost {
+    font-size: 46vw;
+  }
+  .vis {
+    height: 100%;
+  }
+  .srcbtn {
+    top: 4px;
+    font-size: 9px;
+    padding: 7px 10px;
   }
   .step {
-    min-height: 0;
-    padding: 28px 18px 32px;
-    margin: 0 0 52vh;
+    position: relative;
+    z-index: 3;
+    margin: 0 16px 40vh;
+    padding: 26px 18px 30px;
     background: rgba(3, 4, 9, 0.94);
     border: 1px solid var(--hair2);
     opacity: 1;
   }
-  .book {
-    display: flex;
-    flex-direction: column-reverse;
-  }
-  .vis {
-    padding: 14px;
+  .src pre {
+    font-size: 9.5px;
   }
 }
 
@@ -1186,37 +1486,58 @@ a {
   }
 }
 
-/* stage: COMICS */
-.tri {
+/* stage: COMICS (the press shots for now) */
+@keyframes press {
+  0% {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+  4%,
+  30% {
+    opacity: 1;
+  }
+  36%,
+  100% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+}
+.press {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  clip-path: inset(0);
+  border: 1px solid var(--hair);
+}
+.press figure {
   position: absolute;
   inset: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 1px;
-  background: var(--hair2);
+  opacity: 0;
+  animation: press 15s linear infinite;
 }
-.tri figure {
-  position: relative;
-  overflow: hidden;
-  background: #000;
+.press figure:nth-child(2) {
+  animation-delay: 5s;
 }
-.tri img {
+.press figure:nth-child(3) {
+  animation-delay: 10s;
+}
+.press img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: top;
   display: block;
 }
-.tri figcaption {
+.press figcaption {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 10px;
+  padding: 40px 14px 14px;
   font-family: var(--mono);
-  font-size: 8.5px;
-  letter-spacing: 0.22em;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.92));
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
 }
 
 /* ---------------- the crew (A4) ---------------- */
@@ -1378,13 +1699,324 @@ a {
   line-height: 0.92;
 }
 
+/* ---------------- W2 vitals HUD · W1 sound · 60 SEC button ---------------- */
+.top-60 {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  color: var(--ghost);
+  border: 1px solid transparent;
+  padding: 6px 10px;
+  background:
+    linear-gradient(#07080f, #07080f) padding-box,
+    var(--grad) border-box;
+}
+.vitals {
+  position: fixed;
+  left: 18px;
+  bottom: 18px;
+  z-index: 30;
+  display: flex;
+  gap: 18px;
+  align-items: flex-end;
+  padding: 10px 14px;
+  border: 1px solid var(--hair);
+  background: rgba(3, 4, 9, 0.82);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.4s,
+    transform 0.4s;
+  pointer-events: none;
+}
+.vitals.on {
+  opacity: 1;
+  transform: none;
+}
+.vitals b {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--head);
+  font-weight: 400;
+  font-size: 26px;
+  letter-spacing: 0.02em;
+  line-height: 0.95;
+  min-width: 2.6em;
+}
+@keyframes eq {
+  from {
+    height: 20%;
+  }
+  to {
+    height: 100%;
+  }
+}
+.snd {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.24em;
+  color: var(--t2);
+  border: 1px solid var(--hair);
+  background: rgba(3, 4, 9, 0.82);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.snd:hover {
+  color: var(--ghost);
+  border-color: rgba(255, 0, 229, 0.5);
+}
+.snd.on {
+  color: var(--ghost);
+  border-color: transparent;
+  background:
+    linear-gradient(#07080f, #07080f) padding-box,
+    conic-gradient(from var(--foil), #ff00e5, #a100ff, #00efff, #f9f9ff, #ff00e5) border-box;
+  animation: foil 6s linear infinite;
+}
+.snd .eq {
+  display: inline-flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 12px;
+}
+.snd .eq i {
+  width: 2px;
+  height: 30%;
+  background: var(--t3);
+}
+.snd.on .eq i {
+  background: var(--grad);
+  animation: eq 0.9s ease-in-out infinite alternate;
+}
+.snd.on .eq i:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.snd.on .eq i:nth-child(3) {
+  animation-delay: -0.6s;
+}
+.snd.on .eq i:nth-child(4) {
+  animation-delay: -0.15s;
+}
+.snd-t:not(:empty) {
+  color: var(--cyan);
+}
+.snd-t:not(:empty)::before {
+  content: "· ";
+  color: var(--t4);
+}
+body.sheet-open .snd,
+body.sheet-open .vitals {
+  opacity: 0;
+  pointer-events: none;
+}
+@media (max-width: 640px) {
+  .vitals {
+    left: 10px;
+    bottom: 10px;
+    gap: 12px;
+    padding: 8px 10px;
+  }
+  .vitals b {
+    font-size: 20px;
+  }
+  .snd {
+    right: 10px;
+    bottom: 10px;
+    padding: 9px 10px;
+  }
+  .snd-t,
+  .snd-l {
+    display: none;
+  }
+  .top-60 {
+    padding: 5px 7px;
+    font-size: 8.5px;
+  }
+}
+
+/* ---------------- W6 the 60-second read (prints as the W9 case file) ---------------- */
+.tldr {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow-y: auto;
+  background: rgba(3, 4, 9, 0.94);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.tldr.open {
+  opacity: 1;
+}
+.tldr-in {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 28px 60px;
+}
+.tldr-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.tldr-h {
+  margin-top: 30px;
+  font-family: var(--head);
+  font-weight: 400;
+  font-size: clamp(44px, 7vw, 92px);
+  line-height: 0.92;
+  letter-spacing: 0.02em;
+}
+.tldr-p {
+  margin-top: 16px;
+  max-width: 680px;
+  font-weight: 300;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--t2);
+}
+.tldr-grid {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.tc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--hair);
+  background: #05060b;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
+}
+.tc-card:hover {
+  border-color: rgba(255, 0, 229, 0.55);
+  transform: translateY(-3px);
+}
+.tc-card b {
+  font-family: var(--head);
+  font-weight: 400;
+  font-size: 26px;
+  letter-spacing: 0.04em;
+}
+.tc-card span {
+  font-weight: 300;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--t2);
+}
+.tc-card::after {
+  content: "READ →";
+  margin-top: auto;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+  color: var(--mag);
+}
+.tldr-ft {
+  margin-top: 30px;
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+@media (max-width: 900px) {
+  .tldr-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 520px) {
+  .tldr-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* W9: printing (SAVE CASE FILE) gives a one-page light case file of the 60-second read */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+  body > *:not(.tldr) {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .tldr {
+    position: static;
+    display: block !important;
+    opacity: 1;
+    background: #fff;
+    overflow: visible;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .tldr-in {
+    padding: 0;
+    color: #111;
+  }
+  .tldr .lab,
+  .tldr-p,
+  .tc-card span {
+    color: #444;
+  }
+  .tldr-h .grad {
+    -webkit-text-fill-color: #a100ff;
+  }
+  .tldr-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .tc-card {
+    background: #fff;
+    border-color: #ccc;
+    padding: 10px 12px;
+    break-inside: avoid;
+  }
+  .tc-card b {
+    font-size: 20px;
+    color: #111;
+  }
+  .tc-card span {
+    font-size: 11px;
+  }
+  .tc-card::after,
+  #close60,
+  #print60 {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .tc-t .l,
+  .tc-t::before,
+  .tc-t::after,
+  .press figure,
+  .snd.on .eq i,
   .ov-hint,
   .ov-rec i {
     animation: none;
   }
   .prs-roll {
     animation: none;
+  }
+  .press figure:first-child {
+    opacity: 1;
   }
   .cc,
   .holo {
