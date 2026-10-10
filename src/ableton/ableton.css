@@ -803,54 +803,171 @@
   align-items: flex-end;
 }
 .abl-doc {
+  position: relative;
+  overflow: hidden;
   width: 160px;
   aspect-ratio: 1 / 1.414;
   padding: 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
+  background: #030409;
+  border: 1px solid var(--hair);
   transform: rotate(-2deg);
   box-shadow: 0 30px 50px -24px rgba(0, 0, 0, 0.9);
 }
+/* the PDFs are all-dark now: a rain cover, dark inside pages, a drawn KeyLab on the card */
 .abl-doc.cover {
+  justify-content: flex-end;
+}
+.abl-doc.cover .rain {
+  position: absolute;
+  inset: 0;
   background:
-    radial-gradient(circle at 80% 10%, rgba(255, 0, 229, 0.3), transparent 50%),
-    radial-gradient(circle at 10% 90%, rgba(0, 239, 255, 0.22), transparent 55%), #07080f;
-  border: 1px solid var(--hair);
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 9px,
+      rgba(255, 0, 229, 0.22) 9px 10px,
+      transparent 10px 23px,
+      rgba(0, 239, 255, 0.16) 23px 24px
+    ),
+    repeating-linear-gradient(180deg, transparent 0 3px, rgba(3, 4, 9, 0.85) 3px 7px);
+  mask-image: linear-gradient(180deg, transparent, #000 25%, #000 55%, transparent 80%);
+}
+.abl-doc.cover > :not(.rain) {
+  position: relative;
+}
+.abl-doc.cover .seal {
+  position: absolute;
+  top: 16px;
+  right: 12px;
+  padding: 3px 6px;
+  border: 1px solid var(--mag);
+  outline: 1px solid rgba(0, 239, 255, 0.6);
+  outline-offset: 2px;
+  font-family: var(--head);
+  font-size: 13px;
+  color: #c86bff;
+  background: #030409;
+  transform: rotate(-6deg);
 }
 .abl-doc.page {
-  background: #efeef3;
   transform: rotate(1.5deg);
 }
 .abl-doc.card {
   width: 230px;
   aspect-ratio: 1.414 / 1;
-  background: #efeef3;
   transform: rotate(-1deg);
 }
 .abl-doc .dt {
   font-family: var(--head);
-  font-size: 20px;
+  font-size: 17px;
   line-height: 0.95;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
 }
 .abl-doc .dl {
   font-family: var(--mono);
-  font-size: 7px;
-  letter-spacing: 0.24em;
+  font-size: 6px;
+  letter-spacing: 0.22em;
   color: var(--t3);
 }
-.abl-doc.page .dl,
-.abl-doc.card .dl {
-  color: #6b6a75;
+.abl-doc .cn {
+  display: flex;
+  align-items: flex-end;
+  gap: 5px;
+  margin-bottom: 3px;
+  font-family: var(--head);
+  font-size: 13px;
+  line-height: 1;
+}
+.abl-doc .cn b {
+  font-size: 30px;
+  line-height: 0.8;
+  font-weight: 400;
+}
+.abl-doc .sc {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 7px;
+  border: 1px solid #1c1d26;
+  border-left: 2px solid #ff00e5;
+  background: #080911;
 }
 .abl-doc .ln {
-  height: 3px;
-  background: #d3d2da;
+  height: 2px;
+  background: #3a3b48;
 }
-.abl-doc .acc {
-  height: 3px;
+.abl-doc .ok {
+  width: 30%;
+  height: 2px;
+  background: #3ddc84;
+}
+.abl-doc .acc,
+.abl-doc .ft {
+  height: 2px;
   background: var(--grad);
+}
+.abl-doc .ft {
+  margin-top: auto;
+  opacity: 0.8;
+}
+.abl-doc .kl {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 6px 8px;
+  padding: 7px;
+  border-radius: 4px;
+  background: #15161d;
+}
+.abl-doc .pads {
+  display: grid;
+  grid-template-columns: repeat(4, 11px);
+  gap: 3px;
+}
+.abl-doc .pads i,
+.abl-doc .knobs i {
+  height: 11px;
+  border: 1px solid #00efff;
+  border-radius: 2px;
+}
+.abl-doc .pads i.m,
+.abl-doc .knobs i {
+  border-color: #ff00e5;
+}
+.abl-doc .knobs {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 3px;
+  align-self: start;
+}
+.abl-doc .knobs i {
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.abl-doc .keys {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 1px;
+  height: 22px;
+}
+.abl-doc .keys i {
+  flex: 1;
+  border-radius: 1px;
+  background: #ececf1;
+}
+.abl-doc .keys i.a {
+  background: #ffb547;
+}
+.abl-doc .to {
+  margin-top: auto;
+  padding: 4px 6px;
+  border: 1px solid #ffb547;
+  font-family: var(--mono);
+  font-size: 6px;
+  letter-spacing: 0.18em;
+  color: #ffb547;
 }
 
 .abl-dl-row {

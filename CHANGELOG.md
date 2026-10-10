@@ -5,10 +5,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Changed
+
+- **Ableton set:** the setup guide and stage card are redesigned and all-dark like the site: a digital-rain cover with the Nº404 seal, the KeyLab drawn with every control labelled, a signal-flow diagram, a setlist page with each song's six vocal chops, and a back cover like the site footer (10 pages). The download (v1.2, same project) now carries the new PDFs, and the previews on the page match them.
+
 ### Fixed
 
 - **Ableton set and Source Vault:** on opening, the menu no longer lights CREDITS (the scroll-spy measured the footer while it was still hidden); nothing is lit while the header is in view.
-- **Ableton set:** the big chapter numbers (01–09) are no longer clipped at the top and bottom; the PDF buttons sit side by side; the guide's page count is right (7 pages).
+- **Ableton set:** the big chapter numbers (01–09) are no longer clipped at the top and bottom; the PDF buttons sit side by side.
 
 ### Added
 
