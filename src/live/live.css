@@ -848,6 +848,59 @@ body.lv-learn [data-ctl] {
   outline: 1px dashed var(--cyan);
   outline-offset: 2px;
 }
+/* Ableton backup · standby: the page follows Ableton silently; TAKE OVER starts it from the same spot */
+.lv-standby {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 6px 6px 14px;
+  background: rgba(0, 0, 0, 0.82);
+  border: 1px solid var(--hair);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  z-index: 9;
+}
+.lv-standby[hidden] {
+  display: none;
+}
+.lv-standby b {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+}
+.lv-standby em {
+  font-style: normal;
+  color: rgba(244, 244, 248, 0.5);
+}
+.lv-standby .lv-sb-take {
+  color: var(--ghost, #f4f4f8);
+  border: 1px solid var(--hair);
+}
+.lv-standby.lost {
+  border-color: var(--amber, #ffb84d);
+}
+.lv-standby.lost em,
+.lv-standby.lost .lv-sb-take {
+  color: var(--amber, #ffb84d);
+}
+.lv-standby.lost .lv-sb-take {
+  border-color: var(--amber, #ffb84d);
+  animation: lv-sb-pulse 0.9s ease-in-out infinite;
+}
+@keyframes lv-sb-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lv-standby.lost .lv-sb-take {
+    animation: none;
+  }
+}
+
 .lv-toast {
   position: fixed;
   left: 50%;

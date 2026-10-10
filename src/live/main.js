@@ -19,6 +19,7 @@ import { PAD_DEFS, synthKit, vocalChop } from "./pads";
 import { MOVES, makeMoves } from "./moves";
 import { makeNotesEditor, noteFor, reload as reloadNotes, tagLines } from "./notes";
 import { makeRehearse } from "./rehearse";
+import { makeStandby } from "./standby";
 import { makeRemote } from "./remote";
 import { makeRuler } from "./ruler";
 import { startSafety, safetyRows } from "./safety";
@@ -493,6 +494,18 @@ function startShow() {
     lightsOn: () => lights.on,
   });
   setInterval(syncLights, 250);
+  standby = makeStandby({
+    engine: () => engine,
+    tl: () => TL,
+    toast,
+    midi: midiConnect,
+    hhmmss: (t) => `${Math.floor(t / 3600)}:${fmt(t % 3600).padStart(5, "0")}`,
+  });
+  $("#standbyBtn").onclick = () => {
+    if (S.locked) return;
+    setMenu(false);
+    standby.toggle();
+  };
   rehearse = makeRehearse($("#rehearseDrawer"), {
     engine: () => engine,
     tl: () => TL,
@@ -746,6 +759,7 @@ let setBuilder = null,
   ctrlWiz = null,
   remote = null,
   rehearse = null,
+  standby = null,
   capture = null;
 function paintMic(st) {
   const chip = $("#micChip");
@@ -1769,20 +1783,30 @@ try {
   midiMap = {};
 }
 let learnFor = null;
+// connect (once): true when MIDI is on
+async function midiConnect() {
+  if (midi.access) return true;
+  if (!navigator.requestMIDIAccess) {
+    toast("MIDI ISN'T AVAILABLE IN THIS BROWSER (USE CHROME OR EDGE)");
+    return false;
+  }
+  try {
+    midi.access = await navigator.requestMIDIAccess();
+  } catch {
+    toast("MIDI ACCESS WAS DECLINED");
+    return false;
+  }
+  const hook = () => midi.access.inputs.forEach((inp) => (inp.onmidimessage = onMidi));
+  hook();
+  midi.access.onstatechange = hook;
+  $("#midiBtn").classList.add("on");
+  $("#midiTxt").textContent = `MIDI · ${midi.access.inputs.size} IN`;
+  return true;
+}
 async function midi() {
-  if (!navigator.requestMIDIAccess) return toast("MIDI ISN'T AVAILABLE IN THIS BROWSER (USE CHROME OR EDGE)");
   if (!midi.access) {
-    try {
-      midi.access = await navigator.requestMIDIAccess();
-    } catch {
-      return toast("MIDI ACCESS WAS DECLINED");
-    }
-    const hook = () => midi.access.inputs.forEach((inp) => (inp.onmidimessage = onMidi));
-    hook();
-    midi.access.onstatechange = hook;
-    $("#midiBtn").classList.add("on");
-    $("#midiTxt").textContent = `MIDI · ${midi.access.inputs.size} IN`;
-    return toast("MIDI CONNECTED · TAP MIDI AGAIN TO LEARN");
+    if (await midiConnect()) toast("MIDI CONNECTED · TAP MIDI AGAIN TO LEARN");
+    return;
   }
   learnFor = learnFor ? null : "pick";
   document.body.classList.toggle("lv-learn", !!learnFor);
@@ -1807,6 +1831,7 @@ document.addEventListener(
   true,
 );
 function onMidi(e) {
+  if (standby?.feed(e.data)) return; // Ableton's position feed (channel 16 CC 110-115), never learnable
   const [st, d1, d2] = e.data;
   const type = st & 0xf0;
   const id = `${type === 0xb0 ? "cc" : "note"}:${st & 0x0f}:${d1}`;
